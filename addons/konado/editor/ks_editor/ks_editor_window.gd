@@ -254,11 +254,15 @@ func save_file() -> bool:
 		# 更新标签
 		file_label.text = "正在编辑: %s" % current_file_path.get_file()
 		
-		# 发送保存成功的信号（可选）
+		# 发送保存成功的信号
 		if Engine.is_editor_hint():
-			EditorInterface.get_resource_filesystem().scan()
+			#EditorInterface.get_resource_filesystem().scan()
+			# 强制触发重新导入
+			EditorInterface.get_resource_filesystem().reimport_files([current_file_path])
 		
 		print("文件已保存: %s" % current_file_path)
+		
+		
 		return true
 	push_error("无法保存文件: %s" % current_file_path)
 	return false

@@ -14,8 +14,6 @@ actor change 可娜 害羞
 
 "Kona" "今天想喝点什么？" 02
 
-#actor exit 可娜
-
 actor change 可娜 正常
 
 # 111
