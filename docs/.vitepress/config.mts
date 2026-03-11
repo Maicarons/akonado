@@ -125,6 +125,7 @@ export default defineConfig({
               { text: '元数据', link: '/script/meta-data' },
               { text: '普通对话', link: '/script/conversation' },
               { text: '分支', link: '/script/branch' },
+              { text: '条件分支', link: '/script/if-else-branch' },
               { text: '选项', link: '/script/option-to-jump' },
               {
                 text: '背景',
