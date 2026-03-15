@@ -36,6 +36,7 @@ signal on_dialogue_hide_completed
 		dialogue_text = value
 		update_dialogue_content()
 
+@export var dialogue_font_size: int = 24     ## 对话文本字体大小（新增）
 ## 打字间隔（单字符）
 @export var typing_interval: float = 0.4:
 	set(value):
@@ -88,6 +89,7 @@ var typing_tween: Tween = null
 
 func _ready() -> void:
 	self.modulate.a = 0.0
+	apply_dialogue_text_theme_settings()
 	update_dialogue_box_height()
 	
 	if enable_typing_effect_audio:
@@ -101,9 +103,13 @@ func _ready() -> void:
 		audio_player.autoplay = false
 		# 初始化随机间隔
 		current_random_interval = randf_range(min_audio_interval, max_audio_interval)
-		
-		
-		
+
+## 应用对话文本的主题设置
+func apply_dialogue_text_theme_settings() -> void:
+	if not is_inside_tree():
+		return
+	dialogue_label.add_theme_font_size_override("normal_font_size", dialogue_font_size)
+	
 ## 隐藏对话框（带透明度过渡动画）
 func hide_dialogue_box() -> void:
 	# 停止原有过渡动画，避免动画冲突
@@ -176,9 +182,12 @@ func update_dialogue_content() -> void:
 	if not is_inside_tree() or dialogue_text.is_empty():
 		return
 	
+	# 每次更新对话内容时，重新应用主题设置（确保字体大小/颜色生效）
+	apply_dialogue_text_theme_settings()
+	
 	update_dialogue_box_height()
 	dialogue_label.visible_ratio = 0
-	dialogue_label.text = dialogue_text
+	dialogue_label.text = dialogue_text  # 恢复原生text赋值，无需BBCode
 	await get_tree().process_frame
 	
 	# 停止原有打字动画
@@ -195,7 +204,6 @@ func update_dialogue_content() -> void:
 	# 优化：按**字符数**计算总时长
 	var total_typing_time = dialogue_text.length() * typing_interval
 	typing_tween.tween_property(dialogue_label, "visible_ratio", 1.0, total_typing_time).set_trans(Tween.TRANS_LINEAR)
-	
 
 ## 跳过打字机动画
 func skip_typing_anim() -> void:
