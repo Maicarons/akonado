@@ -53,9 +53,9 @@ signal on_dialogue_hide_completed
 
 @export_group("对话框设置")
 @export var dialogue_margins: int = 100     ## 对话框到底部距离
-@export var dialogue_bg: Texture2D          ## 对话框背景
+@export var dialogue_bg: StyleBox          ## 对话框背景
 @export var dialogue_color: Color = Color.WHITE ## 对话文字颜色
-@export var dialogue_hight_max: int = 300  ## 对话文本框最大高度
+@export var dialogue_height: int = 200  ## 对话文本框高度
 
 @export_group("按钮")
 @export var button_show: bool = false
@@ -82,7 +82,9 @@ var fade_tween: Tween = null
 @onready var dialogue_label: RichTextLabel = %dialogue_label
 @onready var progress_bar: TextureProgressBar = %ProgressBar
 @onready var next_button: Button = %Button
-@onready var dialogue_box_bg: NinePatchRect = %dialogue_box_bg
+@onready var dialogue_container: MarginContainer = %dialogue_container
+@onready var dialogue_box_bg: Panel = %dialogue_box_bg
+
 
 var typing_tween: Tween = null
 
@@ -168,13 +170,16 @@ func update_character_name() -> void:
 	character_name_label.label_settings.font_color = name_color
 	
 func update_dialogue_box_height() -> void:
-	# 计算文本高度并限制最大值
-	var text_hight: int = dialogue_label.get_content_height()
-	dialogue_label.size.y = min(text_hight, dialogue_hight_max)
-	dialogue_label.position.y = size.y - dialogue_label.size.y - dialogue_margins
-	# 适配对话框背景位置和尺寸
-	dialogue_box_bg.position.y = dialogue_label.position.y - 150
-	dialogue_box_bg.size.y = dialogue_label.size.y + 200
+	# 更改边距
+	dialogue_container.add_theme_constant_override("margin_left", dialogue_margins)
+	dialogue_container.add_theme_constant_override("margin_right",dialogue_margins)
+	dialogue_container.add_theme_constant_override("margin_bottom",dialogue_margins)
+	# 如果用户选择了背景
+	if dialogue_bg:
+		dialogue_box_bg.add_theme_stylebox_override("panel",dialogue_bg)
+	# 更改文本高度
+	dialogue_label.custom_minimum_size.y = dialogue_height
+	
 	
 func update_dialogue_content() -> void:
 	if next_button:

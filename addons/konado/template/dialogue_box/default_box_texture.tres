@@ -1,0 +1,15 @@
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://bma1rbavb1x58"]
+
+[ext_resource type="Texture2D" uid="uid://mxrma0a1bgu" path="res://addons/konado/template/dialogue_box/dialoguebox_01.png" id="1_ss4mn"]
+
+[resource]
+texture = ExtResource("1_ss4mn")
+texture_margin_left = 29.76223
+texture_margin_top = 59.85067
+texture_margin_right = 370.1975
+texture_margin_bottom = 29.85571
+expand_margin_left = 40.0
+expand_margin_top = 40.0
+expand_margin_right = 40.0
+expand_margin_bottom = 40.0
+region_rect = Rect2(0, 0, 1229, 278)
