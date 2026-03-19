@@ -78,6 +78,9 @@ enum DialogState
 
 var dialogueState: DialogState
 
+## 当前对话
+var cur_dialogue_shot:KND_Shot
+
 ## 读取对话列表的下标
 var cur_index: int
 
@@ -167,6 +170,9 @@ func init_dialogue(callback: Callable = Callable()) -> void:
 	if start_dialogue_shot == null:
 		push_error("未设置对话镜头")
 		return
+	else:
+		# 如果不为空，复制一份start_dialogue_shot（因为ifelse语句会改变它）
+		cur_dialogue_shot = start_dialogue_shot.duplicate()
 	# 将角色表传给acting_interface
 	_acting_interface.chara_list = chara_list
 
@@ -184,7 +190,7 @@ func init_dialogue(callback: Callable = Callable()) -> void:
 
 ## 设置对话数据的方法
 func set_shot(new_shot: KND_Shot) -> void:
-	self.start_dialogue_shot = new_shot
+	cur_dialogue_shot = new_shot.duplicate()
 	
 ## 设置角色表的方法
 func set_chara_list(chara_list: KND_CharacterList) -> void:
@@ -241,17 +247,17 @@ func _process(delta) -> void:
 			if justenter:
 				justenter = false
 				print_rich("[color=cyan][b]当前状态：[/b][/color][color=orange]播放状态[/color]")
-				if start_dialogue_shot == null:
+				if cur_dialogue_shot == null:
 					print_rich("[color=red]对话为空[/color]")
 					return
-				if start_dialogue_shot.dialogues.size() <= 0:
+				if cur_dialogue_shot.dialogues.size() <= 0:
 					print_rich("[color=red]对话为空[/color]")
 					_dialogue_goto_state(DialogState.OFF)
 					return
 				# 对话类型
-				cur_dialogue_type = start_dialogue_shot.dialogues[cur_index].dialog_type
+				cur_dialogue_type = cur_dialogue_shot.dialogues[cur_index].dialog_type
 				# 对话当前句
-				var dialog = start_dialogue_shot.dialogues[cur_index]
+				var dialog = cur_dialogue_shot.dialogues[cur_index]
 				dialogue_line_start.emit(cur_index)
 				# 隐藏选项
 				_konado_choice_interface._choice_container.hide()
@@ -351,13 +357,16 @@ func _process(delta) -> void:
 				# 如果是停止BGM
 				elif cur_dialogue_type == KND_Dialogue.Type.STOP_BGM:
 					_audio_interface.stop_bgm()
+					_dialogue_goto_state(DialogState.PAUSED)
 					_process_next()
 				# 如果是播放音效
 				elif cur_dialogue_type == KND_Dialogue.Type.PLAY_SOUND_EFFECT:
-					var s = _audio_interface.finish_playsoundeffect
-					s.connect(_auto_process_next.bind(s))
+					#var s = _audio_interface.finish_playsoundeffect
+					#s.connect(_auto_process_next.bind(s))
 					var se_name = dialog.soundeffect_name
 					_play_soundeffect(se_name)
+					_dialogue_goto_state(DialogState.PAUSED)
+					_process_next()
 				# if else分支
 				elif cur_dialogue_type == KND_Dialogue.Type.IFELSE_BRANCH:
 					print("ifelse分支对话")
@@ -375,11 +384,11 @@ func _process(delta) -> void:
 						else:
 							var insert_position = cur_index + 1
 							for i in range(tmp_dialogues.size()):
-								start_dialogue_shot.dialogues.insert(insert_position + i, tmp_dialogues[i])
+								cur_dialogue_shot.dialogues.insert(insert_position + i, tmp_dialogues[i])
 							await get_tree().process_frame
 							
 							print("添加了 %d 个ifelse对话" % tmp_dialogues.size())
-							print("当前对话总数: " + str(start_dialogue_shot.dialogues.size()))
+							print("当前对话总数: " + str(cur_dialogue_shot.dialogues.size()))
 					else:
 						printerr("无法获取变量")
 					
@@ -395,11 +404,11 @@ func _process(delta) -> void:
 						if tag_dialogues[i].dialog_type == KND_Dialogue.Type.BRANCH:
 							print_rich("[color=red]标签对话中不能包含标签对话[/color]")
 							continue
-						start_dialogue_shot.dialogues.insert(insert_position + i, tag_dialogues[i])
+						cur_dialogue_shot.dialogues.insert(insert_position + i, tag_dialogues[i])
 					await get_tree().process_frame
 					
 					print("添加了 %d 个标签对话" % tag_dialogues.size())
-					print("当前对话总数: " + str(start_dialogue_shot.dialogues.size()))
+					print("当前对话总数: " + str(cur_dialogue_shot.dialogues.size()))
 					
 					_dialogue_goto_state(DialogState.PAUSED)
 					_process_next()
@@ -457,7 +466,7 @@ func _process_next() -> void:
 			_audio_interface.stop_voice()
 			print("对话播放完成，开始播放下一个")
 			# 如果列表中所有对话播放完成了
-			if cur_index + 1 >= start_dialogue_shot.dialogues.size():
+			if cur_index + 1 >= cur_dialogue_shot.dialogues.size():
 				# 切换到对话关闭状态
 				_dialogue_goto_state(DialogState.OFF)
 			# 如果列表中还有对话没有播放
@@ -627,11 +636,13 @@ func _play_voice(voice_name: String) -> void:
 	_audio_interface.play_voice(target_voice)
 	pass
 
+signal play_sfx(se_name)
 ## 播放音效
 func _play_soundeffect(se_name: String) -> void:
 	if se_name == null:
 		return
 	var target_soundeffect: AudioStream
+	play_sfx.emit(se_name)
 	if soundeffect_list == null or soundeffect_list.soundeffects == null:
 		return # 判空
 	for soundeffect in soundeffect_list.soundeffects:
@@ -652,14 +663,14 @@ func on_option_triggered(choice: KND_DialogueChoice) -> void:
 ## 跳转到对话标签的方法
 func _jump_tag(tag: String) -> void:
 	print_rich("跳转到标签： " + str(tag))
-	if start_dialogue_shot.branches == null || start_dialogue_shot.branches.size() <= 0:
+	if cur_dialogue_shot.branches == null || cur_dialogue_shot.branches.size() <= 0:
 		printerr("该对话没有分支")
 		return
-	var target_dialogue: KND_Dialogue = start_dialogue_shot.branches[tag]
+	var target_dialogue: KND_Dialogue = cur_dialogue_shot.branches[tag]
 	if target_dialogue == null:
 		print("无法完成跳转，没有这个分支")
 		return
 	
-	start_dialogue_shot.dialogues.insert(cur_index + 1, target_dialogue)
-	print("插入标签，对话长度" + str(start_dialogue_shot.dialogues.size()))
+	cur_dialogue_shot.dialogues.insert(cur_index + 1, target_dialogue)
+	print("插入标签，对话长度" + str(cur_dialogue_shot.dialogues.size()))
 	_process_next()

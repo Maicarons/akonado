@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bcl2e6o0kb5dm"]
 
 [ext_resource type="PackedScene" uid="uid://bj8ynu8013j4j" path="res://addons/konado/template/konado_dialogue.tscn" id="1_57pxw"]
+[ext_resource type="Script" uid="uid://ct7rfs05wpar0" path="res://sample/demo/demo.gd" id="1_sgljs"]
 [ext_resource type="Resource" uid="uid://dtbwl6d1phfk0" path="res://sample/demo/demo_01.ks" id="2_grqbd"]
 [ext_resource type="Resource" uid="uid://gi0knny11y78" path="res://sample/demo/new_resource.tres" id="3_c17kf"]
 [ext_resource type="Resource" uid="uid://bf0o7uo4h3ta1" path="res://sample/demo/bg_list.tres" id="4_qcbmp"]
@@ -12,13 +13,13 @@
 
 [sub_resource type="Resource" id="Resource_dv03n"]
 script = ExtResource("7_grqbd")
-voice_name = "01"
+voice_name = "voice_01"
 voice = ExtResource("8_sgljs")
 metadata/_custom_type_script = "uid://i3l661i8g2yy"
 
 [sub_resource type="Resource" id="Resource_sgljs"]
 script = ExtResource("7_grqbd")
-voice_name = "02"
+voice_name = "voice_02"
 voice = ExtResource("9_grqbd")
 metadata/_custom_type_script = "uid://i3l661i8g2yy"
 
@@ -34,15 +35,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_sgljs")
 
 [node name="KonadoDialogueManager" parent="." unique_id=1487339260 instance=ExtResource("1_57pxw")]
 layout_mode = 1
 dialogue_variables = Dictionary[String, int]({
-"": 0,
-"love": 1
+"love": 0
 })
 start_dialogue_shot = ExtResource("2_grqbd")
 chara_list = ExtResource("3_c17kf")
 background_list = ExtResource("4_qcbmp")
 bgm_list = ExtResource("5_qcbmp")
 voice_list = SubResource("Resource_nuu33")
+
+[connection signal="play_sfx" from="KonadoDialogueManager" to="." method="_on_konado_dialogue_manager_play_sfx"]

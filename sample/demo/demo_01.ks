@@ -1,83 +1,37 @@
+# 播放bgm语句，<bgm名称>为背景列表中的bgm_name
 play bgm echo
 
+# 背景语句：
+# background bg1 windmill
+# background bg1 wave
+# background bg1 erase
+# background bg1 cyberglitch
+# 背景名称后面的代号为效果，效果有8种可以自己试试。
 background bg1 none
 
-actor show 可娜 正常 at 2 5 scale 0.3
+# 演员显示语句：actor show <角色名称> <角色状态> at <x坐标> <y坐标> scale <缩放比例> [mirror]
+# 写mirror会使演员镜像显示（位置不变）
+actor show 可娜 正常 at 3 5 scale 0.3
 
-"Kona" "你好！欢迎来到我们的咖啡馆。" 01
+# 对话语句：
+# 第一个""中为名字，第二个""中为对话内容，后面的编号为语音列表中的voice_name
+"Kona" "你好！欢迎来到我们的咖啡馆。" voice_01
 
-#jump res://sample/demo/demo_02.ks
+# 演员移动语句，1 5代表着屏幕分6*6=36份（默认），演员的基点在左1/6、下5/6处。
+# 屏幕划分份数可以在KonadoDialogueManager的UI Settings修改
+actor move 可娜 1 5
 
-actor move 可娜 4 5
+# 改变角色的表情
+actor change 可娜 介绍说话
 
-actor change 可娜 害羞
+"Kona" "和我一起用Konado做视觉小说吧！"
 
-"Kona" "今天想喝点什么？" 02
-
-actor change 可娜 正常
-
-# 111
-#background bg2 cyberglitch
-
-#global num_value += 1
-# 逻辑判断 %是获取变量
-if %love == 0:
-    "Kona" "今天想喝点什么？"
-#else:
-    "Kona" "又见面了朋友！"
-    "Kona" "又见面了！今天想喝点什么？"
-endif
+# 演员退出
+actor exit 可娜
 
 
-background bg1 windmill
+# 跳转语句，可以打开demo_02继续看示例文件的分支部分。
+jump res://sample/demo/demo_02.ks
 
-#background bg2 wave
-
-#background bg1 erase
-
-choice "Coffee" coffee_choice "Tea" tea_choice
-
-branch coffee_choice
-    "Kona" "很棒的选择！我们的咖啡都是现煮的。"
-    "Kona" "你想要热的还是冰的？"
-    choice "Hot" coffee_hot "Iced" coffee_iced
-
-branch coffee_hot
-    "Kona" "一杯热咖啡马上就来！"
-    "Kona" "一共4.5美元。请找位置坐，我很快给您送过去。"
-    end
-    
-branch coffee_iced
-    "Kona" "很适合暖和的天气！一杯冰咖啡马上准备。"
-    "Kona" "一共5美元。我这就为您制作。"
-    end
-
-branch tea_choice
-    "Kona" "非常好！我们有多种茶叶。"
-    "Kona" "你想要绿茶还是红茶？"
-    choice "Green tea" green_tea "Black tea" black_tea
-
-branch green_tea
-    "Kona" "绝佳的选择！我们的绿茶是从中国进口的。"
-    "Kona" "一共3.75美元。我会为您泡到最佳口感。"
-    end
-    
-branch black_tea
-    "Kona" "经典之选！我们的红茶味道浓郁醇厚。"
-    "Kona" "一共3.5美元。需要加牛奶还是柠檬？"
-    choice "Milk" with_milk "Lemon" with_lemon "Nothing, thanks" plain_tea
-    
-branch with_milk
-    "Kona" "红茶加牛奶——完美的搭配！"
-    "Kona" "我马上给您送过来。"
-    end
-        
-branch with_lemon
-    "Kona" "红茶加一片柠檬——很清爽！"
-    "Kona" "马上就来！"
-    end
-        
-branch plain_tea
-    "Kona" "简单又优雅。我这就为您准备红茶。"
-    "Kona" "请享用您的茶！"
-    end
+# 结束语句，是关闭对话框的作用
+end

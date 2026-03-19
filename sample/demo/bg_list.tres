@@ -3,7 +3,12 @@
 [ext_resource type="Script" uid="uid://di66ghc1qq8e5" path="res://addons/konado/scripts/background/knd_background.gd" id="1_84d5u"]
 [ext_resource type="Script" uid="uid://5aqgmxi8gxcw" path="res://addons/konado/scripts/background/knd_background_list.gd" id="2_71yj3"]
 [ext_resource type="Texture2D" uid="uid://bb7nhjioefh8a" path="res://sample/demo/sample_arts/示例-咖啡馆-背景.png" id="2_mfnc7"]
-[ext_resource type="Texture2D" uid="uid://jw3mdmdblgx8" path="res://assets/banner/2.2/konado-2.2-banner.png" id="3_mfnc7"]
+[ext_resource type="Texture2D" uid="uid://bo8u6nb7xuyl" path="res://sample/demo/sample_arts/01.png" id="3_4xo75"]
+[ext_resource type="Texture2D" uid="uid://ckrkayafsqgic" path="res://sample/demo/sample_arts/02.png" id="4_7sk0e"]
+[ext_resource type="Texture2D" uid="uid://cyhlk1hod47gb" path="res://sample/demo/sample_arts/结束.png" id="4_55st1"]
+[ext_resource type="Texture2D" uid="uid://djgrve3cuhwbb" path="res://sample/demo/sample_arts/03.png" id="5_vkseo"]
+[ext_resource type="Texture2D" uid="uid://djdy733ored5q" path="res://sample/demo/sample_arts/04.png" id="6_o1kv4"]
+[ext_resource type="Texture2D" uid="uid://c885teqil5cw5" path="res://sample/demo/sample_arts/geometry-frame_07.png" id="8_7sk0e"]
 
 [sub_resource type="Resource" id="Resource_84d5u"]
 script = ExtResource("1_84d5u")
@@ -13,11 +18,41 @@ metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_55st1"]
 script = ExtResource("1_84d5u")
-background_name = "bg2"
-background_image = ExtResource("3_mfnc7")
+background_name = "01"
+background_image = ExtResource("3_4xo75")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
+[sub_resource type="Resource" id="Resource_7oel1"]
+script = ExtResource("1_84d5u")
+background_name = "02"
+background_image = ExtResource("4_7sk0e")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
+[sub_resource type="Resource" id="Resource_dq7nf"]
+script = ExtResource("1_84d5u")
+background_name = "03"
+background_image = ExtResource("5_vkseo")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
+[sub_resource type="Resource" id="Resource_pq6qq"]
+script = ExtResource("1_84d5u")
+background_name = "04"
+background_image = ExtResource("6_o1kv4")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
+[sub_resource type="Resource" id="Resource_jcqqy"]
+script = ExtResource("1_84d5u")
+background_name = "bg_end"
+background_image = ExtResource("4_55st1")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
+[sub_resource type="Resource" id="Resource_vkseo"]
+script = ExtResource("1_84d5u")
+background_name = "00"
+background_image = ExtResource("8_7sk0e")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [resource]
 script = ExtResource("2_71yj3")
-background_list = Array[ExtResource("1_84d5u")]([SubResource("Resource_84d5u"), SubResource("Resource_55st1")])
+background_list = Array[ExtResource("1_84d5u")]([SubResource("Resource_84d5u"), SubResource("Resource_55st1"), SubResource("Resource_7oel1"), SubResource("Resource_dq7nf"), SubResource("Resource_pq6qq"), SubResource("Resource_jcqqy"), SubResource("Resource_vkseo")])
 metadata/_custom_type_script = "uid://5aqgmxi8gxcw"
