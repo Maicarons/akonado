@@ -14,10 +14,10 @@ signal shot_start
 signal shot_end
 
 ## 对话开始播放的信号
-signal dialogue_line_start(line: int)
+signal dialogue_line_start(node_id: String)
 
 ## 对话结束播放的信号
-signal dialogue_line_end(line: int)
+signal dialogue_line_end(node_id: String)
 
 ## 自定义信号
 signal custom_signal(content: String)
@@ -84,8 +84,8 @@ var dialogueState: DialogState
 ## 当前对话
 var cur_dialogue_shot:KND_Shot
 
-## 读取对话列表的下标
-var cur_index: int
+## 当前对话节点ID
+var cur_node_id: String = ""
 
 ## 是否第一进入当前句对话，由于一些方法只需要在首次进入当前行对话时调用一次，而一些方法需要循环调用（如检查打字动画是否完成的方法）
 ## 因此，需要判断是否第一次进入当前行对话
@@ -93,6 +93,12 @@ var justenter: bool
 
 ## 当前对话的类型
 var cur_dialogue_type: KND_Dialogue.Type
+
+## 获取当前对话节点
+func _current_dialogue() -> KND_Dialogue:
+	if cur_dialogue_shot == null or cur_node_id.is_empty():
+		return null
+	return cur_dialogue_shot.find_node(cur_node_id)
 
 ## 资源列表
 @export_category("Dialogue Resources")
@@ -181,7 +187,7 @@ func init_dialogue(callback: Callable = Callable()) -> void:
 		push_error("未设置对话镜头")
 		return
 	else:
-		# 如果不为空，复制一份start_dialogue_shot（因为ifelse语句会改变它）
+		# 如果不为空，复制一份start_dialogue_shot
 		cur_dialogue_shot = start_dialogue_shot.duplicate()
 	# 将角色表传给acting_interface
 	_acting_interface.chara_list = chara_list
@@ -190,10 +196,15 @@ func init_dialogue(callback: Callable = Callable()) -> void:
 	_acting_interface.delete_all_actor()
 
 	justenter = true
-	dialogueState == DialogState.OFF
-	cur_index = 0
+	dialogueState = DialogState.OFF
+	if cur_dialogue_shot.start_node_id and not cur_dialogue_shot.start_node_id.is_empty():
+		cur_node_id = cur_dialogue_shot.start_node_id
+	elif cur_dialogue_shot.dialogues.size() > 0:
+		cur_node_id = cur_dialogue_shot.dialogues[0].node_id
+	else:
+		cur_node_id = ""
 	print_rich("[color=yellow]初始化对话 [/color]" + "justenter: " + str(justenter) +
-	" 对话下标: " + str(cur_index) + " 当前状态: " + str(dialogueState))
+	" 当前节点ID: " + str(cur_node_id) + " 当前状态: " + str(dialogueState))
 	print("---------------------------------------------")
 	if callback:
 		callback.call()
@@ -201,6 +212,12 @@ func init_dialogue(callback: Callable = Callable()) -> void:
 ## 设置对话数据的方法
 func set_shot(new_shot: KND_Shot) -> void:
 	cur_dialogue_shot = new_shot.duplicate()
+	if cur_dialogue_shot.start_node_id and not cur_dialogue_shot.start_node_id.is_empty():
+		cur_node_id = cur_dialogue_shot.start_node_id
+	elif cur_dialogue_shot.dialogues.size() > 0:
+		cur_node_id = cur_dialogue_shot.dialogues[0].node_id
+	else:
+		cur_node_id = ""
 	
 ## 设置角色表的方法
 func set_chara_list(chara_list: KND_CharacterList) -> void:
@@ -232,9 +249,9 @@ func get_dialogue_variable(key: String) -> Dictionary:
 
 ## 开始对话的方法
 func start_dialogue() -> void:
-	if !_konado_choice_interface:
+	if _konado_choice_interface:
 		_konado_choice_interface.show()
-	if !_acting_interface:
+	if _acting_interface:
 		_acting_interface.show()
 	
 	_konado_dialogue_box.show_dialogue_box()
@@ -260,15 +277,14 @@ func _process(delta) -> void:
 				if cur_dialogue_shot == null:
 					print_rich("[color=red]对话为空[/color]")
 					return
-				if cur_dialogue_shot.dialogues.size() <= 0:
-					print_rich("[color=red]对话为空[/color]")
+				var dialog = _current_dialogue()
+				if dialog == null:
+					print_rich("[color=red]当前节点为空，节点ID: %s[/color]" % cur_node_id)
 					_dialogue_goto_state(DialogState.OFF)
 					return
 				# 对话类型
-				cur_dialogue_type = cur_dialogue_shot.dialogues[cur_index].dialog_type
-				# 对话当前句
-				var dialog = cur_dialogue_shot.dialogues[cur_index]
-				dialogue_line_start.emit(cur_index)
+				cur_dialogue_type = dialog.dialog_type
+				dialogue_line_start.emit(cur_node_id)
 				# 隐藏选项
 				_konado_choice_interface._choice_container.hide()
 				# 判断对话类型
@@ -391,47 +407,35 @@ func _process(delta) -> void:
 				elif cur_dialogue_type == KND_Dialogue.Type.IFELSE_BRANCH:
 					print("ifelse分支对话")
 					var target_value = dialog.target_value
-					var tmp_dialogues: Array[KND_Dialogue] = []
+					var condition_met = false
 					if get_dialogue_variable(dialog.varname).has("value"):
-						if target_value == get_dialogue_variable(dialog.varname).get("value"):
-							tmp_dialogues = dialog.if_result_dialogs
-						else:
-							tmp_dialogues = dialog.else_result_dialogs
-						if tmp_dialogues == null || tmp_dialogues.size() <= 0:
-							print("未满足条件或else无语句")
-							_dialogue_goto_state(DialogState.PAUSED)
-							_process_next()
-						else:
-							var insert_position = cur_index + 1
-							for i in range(tmp_dialogues.size()):
-								cur_dialogue_shot.dialogues.insert(insert_position + i, tmp_dialogues[i])
-							await get_tree().process_frame
-							
-							print("添加了 %d 个ifelse对话" % tmp_dialogues.size())
-							print("当前对话总数: " + str(cur_dialogue_shot.dialogues.size()))
+						condition_met = (target_value == get_dialogue_variable(dialog.varname).get("value"))
 					else:
-						printerr("无法获取变量")
-					
-					_dialogue_goto_state(DialogState.PAUSED)
-					_process_next()
-				# 如果是分支对话
+						printerr("无法获取变量: " + dialog.varname)
+
+					if condition_met and not dialog.if_next_id.is_empty():
+						# 条件成立，跳转到if分支
+						cur_node_id = dialog.if_next_id
+						_dialogue_goto_state(DialogState.PLAYING)
+					elif not condition_met and not dialog.else_next_id.is_empty():
+						# 条件不成立，跳转到else分支
+						cur_node_id = dialog.else_next_id
+						_dialogue_goto_state(DialogState.PLAYING)
+					else:
+						# 没有对应分支，走主线next_id
+						if not dialog.next_id.is_empty():
+							cur_node_id = dialog.next_id
+							_dialogue_goto_state(DialogState.PLAYING)
+						else:
+							_dialogue_goto_state(DialogState.OFF)
+				# 如果是分支对话（已弃用，直接跳到下一个节点）
 				elif cur_dialogue_type == KND_Dialogue.Type.BRANCH:
-					print_rich("[color=orange]分支对话[/color]")
-					var tag_dialogues: Array[KND_Dialogue] = dialog.branch_dialogue
-					var insert_position = cur_index + 1
-					for i in range(tag_dialogues.size()):
-						# 检查是否已经存在
-						if tag_dialogues[i].dialog_type == KND_Dialogue.Type.BRANCH:
-							print_rich("[color=red]标签对话中不能包含标签对话[/color]")
-							continue
-						cur_dialogue_shot.dialogues.insert(insert_position + i, tag_dialogues[i])
-					await get_tree().process_frame
-					
-					print("添加了 %d 个标签对话" % tag_dialogues.size())
-					print("当前对话总数: " + str(cur_dialogue_shot.dialogues.size()))
-					
-					_dialogue_goto_state(DialogState.PAUSED)
-					_process_next()
+					print_rich("[color=orange]分支对话（已弃用）[/color]")
+					if not dialog.next_id.is_empty():
+						cur_node_id = dialog.next_id
+						_dialogue_goto_state(DialogState.PLAYING)
+					else:
+						_dialogue_goto_state(DialogState.OFF)
 				# 如果是镜头跳转
 				elif cur_dialogue_type == KND_Dialogue.Type.JUMP:
 					var load_path = dialog.jump_shot_path
@@ -439,7 +443,6 @@ func _process(delta) -> void:
 						var res = load(load_path) as KND_Shot
 						print(res.dialogues)
 						_dialogue_goto_state(DialogState.OFF)
-						cur_index = 0
 						set_shot(res)
 						_dialogue_goto_state(DialogState.PLAYING)
 				# 信号触发
@@ -477,7 +480,7 @@ func isfinishtyping(wait_voice: bool) -> void:
 	
 ## 处理下一个，绑定到下一个按钮
 func _process_next() -> void:
-	dialogue_line_end.emit(cur_index)
+	dialogue_line_end.emit(cur_node_id)
 	print_rich("[color=yellow]判断状态[/color]")
 	match dialogueState:
 		DialogState.OFF:
@@ -492,13 +495,13 @@ func _process_next() -> void:
 		DialogState.PAUSED:
 			_audio_interface.stop_voice()
 			print("对话播放完成，开始播放下一个")
-			# 如果列表中所有对话播放完成了
-			if cur_index + 1 >= cur_dialogue_shot.dialogues.size():
+			# 检查是否还有下一个节点
+			var cur := _current_dialogue()
+			if cur == null or cur.next_id.is_empty() or cur_dialogue_shot.find_node(cur.next_id) == null:
 				# 切换到对话关闭状态
 				_dialogue_goto_state(DialogState.OFF)
-			# 如果列表中还有对话没有播放
 			else:
-				_nextline()
+				_goto_next_node()
 				# 切换到播放状态
 				_dialogue_goto_state(DialogState.PLAYING)
 			return
@@ -527,13 +530,15 @@ func _dialogue_goto_state(dialogstate: DialogState) -> void:
 	dialogueState = dialogstate
 	print_rich("[color=yellow]切换状态到: [/color]" + str(dialogueState))
 
-## 增加对话下标，下一句
-func _nextline() -> void:
-	cur_index += 1
+## 导航到下一个节点
+func _goto_next_node() -> void:
+	var node := _current_dialogue()
+	if node:
+		cur_node_id = node.next_id
 	print("---------------------------------------------")
 	# 打印时间 日期+时间
 	print("当前时间：" + str(Time.get_time_string_from_system()))
-	print("对话下标：" + str(cur_index))
+	print("导航到节点: %s" % cur_node_id)
 			
 ## 开始自动播放的方法
 func start_autoplay(value: bool):
@@ -681,26 +686,17 @@ func _play_soundeffect(se_name: String) -> void:
 	
 ## 选项触发方法
 func on_option_triggered(choice: KND_DialogueChoice) -> void:
-	_dialogue_goto_state(DialogState.PAUSED)
 	_konado_choice_interface._choice_container.hide()
-	_jump_tag(choice.jump_tag)
-	print("玩家选择按钮： " + str(choice.choice_text))
-	
-	
-## 跳转到对话标签的方法
-func _jump_tag(tag: String) -> void:
-	print_rich("跳转到标签： " + str(tag))
-	if cur_dialogue_shot.branches == null || cur_dialogue_shot.branches.size() <= 0:
-		printerr("该对话没有分支")
-		return
-	var target_dialogue: KND_Dialogue = cur_dialogue_shot.branches[tag]
-	if target_dialogue == null:
-		print("无法完成跳转，没有这个分支")
-		return
-	
-	cur_dialogue_shot.dialogues.insert(cur_index + 1, target_dialogue)
-	print("插入标签，对话长度" + str(cur_dialogue_shot.dialogues.size()))
-	_process_next()
+	dialogue_line_end.emit(cur_node_id)
+	print("玩家选择按钮: " + str(choice.choice_text))
+	if not choice.next_id.is_empty():
+		# 跳转到选项目标节点并开始播放
+		cur_node_id = choice.next_id
+		_dialogue_goto_state(DialogState.PLAYING)
+	else:
+		# 选项没有跳转目标，停止对话
+		print("选项没有跳转目标")
+		_dialogue_goto_state(DialogState.OFF)
 
 ## 保存游戏
 func save_game(save_id: int) -> bool:

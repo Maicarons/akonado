@@ -13,6 +13,7 @@ var current_file_path: String = ""
 var is_modified: bool = false
 var last_saved_content: String = ""
 
+
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		return
@@ -24,8 +25,7 @@ func _ready() -> void:
 	close_button.pressed.connect(close_file)
 	if code_editor:
 		code_editor.text_changed.connect(_on_text_changed)
-		
-	
+
 	# 初始化时如果没有打开文件，禁止编辑
 	call_deferred("update_editor_state")
 

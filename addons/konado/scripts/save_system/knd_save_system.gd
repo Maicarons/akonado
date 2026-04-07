@@ -247,8 +247,8 @@ func _capture_dialogue_state() -> Dictionary:
 	else:
 		print("当前镜头为空，未保存shot_path")
 	
-	# 保存当前对话索引
-	state["current_index"] = dialogue_manager.cur_index
+	# 保存当前对话节点ID
+	state["current_node_id"] = dialogue_manager.cur_node_id
 	
 	# 保存对话状态
 	state["dialogue_state"] = dialogue_manager.dialogueState
@@ -261,11 +261,11 @@ func _capture_dialogue_state() -> Dictionary:
 		print("保存角色名称: " + dialogue_manager._konado_dialogue_box.character_name)
 	else:
 		# 如果对话框不存在，尝试从当前镜头的对话列表中获取
-		if dialogue_manager.cur_dialogue_shot and dialogue_manager.cur_index >= 0 and dialogue_manager.cur_index < dialogue_manager.cur_dialogue_shot.dialogues.size():
-			var current_dialog = dialogue_manager.cur_dialogue_shot.dialogues[dialogue_manager.cur_index]
-			if current_dialog:
-				state["current_dialog_content"] = current_dialog.content
-				print("保存对话内容: " + current_dialog.content)
+		if dialogue_manager.cur_dialogue_shot:
+			var current_dialog = dialogue_manager._current_dialogue()
+			if current_dialog and current_dialog.dialog_content:
+				state["current_dialog_content"] = current_dialog.dialog_content
+				print("保存对话内容: " + current_dialog.dialog_content)
 	
 	return state
 
@@ -277,16 +277,16 @@ func _restore_dialogue_state(state: Dictionary) -> void:
 		if shot:
 			dialogue_manager.set_shot(shot)
 	
-	# 恢复对话索引
-	if state.has("current_index"):
-		# 确保对话索引不会超出对话列表长度
-		var index = state["current_index"]
-		if dialogue_manager.cur_dialogue_shot and dialogue_manager.cur_dialogue_shot.dialogues.size() > 0:
-			# 确保索引在有效范围内
-			index = clamp(index, 0, dialogue_manager.cur_dialogue_shot.dialogues.size() - 1)
-			dialogue_manager.cur_index = index
+	# 恢复对话节点ID
+	if state.has("current_node_id"):
+		var node_id: String = state["current_node_id"]
+		if dialogue_manager.cur_dialogue_shot and dialogue_manager.cur_dialogue_shot.find_node(node_id) != null:
+			dialogue_manager.cur_node_id = node_id
+		elif dialogue_manager.cur_dialogue_shot:
+			# 节点ID无效，回退到起始节点
+			dialogue_manager.cur_node_id = dialogue_manager.cur_dialogue_shot.start_node_id
 		else:
-			dialogue_manager.cur_index = 0
+			dialogue_manager.cur_node_id = ""
 	
 	# 恢复对话状态
 	if state.has("dialogue_state"):

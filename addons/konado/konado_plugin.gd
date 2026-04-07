@@ -33,6 +33,9 @@ var filesystem_dock: FileSystemDock
 var ks_tooltip_plugin: EditorResourceTooltipPlugin
 
 var ks_editor: KsEditorWindow
+var graph_editor: KndGraphEdit
+## 追踪当前活跃的编辑器: "ks" 或 "graph"
+var _active_editor: String = "ks"
 
 var inspector_plugin: EditorInspectorPlugin = null
 
@@ -58,23 +61,42 @@ func _enter_tree() -> void:
 	ks_editor = load("res://addons/konado/editor/ks_editor/ks_editor.tscn").instantiate() as KsEditorWindow
 	EditorInterface.get_editor_main_screen().add_child(ks_editor)
 	ks_editor.hide()
-	
+
+	# 初始化节点图编辑器（独立于KS文本编辑器）
+	graph_editor = KndGraphEdit.new()
+	graph_editor.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	graph_editor.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# 添加到编辑器主屏幕
+	EditorInterface.get_editor_main_screen().add_child(graph_editor)
+	graph_editor.hide()
+
 	var inspector_plugin = preload("res://addons/konado/audioeffect/audioeffect_inspector_plugin.gd").new()
 	# add_inspector_plugin完成注册
 	add_inspector_plugin(inspector_plugin)
 	
 # 控制显示
-func _make_visible(visible:bool) -> void:
-	if not ks_editor:
-		return
-
-	if ks_editor.get_parent() is Window:
-		if visible:
-			get_editor_interface().set_main_screen_editor("Script")
-			ks_editor.show()
-			ks_editor.get_parent().grab_focus()
+func _make_visible(visible: bool) -> void:
+	if visible:
+		if _active_editor == "graph":
+			if graph_editor:
+				graph_editor.show()
+			if ks_editor:
+				ks_editor.hide()
+		else:
+			if ks_editor:
+				if ks_editor.get_parent() is Window:
+					get_editor_interface().set_main_screen_editor("Script")
+					ks_editor.show()
+					ks_editor.get_parent().grab_focus()
+				else:
+					ks_editor.show()
+			if graph_editor:
+				graph_editor.hide()
 	else:
-		ks_editor.visible = visible
+		if ks_editor:
+			ks_editor.hide()
+		if graph_editor:
+			graph_editor.hide()
 
 func _exit_tree() -> void:
 	_cleanup_import_plugins()
@@ -85,18 +107,36 @@ func _exit_tree() -> void:
 		
 	if ks_editor:
 		EditorInterface.get_editor_main_screen().remove_child(ks_editor)
-	
+
+	if graph_editor:
+		EditorInterface.get_editor_main_screen().remove_child(graph_editor)
+
 	if inspector_plugin != null:
 		remove_inspector_plugin(inspector_plugin)
 		inspector_plugin = null
 	print("Konado unloaded")
 
-## 用于处理ks文件
+## 用于处理ks文件和KND_Shot资源
 func _handles(object: Object) -> bool:
 	if object is Resource and object.resource_path.get_extension() == "ks":
-		ks_editor.edit(object.resource_path)
+		return true
+	if object is KND_Shot:
 		return true
 	return false
+
+
+func _edit(object: Object) -> void:
+	if object is Resource and object.resource_path.get_extension() == "ks":
+		_active_editor = "ks"
+		ks_editor.edit(object.resource_path)
+		ks_editor.show()
+		graph_editor.hide()
+	elif object is KND_Shot:
+		_active_editor = "graph"
+		if graph_editor:
+			graph_editor.edit(object.resource_path)
+			graph_editor.show()
+		ks_editor.hide()
 	
 	
 
