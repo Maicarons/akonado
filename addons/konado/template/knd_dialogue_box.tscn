@@ -6,11 +6,21 @@
 [ext_resource type="Texture2D" uid="uid://cikw85v0iyjij" path="res://addons/konado/template/progress/love_progress_under.svg" id="4_npsm6"]
 [ext_resource type="StyleBox" uid="uid://bma1rbavb1x58" path="res://addons/konado/template/dialogue_box/default_box_texture.tres" id="5_kbhpi"]
 [ext_resource type="Texture2D" uid="uid://m3yl5jmfhhep" path="res://addons/konado/template/progress/love_progress.svg" id="5_r384c"]
+[ext_resource type="Shader" uid="uid://dvxdvdhi0klnr" path="res://addons/konado/typewriter/typewriter_fade.gdshader" id="7_7s3ph"]
+[ext_resource type="Script" uid="uid://bpdmh056bgwg7" path="res://addons/konado/typewriter/typewriter_text.gd" id="8_ee3rv"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_bewkk"]
 font_size = 42
 
-[node name="KonadoDialogueBox" type="Control" unique_id=1215106161]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7s3ph"]
+shader = ExtResource("7_7s3ph")
+shader_parameter/progress = 0.0
+shader_parameter/softness = 3.0
+shader_parameter/angle_rad = 0.0
+shader_parameter/spatial_blend = 0.15
+shader_parameter/rect_size = Vector2(1720, 120)
+
+[node name="KonadoDialogueBox" type="Control" unique_id=1215106161 node_paths=PackedStringArray("typewriter_text")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,6 +32,8 @@ size_flags_vertical = 4
 theme = ExtResource("1_t8rxq")
 script = ExtResource("2_c0wvo")
 typing_effect_audio = ExtResource("3_c0wvo")
+typewriter_mode = 1
+typewriter_text = NodePath("dialogue_container/VBoxContainer/KND_TypewriterText")
 
 [node name="dialogue_container" type="MarginContainer" parent="." unique_id=1266611211]
 unique_name_in_owner = true
@@ -81,21 +93,12 @@ custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 
-[node name="Button" type="Button" parent="dialogue_container/VBoxContainer/dialogue_label" unique_id=149827273]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.9
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -8.799988
-offset_bottom = 38.0
-grow_horizontal = 0
-grow_vertical = 0
-text = "确认按钮"
+[node name="KND_TypewriterText" type="Control" parent="dialogue_container/VBoxContainer" unique_id=1544237387]
+material = SubResource("ShaderMaterial_7s3ph")
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+script = ExtResource("8_ee3rv")
+metadata/_custom_type_script = "uid://bpdmh056bgwg7"
 
 [connection signal="gui_input" from="dialogue_container/VBoxContainer/character_name_label" to="." method="_on_character_name_label_gui_input"]
 [connection signal="gui_input" from="dialogue_container/VBoxContainer/dialogue_label" to="." method="_gui_input"]
-[connection signal="pressed" from="dialogue_container/VBoxContainer/dialogue_label/Button" to="." method="_on_button_pressed"]

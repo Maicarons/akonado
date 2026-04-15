@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=85 format=3 uid="uid://dy4cs3bqk267w"]
+[gd_resource type="Theme" format=3 uid="uid://dy4cs3bqk267w"]
 
 [ext_resource type="Texture2D" uid="uid://crovcslajuick" path="res://addons/konado/editor/theme/关闭按钮.png" id="1_6teqf"]
 [ext_resource type="Texture2D" uid="uid://c160sij6d1xop" path="res://addons/konado/editor/theme/透明.png" id="3_6tw67"]

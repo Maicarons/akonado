@@ -1,6 +1,6 @@
 [gd_resource type="SyntaxHighlighter" script_class="KND_KsHighlighter" format=3 uid="uid://dj1uoip1wfxuw"]
 
-[ext_resource type="Script" uid="uid://b7qcydfl4hoxc" path="res://addons/konado/editor/ks_editor/highlighter.gd" id="1_65n6k"]
+[ext_resource type="Script" uid="uid://b7qcydfl4hoxc" path="res://addons/konado/editor/ks_editor/ks_syntax_highlighter.gd" id="1_65n6k"]
 
 [resource]
 script = ExtResource("1_65n6k")

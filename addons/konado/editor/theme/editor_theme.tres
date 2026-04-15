@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=204 format=4 uid="uid://dwtf3ffxpbiox"]
+[gd_resource type="Theme" format=4 uid="uid://dwtf3ffxpbiox"]
 
 [ext_resource type="Script" uid="uid://c23lxbcsbwnj" path="res://addons/konado/editor/theme/tab_stylebox.gd" id="1_bdkje"]
 

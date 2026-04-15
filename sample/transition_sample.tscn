@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://di0hxh74j4qhe"]
+[gd_scene format=3 uid="uid://di0hxh74j4qhe"]
 
 [ext_resource type="Shader" uid="uid://dm7gh1epg25rd" path="res://addons/konado/shader/bg_trans_effects/cyber_glitch_effect.gdshader" id="1_4x34o"]
 [ext_resource type="Texture2D" uid="uid://bkrpa0r41e1n7" path="res://assets/banner/2.0/konado-2.0-banner.png" id="2_40i07"]

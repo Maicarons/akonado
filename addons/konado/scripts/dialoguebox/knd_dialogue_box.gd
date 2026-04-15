@@ -1,6 +1,12 @@
 extends Control
 class_name KND_DialogueBox
 
+## 打字机模式枚举
+enum TypewriterMode {
+	TRADITIONAL = 0,  ## 传统模式
+	FADE_IN_TYPEWRITER = 1  ## 淡入打字机模式
+}
+
 ## Konado对话框模板
 ## 可以自定义设置画面显示内容、位置、尺寸
 
@@ -68,6 +74,9 @@ signal on_dialogue_hide_completed
 @export var fade_trans_type: Tween.TransitionType = Tween.TRANS_SINE  ## 过渡动画曲线类型
 @export var fade_ease_type: Tween.EaseType = Tween.EASE_IN_OUT        ## 过渡动画缓动类型
 
+@export_group("打字机设置")
+@export var typewriter_mode: TypewriterMode = TypewriterMode.TRADITIONAL  ## 打字机模式
+
 # 动态音频播放器
 @onready var audio_player: AudioStreamPlayer = AudioStreamPlayer.new()
 # 音效状态变量 - 记录上一次播放时间、当前随机间隔
@@ -81,10 +90,11 @@ var fade_tween: Tween = null
 @onready var character_name_label: Label = %character_name_label
 @onready var dialogue_label: RichTextLabel = %dialogue_label
 @onready var progress_bar: TextureProgressBar = %ProgressBar
-@onready var next_button: Button = %Button
 @onready var dialogue_container: MarginContainer = %dialogue_container
 @onready var dialogue_box_bg: Panel = %dialogue_box_bg
 
+# TypewriterText 组件
+@export var typewriter_text: KND_TypewriterText
 
 var typing_tween: Tween = null
 
@@ -105,12 +115,36 @@ func _ready() -> void:
 		audio_player.autoplay = false
 		# 初始化随机间隔
 		current_random_interval = randf_range(min_audio_interval, max_audio_interval)
+	
+	# 根据打字机模式处理 TypewriterText 组件
+	if typewriter_mode == TypewriterMode.FADE_IN_TYPEWRITER:
+		create_typewriter_text()
+	else:
+		# 如果 TypewriterText 组件存在，则隐藏它并显示传统的 dialogue_label
+		if typewriter_text != null:
+			typewriter_text.hide()
+		dialogue_label.show()
 
 ## 应用对话文本的主题设置
 func apply_dialogue_text_theme_settings() -> void:
 	if not is_inside_tree():
 		return
 	dialogue_label.add_theme_font_size_override("normal_font_size", dialogue_font_size)
+	
+	# 如果使用 TypewriterText 模式，也应用主题设置
+	if typewriter_text != null:
+		typewriter_text.font_size = dialogue_font_size
+		typewriter_text.font_color = dialogue_color
+
+## 创建 TypewriterText 组件
+func create_typewriter_text() -> void:
+	# 连接信号
+	typewriter_text.typewriter_finished.connect(func():
+		typing_completed.emit()
+	)
+	
+	# 隐藏默认的 dialogue_label
+	dialogue_label.hide()
 	
 ## 隐藏对话框（带透明度过渡动画）
 func hide_dialogue_box() -> void:
@@ -180,10 +214,12 @@ func update_dialogue_box_height() -> void:
 	# 更改文本高度
 	dialogue_label.custom_minimum_size.y = dialogue_height
 	
+	# 如果使用 TypewriterText 模式，也设置其高度
+	if typewriter_text != null:
+		typewriter_text.size = Vector2(dialogue_container.size.x, dialogue_height)
+	
 	
 func update_dialogue_content() -> void:
-	if next_button:
-		next_button.hide()
 	if not is_inside_tree() or dialogue_text.is_empty():
 		return
 	
@@ -191,44 +227,77 @@ func update_dialogue_content() -> void:
 	apply_dialogue_text_theme_settings()
 	
 	update_dialogue_box_height()
-	dialogue_label.visible_ratio = 0
-	dialogue_label.text = dialogue_text  # 恢复原生text赋值，无需BBCode
-	await get_tree().process_frame
 	
-	# 停止原有打字动画
-	if typing_tween != null and typing_tween.is_running():
-		typing_tween.kill()
 	# 重置音效状态 - 重新打字时从头计算间隔
 	last_audio_play_time = 0.0
 	current_random_interval = randf_range(min_audio_interval, max_audio_interval)
 	
-	# 创建新的打字动画
-	typing_tween = get_tree().create_tween()
-	typing_tween.finished.connect(func(): 
-		typing_completed.emit())
-	# 优化：按**字符数**计算总时长
-	var total_typing_time = dialogue_text.length() * typing_interval
-	typing_tween.tween_property(dialogue_label, "visible_ratio", 1.0, total_typing_time).set_trans(Tween.TRANS_LINEAR)
+	# 根据打字机模式选择不同的更新方式
+	if typewriter_mode == TypewriterMode.FADE_IN_TYPEWRITER:
+		# 淡入打字机模式
+		if typewriter_text == null:
+			create_typewriter_text()
+		else:
+			typewriter_text.set_bbcode(dialogue_text, true)
+	else:
+		# 传统模式
+		dialogue_label.visible_ratio = 0
+		dialogue_label.text = dialogue_text  # 恢复原生text赋值，无需BBCode
+		await get_tree().process_frame
+		
+		# 停止原有打字动画
+		if typing_tween != null and typing_tween.is_running():
+			typing_tween.kill()
+		
+		# 创建新的打字动画
+		typing_tween = get_tree().create_tween()
+		typing_tween.finished.connect(func(): 
+			typing_completed.emit())
+		# 优化：按**字符数**计算总时长
+		var total_typing_time = dialogue_text.length() * typing_interval
+		typing_tween.tween_property(dialogue_label, "visible_ratio", 1.0, total_typing_time).set_trans(Tween.TRANS_LINEAR)
 
 ## 跳过打字机动画
 func skip_typing_anim() -> void:
-	# 如果打字动画正在运行，则中断并跳过
-	if typing_tween != null and typing_tween.is_running():
-		# 停止打字动画
-		typing_tween.kill()
-		# 直接显示完整文本
-		dialogue_label.visible_ratio = 1.0
-		
-		if enable_typing_effect_audio and audio_player.is_playing():
-			audio_player.stop()
-		# 重置音效状态
-		last_audio_play_time = 0.0
-		current_random_interval = randf_range(min_audio_interval, max_audio_interval)
-		typing_completed.emit()
+	# 根据打字机模式选择不同的跳过方式
+	if typewriter_mode == TypewriterMode.FADE_IN_TYPEWRITER:
+		# 淡入打字机模式
+		if typewriter_text != null and typewriter_text.is_playing():
+			typewriter_text.skip()
+			
+			if enable_typing_effect_audio and audio_player.is_playing():
+				audio_player.stop()
+			# 重置音效状态
+			last_audio_play_time = 0.0
+			current_random_interval = randf_range(min_audio_interval, max_audio_interval)
+			typing_completed.emit()
+	else:
+		# 传统模式
+		# 如果打字动画正在运行，则中断并跳过
+		if typing_tween != null and typing_tween.is_running():
+			# 停止打字动画
+			typing_tween.kill()
+			# 直接显示完整文本
+			dialogue_label.visible_ratio = 1.0
+			
+			if enable_typing_effect_audio and audio_player.is_playing():
+				audio_player.stop()
+			# 重置音效状态
+			last_audio_play_time = 0.0
+			current_random_interval = randf_range(min_audio_interval, max_audio_interval)
+			typing_completed.emit()
 
 func _process(delta: float) -> void:
 	# 仅当打字动画运行、文本非空时，处理音效逻辑
-	if not (typing_tween and typing_tween.is_running() and not dialogue_text.is_empty()):
+	var is_typing = false
+	if typewriter_mode == TypewriterMode.FADE_IN_TYPEWRITER:
+		# 淡入打字机模式
+		is_typing = typewriter_text != null and typewriter_text.is_playing() and not dialogue_text.is_empty()
+	else:
+		# 传统模式
+		is_typing = typing_tween and typing_tween.is_running() and not dialogue_text.is_empty()
+	
+	if not is_typing:
 		return
 	
 	# 获取当前运行时间（秒），用于计算时间间隔
@@ -237,7 +306,17 @@ func _process(delta: float) -> void:
 	var time_since_last_play = current_time - last_audio_play_time
 	
 	if enable_typing_effect_audio:
-		if time_since_last_play > current_random_interval and randf() < audio_trigger_chance and dialogue_label.visible_ratio < 0.98:
+		var should_play = false
+		if typewriter_mode == TypewriterMode.FADE_IN_TYPEWRITER:
+			# 淡入打字机模式：检查进度
+			var progress = typewriter_text.get_progress()
+			var total_chars = dialogue_text.length()
+			should_play = progress < float(total_chars)
+		else:
+			# 传统模式：检查 visible_ratio
+			should_play = dialogue_label.visible_ratio < 0.98
+		
+		if time_since_last_play > current_random_interval and randf() < audio_trigger_chance and should_play:
 			# 防重叠
 			audio_player.stop()
 			audio_player.play()
