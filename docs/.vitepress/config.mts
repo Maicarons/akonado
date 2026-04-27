@@ -188,6 +188,14 @@ export default defineConfig({
             ]
           },
           {
+            text: 'Konado设置系统',
+            items: [
+              { text: '安装', link: '/konado_settings/konadosettings-install' },
+              { text: '配置文件', link: '/konado_settings/konado-config' },
+              { text: '使用API', link: '/konado_settings/konadosettings-api' }
+            ]
+          },
+          {
             text: 'Konado成就系统',
             items: [
               { text: '安装', link: '/kndachievement/install_kndachievement' },

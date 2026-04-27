@@ -855,6 +855,7 @@ Button/styles/normal = SubResource("StyleBoxEmpty_hpnxh")
 Button/styles/pressed = SubResource("StyleBoxFlat_3di37")
 ButtonContainer/base_type = &"Panel"
 ButtonContainer/styles/panel = SubResource("StyleBoxFlat_b0usx")
+CheckBox/constants/icon_max_width = 40
 GraphEdit/colors/activity = Color(1, 0.0286458, 0.0286458, 1)
 GraphEdit/colors/connection_hover_tint_color = Color(0, 0.655951, 1, 0.686275)
 GraphEdit/colors/connection_rim_color = Color(0.17, 0.17, 0.17, 0.396078)

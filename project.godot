@@ -30,6 +30,7 @@ config/icon="uid://b5olx2vwoscbr"
 
 KonadoAPI="*uid://ptylvcqylq7j"
 KND_AchievementManager="*uid://dlhxd0ixnuo6i"
+KND_Settings="*uid://crc32ueqs8u1w"
 KND_WebTool="*uid://b4rup11rlc0uk"
 
 [display]
@@ -44,7 +45,7 @@ project/assembly_name="Konado"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/konado/plugin.cfg", "res://addons/konado_achievement/plugin.cfg", "res://addons/konadowebtool/plugin.cfg")
+enabled=PackedStringArray("res://addons/konado/plugin.cfg", "res://addons/konado_achievement/plugin.cfg", "res://addons/konado_settings/plugin.cfg", "res://addons/konado_webtool/plugin.cfg")
 
 [gui]
 

@@ -1,0 +1,140 @@
+{
+	"categories": [
+		{
+			"id": "audio",
+			"display_name": "音频",
+			"items": [
+				{
+					"key": "master_volume",
+					"label": "主音量",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"],
+					"tooltip": "调节游戏的整体音量"
+				},
+				{
+					"key": "music_volume",
+					"label": "音乐音量",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 0.8,
+					"platforms": ["all"]
+				},
+				{
+					"key": "sfx_volume",
+					"label": "音效音量",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"]
+				},
+				{
+					"key": "voice_volume",
+					"label": "语音音量",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"]
+				}
+			]
+		},
+		{
+			"id": "text",
+			"display_name": "文本播放",
+			"items": [
+				{
+					"key": "text_speed",
+					"label": "文字速度",
+					"type": 0,
+					"min_value": 0.01,
+					"max_value": 0.2,
+					"step": 0.005,
+					"default_value": 0.05,
+					"platforms": ["all"]
+				},
+				{
+					"key": "auto_delay",
+					"label": "自动等待",
+					"type": 0,
+					"min_value": 1.0,
+					"max_value": 5.0,
+					"step": 0.5,
+					"default_value": 2.0,
+					"platforms": ["all"]
+				},
+				{
+					"key": "auto_mode",
+					"label": "自动模式",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "skip_read",
+					"label": "跳过已读",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "skip_all",
+					"label": "跳过全部",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				}
+			]
+		},
+		{
+			"id": "display",
+			"display_name": "画面",
+			"items": [
+				{
+					"key": "fullscreen",
+					"label": "全屏",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "language",
+					"label": "语言",
+					"type": 2,
+					"options": ["zh", "en", "ja"],
+					"default_value": "zh",
+					"platforms": ["all"]
+				},
+				{
+					"key": "debug_mode",
+					"label": "调试模式",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["debug"]
+				},
+				{
+					"key": "windows_only",
+					"label": "Windows专属",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["windows"]
+				},
+				{
+					"key": "mobile_only",
+					"label": "移动设备专属",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["android", "ios"]
+				}
+			]
+		}
+	]
+}
