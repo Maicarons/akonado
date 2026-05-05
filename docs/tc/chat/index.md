@@ -1,5 +1,6 @@
 ---
 layout: home
+sidebar_hidden: true
 
 hero:
   name: "Konado"

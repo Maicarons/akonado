@@ -1,5 +1,11 @@
 import { defineConfig } from 'vitepress'
-import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid';
+import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid'
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
+import { genZhSidebar, genEnSidebar, genTcSidebar } from './genSidebar'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const docsRoot = resolve(__dirname, '..')
 
 export default defineConfig({
 
@@ -7,7 +13,7 @@ export default defineConfig({
 
   markdown: {
     config(md) {
-      md.use(MermaidMarkdown);
+      md.use(MermaidMarkdown)
     },
   },
   vite: {
@@ -47,7 +53,7 @@ export default defineConfig({
       {
         icon:
         {
-          svg: '<svg t="1752549910319" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4388" width="200" height="200"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#FFAD16" p-id="4389"></path><path d="M500.053333 571.733333s-8.533333-25.6-8.533333-35.84v-5.12c0-58.026667 46.08-105.813333 100.693333-105.813333 27.306667 0 52.906667 5.12 71.68 25.6 13.653333-15.36 32.426667-22.186667 52.906667-23.893333-5.12-81.92-69.973333-153.6-150.186667-153.6-40.96 0-80.213333 17.066667-107.52 47.786666C431.786667 290.133333 392.533333 273.066667 351.573333 273.066667c-83.626667 0-150.186667 69.973333-150.186666 155.306666v8.533334c0 15.36 3.413333 32.426667 10.24 49.493333v1.706667c46.08 109.226667 221.866667 237.226667 230.4 242.346666 5.12 3.413333 10.24 5.12 15.36 5.12 5.12 0 11.946667-1.706667 15.36-5.12 3.413333-3.413333 39.253333-27.306667 88.746666-69.973333-27.306667-25.6-49.493333-58.026667-61.44-88.746667z m0 0" fill="#FFFFFF" p-id="4390"></path><path d="M815.786667 539.306667c0-49.493333-39.253333-88.746667-85.333334-88.746667-23.893333 0-46.08 10.24-61.44 27.306667-15.36-17.066667-37.546667-27.306667-61.44-27.306667-47.786667 0-85.333333 40.96-85.333333 88.746667v6.826666c0 8.533333 1.706667 18.773333 6.826667 29.013334v1.706666c25.6 63.146667 128 134.826667 131.413333 138.24 3.413333 1.706667 5.12 3.413333 8.533333 3.413334s6.826667-1.706667 8.533334-3.413334c3.413333-3.413333 90.453333-64.853333 124.586666-122.88 1.706667-1.706667 1.706667-3.413333 3.413334-5.12v-1.706666c1.706667-3.413333 3.413333-8.533333 5.12-11.946667 3.413333-8.533333 5.12-17.066667 5.12-25.6V546.133333v-6.826666z m0 0" fill="#FFFFFF" p-id="4391"></path></svg>'
+          svg: '<svg t="1752549910319" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4388" width="200" height="200"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#FFAD16" p-id="4389"></path><path d="M500.053333 571.733333s-8.533333-25.6-8.533333-35.84v-5.12c0-58.026667 46.08-105.813333 100.693333-105.813333 27.306667 0 52.906667 5.12 71.68 25.6 13.653333-15.36 32.426667-22.186667 52.906667-23.893333-5.12-81.92-69.973333-153.6-150.186667-153.6-40.96 0-80.213333 17.066667-107.52 47.786666C431.786667 290.133333 392.533333 273.066667 351.573333 273.066667c-83.626667 0-150.186667 69.973333-150.186666 155.306667v8.533334c0 15.36 3.413333 32.426667 10.24 49.493333v1.706667c46.08 109.226667 221.866667 237.226667 230.4 242.346666 5.12 3.413333 10.24 5.12 15.36 5.12 5.12 0 11.946667-1.706667 15.36-5.12 3.413333-3.413333 39.253333-27.306667 88.746666-69.973333-27.306667-25.6-49.493333-58.026667-61.44-88.746667z m0 0" fill="#FFFFFF" p-id="4390"></path><path d="M815.786667 539.306667c0-49.493333-39.253333-88.746667-85.333334-88.746667-23.893333 0-46.08 10.24-61.44 27.306667-15.36-17.066667-37.546667-27.306667-61.44-27.306667-47.786667 0-85.333333 40.96-85.333333 88.746667v6.826666c0 8.533333 1.706667 18.773333 6.826667 29.013334v1.706666c25.6 63.146667 128 134.826667 131.413333 138.24 3.413333 1.706667 5.12 3.413333 8.533333 3.413334s6.826667-1.706667 8.533334-3.413334c3.413333-3.413333 90.453333-64.853333 124.586666-122.88 1.706667-1.706667 1.706667-3.413333 3.413334-5.12v-1.706666c1.706667-3.413333 3.413333-8.533333 5.12-11.946667 3.413333-8.533333 5.12-17.066667 5.12-25.6V546.133333v-6.826666z m0 0" fill="#FFFFFF" p-id="4391"></path></svg>'
         }, link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377'
       }
     ],
@@ -59,7 +65,7 @@ export default defineConfig({
 
   locales: {
 
-    root: {
+    zh: {
       label: '简体中文',
       lang: 'zh-CN',
       description: 'Konado: 视觉小说框架',
@@ -95,133 +101,12 @@ export default defineConfig({
           }
         },
         nav: [
-          {
-            text: 'Godot Hub', link: 'https://godothub.com'
-          },
-          {
-            text: '查看文档', link: '/tutorial/install'
-          },
-          {
-            text: '下载插件', link: 'https://github.com/godothub/konado/releases/latest'
-          },
-          {
-            text: '赞助我们', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377'
-          }
+          { text: 'Godot Hub', link: 'https://godothub.com' },
+          { text: '查看文档', link: '/zh/tutorial/install' },
+          { text: '下载插件', link: 'https://github.com/godothub/konado/releases/latest' },
+          { text: '赞助我们', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: [
-          {
-            text: '基础教程',
-            items: [
-              { text: '安装Konado', link: '/tutorial/install' },
-              { text: '对话配置文件', link: '/tutorial/profiles' },
-              { text: '演员坐标与缩放', link: '/tutorial/actor-coordinate-and-scaling' },
-              { text: '自定义对话框', link: '/tutorial/customize-the-dialogbox' },
-              { text: '打字机动效', link: '/tutorial/typewriter-effect' },
-              { text: '打字机音效', link: '/tutorial/typewriter-sound-effect' }
-            ]
-          },
-          {
-            text: 'Konado Script',
-            items: [
-              { text: '脚本介绍', link: '/script/konado-script' },
-              { text: '元数据', link: '/script/meta-data' },
-              { text: '普通对话', link: '/script/conversation' },
-              { text: '分支', link: '/script/branch' },
-              { text: '条件分支', link: '/script/if-else-branch' },
-              { text: '信号', link: '/script/dolphin-signal' },
-              { text: '选项', link: '/script/option-to-jump' },
-              {
-                text: '背景',
-                collapsed: true,
-                items: [
-                  { text: '背景切换', link: '/script/background-switch' }
-                ]
-              },
-              {
-                text: '演员',
-                collapsed: true,
-                items: [
-                  { text: '创建演员', link: '/script/create-actor' },
-                  { text: '演员退场', link: '/script/actor-leave' },
-                  { text: '演员移动', link: '/script/actor-move' },
-                  { text: '演员切换状态', link: '/script/actor-change-state' }
-                ]
-              },
-              {
-                text: '音频',
-                collapsed: true,
-                items: [
-                  { text: '播放背景音乐', link: '/script/play-bgm.md' },
-                  { text: '停止背景音乐', link: '/script/stop-bgm.md' },
-                  { text: '播放音效', link: '/script/play-sound-effect.md' }
-                ]
-              },
-              {
-                text: '结束对话', link: '/script/end-the-conversation.md' 
-              }
-            ]
-          },
-          {
-            text: '开发',
-            items: [
-              {
-                text: '核心功能', items: [
-                  { text: '对话数据', link: '/develop/core/shot-and-dialogue.md' },
-                  { text: '存档系统', link: '/develop/core/save-system.md' },
-                  { text: '背景切换特效', link: '/develop/core/bg-trans-effect.md' },
-                  { text: 'Logger', link: '/develop/core/logger.md' },
-                  { text: '语法高亮器', link: '/develop/core/ks-editor-highlighter.md' }                
-                ]
-              },
-              { text: '版本规划', link: '/develop/roadmap' },
-              { text: '代码贡献', link: '/develop/code-contribute' },
-              { text: '文档贡献', link: '/develop/doc-contribute' },
-              { text: '翻译贡献', link: '/develop/translate-contribute' },
-              { text: '问题反馈', link: '/develop/feedback' }
-            ]
-          },
-          {
-            text: 'Konado .NET API',
-            items: [
-              { text: '安装', link: '/konadotnet/install_konadotnet' },
-              { text: '使用API', link: '/konadotnet/konadotnet_api' }
-            ]
-          },
-          {
-            text: 'Konado设置系统',
-            items: [
-              { text: '安装', link: '/konado_settings/konadosettings-install' },
-              { text: '配置文件', link: '/konado_settings/konado-config' },
-              { text: '使用API', link: '/konado_settings/konadosettings-api' }
-            ]
-          },
-          {
-            text: 'Konado成就系统',
-            items: [
-              { text: '安装', link: '/kndachievement/install_kndachievement' },
-              { text: '成就系统', link: '/kndachievement/achievement-system' },
-              { text: '使用API', link: '/kndachievement/achievement-api' }
-            ]
-
-          },
-          {
-            text: 'Konado WebTool',
-            items: [
-              { text: '安装', link: '/konado_webtool/install_konado_webtool' },
-              { text: '使用WebTool', link: '/konado_webtool/konado_webtool' }
-            ]
-          },
-          {
-            text: '关于',
-            items: [
-              { text: '关于Konado', link: '/about/konado' },
-              { text: '看板娘Kona', link: '/about/kona' },
-              { text: '海报', link: '/about/banner' },
-              { text: '许可证', link: '/about/license' },
-              { text: '鸣谢', link: '/about/thanks' }
-            ]
-          }
-        ]
+        sidebar: genZhSidebar(docsRoot)
       }
     },
 
@@ -261,104 +146,12 @@ export default defineConfig({
           }
         },
         nav: [
-          {
-            text: 'Godot Hub', link: 'https://godothub.com'
-          },
-          {
-            text: '查看文檔', link: '/tc/tutorial/install'
-          },
-          {
-            text: '下載插件', link: 'https://github.com/godothub/konado/releases/latest'
-          },
-          {
-            text: '贊助我們', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377'
-          }
+          { text: 'Godot Hub', link: 'https://godothub.com' },
+          { text: '查看文檔', link: '/tc/tutorial/install' },
+          { text: '下載插件', link: 'https://github.com/godothub/konado/releases/latest' },
+          { text: '贊助我們', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: [
-          {
-            text: '基礎教程',
-            items: [
-              { text: '安裝Konado', link: '/tc/tutorial/install' },
-              { text: '對話配置文件', link: '/tc/tutorial/profiles' },
-              { text: '演員坐標與縮放', link: '/tc/tutorial/actor-coordinate-and-scaling' },
-              { text: '自定義對話框', link: '/tc/tutorial/customize-the-dialogbox' }
-            ]
-          },
-          {
-            text: 'Konado Script',
-            items: [
-              { text: '腳本介紹', link: '/tc/script/konado-script' },
-              { text: '元數據', link: '/tc/script/meta-data' },
-              { text: '普通對話', link: '/tc/script/conversation' },
-              { text: '分支', link: '/tc/script/branch' },
-              { text: '選項', link: '/tc/script/option-to-jump' },
-              {
-                text: '背景',
-                collapsed: true,
-                items: [
-                  { text: '背景切換', link: '/tc/script/background-switch' }
-                ]
-              },
-              {
-                text: '演員',
-                collapsed: true,
-                items: [
-                  { text: '創建演員', link: '/tc/script/create-actor' },
-                  { text: '演員退場', link: '/tc/script/actor-leave' },
-                  { text: '演員移動', link: '/tc/script/actor-move' },
-                  { text: '演員切換狀態', link: '/tc/script/actor-change-state' }
-                ]
-              },
-              {
-                text: '音頻',
-                collapsed: true,
-                items: [
-                  { text: '播放背景音樂', link: '/tc/script/play-bgm.md' },
-                  { text: '停止背景音樂', link: '/tc/script/stop-bgm.md' },
-                  { text: '播放音效', link: '/tc/script/play-sound-effect.md' }
-                ]
-              },
-              {
-                text: '结束对话', link: '/script/end-the-conversation.md'
-              }
-            ]
-          },
-          {
-            text: '開發',
-            items: [
-              {
-                text: '核心功能指南', items: [
-                  { text: '對話數據', link: '/tc/develop/core/shot-and-dialogue.md' },
-                  { text: '背景切換特效', link: '/tc/develop/core/bg-trans-effect.md' },
-                  { text: 'Logger', link: '/tc/develop/core/logger.md' },
-                ]
-              },
-              { text: '版本規劃', link: '/tc/develop/roadmap' },
-              { text: '代碼貢獻', link: '/tc/develop/code-contribute' },
-              { text: '文檔貢獻', link: '/tc/develop/doc-contribute' },
-              { text: '翻譯貢獻', link: '/tc/develop/translate-contribute' },
-              { text: '問題反饋', link: '/tc/develop/feedback' }
-            ]
-          },
-          {
-            text: 'Konado .NET API',
-            items: [
-              { text: '安裝', link: '/tc/konadotnet/install_konadotnet' },
-              { text: '使用API', link: '/tc/konadotnet/konadotnet_api' }
-            ]
-
-          },
-          {
-            text: '關於',
-            items: [
-              { text: '關於Konado', link: '/tc/about/konado' },
-              { text: '看板娘Kona', link: '/tc/about/kona' },
-              { text: '海報', link: '/tc/about/banner' },
-              { text: '許可證', link: '/tc/about/license' },
-              { text: '鳴謝', link: '/tc/about/thanks' }
-            ]
-          }
-        ]
+        sidebar: genTcSidebar(docsRoot)
       }
     },
 
@@ -373,121 +166,12 @@ export default defineConfig({
           text: 'Edit this page online'
         },
         nav: [
-          {
-            text: 'Godot Hub', link: 'https://godothub.com'
-          },
-          {
-            text: 'Documentation', link: '/en/tutorial/install'
-          },
-          {
-            text: 'Download Plugin', link: 'https://github.com/godothub/konado/releases/latest'
-          },
-          {
-            text: 'Sponsor Us', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377'
-          }
+          { text: 'Godot Hub', link: 'https://godothub.com' },
+          { text: 'Documentation', link: '/en/tutorial/install' },
+          { text: 'Download Plugin', link: 'https://github.com/godothub/konado/releases/latest' },
+          { text: 'Sponsor Us', link: 'https://afdian.tv/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: [
-          {
-            text: 'Basic Tutorial',
-            items: [
-              { text: 'Install Konado', link: '/en/tutorial/install' },
-              { text: 'Conversation Profiles', link: '/en/tutorial/profiles' },
-              { text: 'Actor Coordinate and Scaling', link: '/en/tutorial/actor-coordinate-and-scaling' },
-              { text: 'Customize the Dialog Box', link: '/en/tutorial/customize-the-dialogbox' }
-            ]
-          },
-          {
-            text: 'Konado Script',
-            items: [
-              { text: 'Script Introduction', link: '/en/script/konado-script' },
-              { text: 'Meta Data', link: '/en/script/meta-data' },
-              { text: 'Normal Dialogue', link: '/en/script/conversation' },
-              { text: 'Branch', link: '/en/script/branch' },
-              { text: 'Option to Jump', link: '/en/script/option-to-jump' },
-              {
-                text: 'Background',
-                collapsed: true,
-                items: [
-                  { text: 'Background Switch', link: '/en/script/background-switch' }
-                ]
-              },
-              {
-                text: 'Actor',
-                collapsed: true,
-                items: [
-                  { text: 'Create Actor', link: '/en/script/create-actor' },
-                  { text: 'Remove Actor', link: '/en/script/actor-leave' },
-                  { text: 'Move Actor', link: '/en/script/actor-move' },
-                  { text: 'Change Actor State', link: '/en/script/actor-change-state' }
-                ]
-              },
-              {
-                text: 'Audio',
-                collapsed: true,
-                items: [
-                  { text: 'Play BGM', link: '/en/script/play-bgm' },
-                  { text: 'Stop BGM', link: '/en/script/stop-bgm' },
-                  { text: 'Play Sound Effect', link: '/en/script/play-sound-effect' }
-                ]
-              },
-              {
-                text: 'End the Conversation', link: '/en/script/end-the-conversation'
-              }
-            ]
-          },
-          {
-            text: 'Development',
-            items: [
-              {
-                text: 'Core Features', items: [
-                  { text: 'Shot and Dialogue', link: '/en/develop/core/shot-and-dialogue' },
-                  { text: 'Background Transition Effects', link: '/en/develop/core/bg-trans-effect' },
-                  { text: 'Logger', link: '/en/develop/core/logger' },
-                ]
-              },
-              { text: 'Version Planning', link: '/en/develop/roadmap' },
-              { text: 'Code Contribution', link: '/en/develop/code-contribute' },
-              { text: 'Documentation Contribution', link: '/en/develop/doc-contribute' },
-              { text: 'Translation Contribution', link: '/en/develop/translate-contribute' },
-              { text: 'Feedback', link: '/en/develop/feedback' }
-            ]
-          },
-          {
-            text: 'Konado .NET API',
-            items: [
-              { text: 'Install', link: '/en/konadotnet/install_konadotnet' },
-              { text: 'API Reference', link: '/en/konadotnet/konadotnet_api' }
-            ]
-
-          },
-          {
-            text: 'Konado Achievement System',
-            items: [
-              { text: 'Install', link: '/en/kndachievement/install_kndachievement' },
-              { text: 'Achievement System', link: '/en/kndachievement/achievement-system' },
-              { text: 'API Reference', link: '/en/kndachievement/achievement-api' }
-            ]
-
-          },
-          {
-            text: 'Konado WebTool',
-            items: [
-              { text: 'Install', link: '/en/konado_webtool/install_konado_webtool' },
-              { text: 'Using WebTool', link: '/en/konado_webtool/konado_webtool' }
-            ]
-
-          },
-          {
-            text: 'About',
-            items: [
-              { text: 'About Konado', link: '/en/about/konado' },
-              { text: 'Mascot Kona', link: '/en/about/kona' },
-              { text: 'Banners', link: '/en/about/banner' },
-              { text: 'License Agreement', link: '/en/about/license' },
-              { text: 'Acknowledgments', link: '/en/about/thanks' }
-            ]
-          }
-        ]
+        sidebar: genEnSidebar(docsRoot)
       }
     }
   }
