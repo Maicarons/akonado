@@ -21,7 +21,7 @@ metadata/_snap_enabled = true
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_yt2oi"]
 gradient = SubResource("Gradient_6xj1n")
 
-[node name="KonadoDialogueManager" type="Control" unique_id=1487339260 node_paths=PackedStringArray("_konado_choice_interface", "_konado_dialogue_box", "_acting_interface", "_audio_interface", "error_tooltip_panel", "error_tooltip_label", "error_skip_btn", "save_system")]
+[node name="KonadoDialogueLeft" type="Control" unique_id=1487339260 node_paths=PackedStringArray("_konado_choice_interface", "_konado_dialogue_box", "_acting_interface", "_audio_interface", "error_tooltip_panel", "error_tooltip_label", "error_skip_btn", "save_system")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

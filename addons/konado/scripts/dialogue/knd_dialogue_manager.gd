@@ -24,6 +24,10 @@ signal custom_signal(content: String)
 
 @export_category("Playback Settings")
 
+## 是否检查对话节点可见，如果不可见不会执行后续初始化和播放操作，同时会订阅hidden信号，在节点隐藏时停止对话
+## 建议设置为true
+@export var check_visable: bool = true
+
 ## 是否在游戏开始时自动初始化对话，如果为true，则在游戏开始时自动初始化对话，否则需要手动初始化对话
 ## 手动初始化对话的方法为：在游戏开始时，调用`init_dialogue`方法
 @export var init_onstart: bool = true
@@ -135,6 +139,17 @@ func _current_dialogue() -> KND_Dialogue:
 var achievement_mgr: Node = null
 
 func _ready() -> void:
+	if check_visable:
+		if not self.is_visible_in_tree():
+			printerr("对话已隐藏，不做任何操作")
+			return
+		self.hidden.connect(
+			func():
+				printerr("对话已隐藏，自动停止")
+				stop_dialogue()
+				)
+
+		
 	if enable_overlay_log:
 		print("开启日志记录器")
 		# 初始化Logger
