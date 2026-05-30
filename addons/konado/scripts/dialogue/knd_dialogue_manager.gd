@@ -607,12 +607,21 @@ func isfinishtyping(wait_voice: bool) -> void:
 		# 如果有配音等待配音播放完成
 		if wait_voice:
 			await _audio_interface.voice_finish_playing
+			_process_next()
 		else:
 			await get_tree().create_timer(autoplayspeed).timeout
-		_process_next()
+			_process_next()
+		print("触发打字完成信号")
 	else:
+		var current = _current_dialogue()
+		if current == null:
+			print("警告：当前对话为空，无法获取下一句")
+			return
+			
+		var next_id = current.next_id
+		
 		# 检查下一句是否是选项，如果是自动下一句
-		var nd: KND_Dialogue = cur_dialogue_shot.find_node(_current_dialogue().next_id)
+		var nd: KND_Dialogue = cur_dialogue_shot.find_node(next_id)
 		if nd.dialog_type == KND_Dialogue.Type.SHOW_CHOICE:
 			print("选项自动下一个")
 			await get_tree().create_timer(0.05).timeout
