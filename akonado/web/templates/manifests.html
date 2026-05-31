@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% set active = "manifests" %}
+{% block title %}Manifests - Akonado{% endblock %}
+
+{% block content %}
+<h1>Manifests</h1>
+<p style="color:#888;margin-bottom:1.5rem;">JSON manifests define all assets for generation. Edit them to control what gets generated.</p>
+
+<div class="grid">
+    {% for m in manifests %}
+    <a href="/manifests/{{ m.name }}" class="card" style="text-decoration:none;color:inherit;">
+        <span class="badge">{{ m.type }}</span>
+        <h3>{{ m.name }}.json</h3>
+        <p>{{ m.type }} manifest</p>
+    </a>
+    {% endfor %}
+    {% if not manifests %}
+    <div class="card">
+        <h3>No manifests found</h3>
+        <p>Create JSON files in the manifests/ folder to get started.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
