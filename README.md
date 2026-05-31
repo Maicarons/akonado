@@ -1,74 +1,109 @@
-# Konado: Visual Novel Framework
+# Akonado
 
-English | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[English](README.en.md)
 
+基于 Godot + Konado 的全流程 AI 视觉小说生成管线。
 
-<div align="center" style="border-radius: 12px; overflow: hidden">
-<img src="./assets/kona/kona_lantern.png" alt="Konado Mascot" width="50%" max-width="500px">
+<div align="center">
+  <img src="https://img.shields.io/badge/Godot-4.6+-blue.svg?style=flat-square&logo=godotengine&logoSize=14" alt="Godot" height="20">
+  <img src="https://img.shields.io/badge/Python-3.10+-green.svg?style=flat-square&logo=python&logoSize=14" alt="Python" height="20">
+  <img src="https://img.shields.io/badge/License-AGPL_3.0-purple.svg?style=flat-square&logoSize=14" alt="License" height="20">
 </div>
 
 <br>
 
-<div align="center">
-  <img src="https://img.shields.io/badge/License-BSD_3--Clause-orange.svg?style=flat-square&logo=opensourceinitiative&logoSize=14" alt="License" height="20">
-  <img src="https://img.shields.io/github/last-commit/godothub/konado.svg?style=flat-square&logo=github&logoSize=14" alt="Last Commit" height="20">
-  <img src="https://img.shields.io/github/release/godothub/konado.svg?style=flat-square&logo=github&logoSize=14" alt="Latest Release" height="20">
-  <img src="https://img.shields.io/github/forks/godothub/konado?style=flat-square&logo=github&color=blueviolet&logoSize=14" alt="Forks" height="20">
-  
-  <img src="https://img.shields.io/github/stars/godothub/konado?style=flat-square&logo=github&color=ffcb2b&logoSize=14" alt="Stars" height="20">
-  <img src="https://atomgit.com/godothub/konado/star/badge.svg?style=flat-square&logoSize=14" alt="AtomGit GStar" height="20">
-  <img src="https://atomgit.com/godothub/konado/star/2025top.svg?style=flat-square&logoSize=14" alt="AtomGit GStar 2025" height="20">
-</div>
+## 简介
 
-<br>
+Akonado 是一个 AI 驱动的视觉小说资产生成管线。从一句话概要出发，自动生成完整剧本、角色立绘、背景图、BGM、音效、配音和 UI 资产，配合 Godot 引擎和 Konado 插件直接运行视觉小说。
 
+**核心能力：**
 
+- 一句话 → 完整剧本 + 角色 + 场景设定
+- 角色立绘生成（ComfyUI，自动去背景）
+- 背景图、BGM、音效、UI 资产生成
+- 配音合成：MiMo TTS（云端）/ Qwen3 TTS（本地 GPU）
+- JSON 驱动的资产清单，便于编辑和自动化
+- Web GUI 可视化编辑与生成控制
+- CLI 批量操作
+- 可扩展的 provider 和 skill 系统
 
-## Overview
+## 快速开始
 
-Konado is a dialogue creation toolkit for the Godot Engine, with templates and a dialogue manager to help you quickly build Visual Novels, Gal Games, RPGs and other story‑driven projects.
+### 运行视觉小说（Godot）
 
-## Quick Start
+1. 克隆本仓库
+2. 用 Godot 4.6+ 打开项目
+3. 使用 Akonado 生成资产后即可运行
 
-Get up and running with Konado in minutes by following our [Quick Start Guide](https://godothub.com/oss/konado/en/tutorial/install.html).
+### 生成资产（Python）
 
-## Documentation
+```bash
+# 安装
+cd akonado
+pip install -e .
 
-For comprehensive guides, API references, and advanced tutorials, visit our official project website: https://godothub.com/oss/konado/en/.
+# 配置 API 密钥
+cp .env.example .env
+# 编辑 .env 填入你的密钥
 
-## Community
+# 检查 provider 可用性
+python -m akonado check
 
-Join our community to connect with other Konado users, share ideas, and get support. You can participate through:
+# 从一句话生成剧本
+python -m akonado skill run -n generate_script -i "一个关于奶茶店的故事"
 
-- QQ Channel Discussion Group: [Join Now](https://pd.qq.com/g/godot)
-- Discord Server Channel: [Join Now](https://discord.com/channels/1378639076747513938/1425084240550166592)
+# 生成所有资产
+python -m akonado generate all
 
-<a href="https://godothub.com">
-<img src="https://godothub.com/licon/godothub.png" alt="godothub" style="width: 65%;" />
-</a>
+# 启动 Web GUI
+python -m akonado web
+```
 
-## Sponsors
+## 项目结构
 
-If you appreciate our work, please consider supporting us via this [link](https://afdian.com/item/52230b2860a011f083ef52540025c377). Your sponsorship helps us keep improving Konado and providing better support to the community.
+```
+akonado/                  # 本项目根目录（Godot 项目）
+  addons/konado/          # Konado 插件（上游视觉小说框架）
+  assets/                 # 游戏资产（由 AI 生成）
+  story/                  # .ks 脚本（由 AI 生成）
+  docs/
+    konado/               # Konado 框架文档
+    akonado/              # Akonado AI 管线文档
+  akonado/                # AI 资产生成管线（Python 包）
+    providers/            # 后端抽象层（LLM、Image、TTS）
+    generators/           # 资产生成器
+    skills/               # LLM prompt 模板（JSON）
+    manifests/            # 资产清单定义（JSON）
+    web/                  # Flask Web GUI
+    comfyui/              # ComfyUI 工作流模板
+```
 
+## 命令一览
 
-<div align="center">
-  <img src="./assets/kona/kona_love.png" alt="kona_love" height="150">
-</div>
+| 命令 | 说明 |
+|------|------|
+| `python -m akonado check` | 检查 provider 可用性 |
+| `python -m akonado generate <type>` | 生成资产（characters/backgrounds/bgm/se/voice/ui/dialogue/all） |
+| `python -m akonado list [type]` | 查看 manifest 内容 |
+| `python -m akonado clean <type>` | 删除生成的文件 |
+| `python -m akonado skill list` | 列出可用 skills |
+| `python -m akonado skill run -n <name> -i <input>` | 运行 LLM skill |
+| `python -m akonado web` | 启动 Web GUI |
 
+## 文档
 
-## Contributing
+- [快速开始](docs/akonado/getting-started.md)
+- [架构设计](docs/akonado/architecture.md)
+- [后端 Providers](docs/akonado/providers.md)
+- [技能 Skills](docs/akonado/skills.md)
+- [资产清单 Manifests](docs/akonado/manifests.md)
+- [Web GUI](docs/akonado/web-gui.md)
+- [Konado 框架文档](docs/konado/)
 
-Interested in contributing to Konado? Check out our [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on how to get involved.
+## 依赖项目
 
-## Code of Conduct
+- [Konado](https://github.com/DSOE1024/Konado) — Godot 视觉小说对话框架（BSD-3-Clause）
 
-This project adheres to our [Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+## 许可证
 
-## Contributors
-
-A complete list of contributors can be found in [AUTHORS.md](./AUTHORS.md).
-
-## Open Source License
-
-Konado is distributed under the BSD 3-Clause License. See the [LICENSE](./LICENSE) file for full terms and conditions.
+AGPL-3.0-only
