@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set active = "config" %}
+{% block title %}Config - Akonado{% endblock %}
+{% block content %}
+<h1>Configuration</h1>
+<p style="color:#888;margin-bottom:1.5rem;">Edit the <code>.env</code> file. Changes take effect after restarting the pipeline.</p>
+
+{% if saved %}
+<div class="error" style="background:#2ebd5920;border-color:#2ebd59;color:#2ebd59;">Configuration saved successfully.</div>
+{% endif %}
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<form method="POST">
+    <textarea name="content" spellcheck="false">{{ content }}</textarea>
+    <div class="toolbar" style="margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="/config" class="btn btn-secondary">Discard & Reload</a>
+    </div>
+</form>
+{% endblock %}

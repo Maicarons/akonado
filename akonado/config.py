@@ -12,7 +12,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load .env from akonado folder
-_AKONADO_ROOT = Path(__file__).resolve().parent.parent
+_AKONADO_ROOT = Path(__file__).resolve().parent
 _PROJECT_ROOT = _AKONADO_ROOT.parent
 load_dotenv(_AKONADO_ROOT / ".env")
 
@@ -33,6 +33,7 @@ MANIFESTS_DIR = AKONADO_ROOT / "manifests"
 SKILLS_DIR = AKONADO_ROOT / "skills"
 COMFYUI_DIR = AKONADO_ROOT / "comfyui"
 OUTPUT_DIR = AKONADO_ROOT / "output"
+ENV_FILE = _AKONADO_ROOT / ".env"
 
 # ── LLM Provider (OpenAI-compatible) ──────────────────────────
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")

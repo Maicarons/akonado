@@ -17,7 +17,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 from ..config import (
     AKONADO_ROOT, MANIFESTS_DIR, SKILLS_DIR, CHARACTERS_DIR,
     BACKGROUNDS_DIR, BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR,
-    STORY_DIR, ensure_dirs,
+    STORY_DIR, ensure_dirs, ENV_FILE,
 )
 
 
@@ -90,6 +90,27 @@ def create_app() -> Flask:
         with open(path, encoding="utf-8") as f:
             content = f.read()
         return render_template("skill_detail.html", name=name, content=content, error=None)
+
+    # ── Config ───────────────────────────────────────────────────
+
+    @app.route("/config", methods=["GET", "POST"])
+    def config_page():
+        if request.method == "POST":
+            content = request.form["content"]
+            try:
+                ENV_FILE.write_text(content, encoding="utf-8")
+                return render_template("config.html", content=content,
+                                       saved=True, error=None)
+            except Exception as e:
+                return render_template("config.html", content=content,
+                                       saved=False, error=str(e))
+
+        if ENV_FILE.exists():
+            content = ENV_FILE.read_text(encoding="utf-8")
+        else:
+            example = AKONADO_ROOT / ".env.example"
+            content = example.read_text(encoding="utf-8") if example.exists() else ""
+        return render_template("config.html", content=content, saved=False, error=None)
 
     # ── Generation API ─────────────────────────────────────────
 
