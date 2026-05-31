@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% set active = "dashboard" %}
+{% block title %}Akonado Dashboard{% endblock %}
+
+{% block content %}
+<h1>Akonado Dashboard</h1>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="number" id="stat-characters">{{ stats.characters }}</div>
+        <div class="label">Characters</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-backgrounds">{{ stats.backgrounds }}</div>
+        <div class="label">Backgrounds</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-bgm">{{ stats.bgm }}</div>
+        <div class="label">BGM</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-se">{{ stats.se }}</div>
+        <div class="label">Sound Effects</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-voice">{{ stats.voice }}</div>
+        <div class="label">Voice Lines</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-ui">{{ stats.ui }}</div>
+        <div class="label">UI Assets</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" id="stat-stories">{{ stats.stories }}</div>
+        <div class="label">Story Scripts</div>
+    </div>
+</div>
+
+<h2>Provider Status</h2>
+<div class="stat-grid" id="provider-status">
+    <div class="stat-card"><div class="label">Loading...</div></div>
+</div>
+
+<h2 style="margin-top: 2rem;">Quick Actions</h2>
+<div class="toolbar">
+    <button class="btn btn-primary" onclick="runSkill('generate_script')">Generate Script</button>
+    <button class="btn btn-primary" onclick="generate('characters')">Generate Characters</button>
+    <button class="btn btn-primary" onclick="generate('backgrounds')">Generate Backgrounds</button>
+    <button class="btn btn-primary" onclick="generate('bgm')">Generate BGM</button>
+    <button class="btn btn-primary" onclick="generate('se')">Generate SE</button>
+    <button class="btn btn-primary" onclick="generate('voice')">Generate Voice</button>
+    <button class="btn btn-primary" onclick="generate('ui')">Generate UI</button>
+    <button class="btn btn-secondary" onclick="generate('all')">Generate All</button>
+</div>
+
+<h2 style="margin-top: 2rem;">Run Skill</h2>
+<div class="card" style="margin-top: 1rem;">
+    <select id="skill-select" style="width:100%;padding:0.5rem;background:#0f0f0f;color:#e0e0e0;border:1px solid #333;border-radius:6px;margin-bottom:0.5rem;">
+        {% for skill in skills %}
+        <option value="{{ skill.name }}">{{ skill.name }} - {{ skill.description[:50] }}</option>
+        {% endfor %}
+    </select>
+    <textarea id="skill-input" placeholder="Enter your one-sentence premise here..." style="min-height:100px;margin-bottom:0.5rem;"></textarea>
+    <button class="btn btn-primary" onclick="runSelectedSkill()">Run Skill</button>
+    <div id="skill-result" style="margin-top:1rem;display:none;">
+        <h3>Result</h3>
+        <pre style="background:#0f0f0f;padding:1rem;border-radius:8px;overflow-x:auto;max-height:400px;overflow-y:auto;white-space:pre-wrap;font-size:0.8rem;"></pre>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function generate(type) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    try {
+        const resp = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type, engine: 'mimo', force: false})
+        });
+        const data = await resp.json();
+        if (data.status === 'ok' || data.status === 'done') {
+            showToast(`${type} generation complete`);
+            location.reload();
+        } else {
+            showToast(`Error: ${data.message}`, true);
+        }
+    } catch(e) {
+        showToast(`Error: ${e.message}`, true);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.original || type;
+    }
+}
+
+async function runSelectedSkill() {
+    const name = document.getElementById('skill-select').value;
+    const input = document.getElementById('skill-input').value;
+    if (!input.trim()) {
+        showToast('Please enter input text', true);
+        return;
+    }
+    const resultDiv = document.getElementById('skill-result');
+    const pre = resultDiv.querySelector('pre');
+    resultDiv.style.display = 'block';
+    pre.textContent = 'Running...';
+
+    try {
+        const resp = await fetch('/api/skill/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, input, temperature: 0.7})
+        });
+        const data = await resp.json();
+        if (data.status === 'ok') {
+            pre.textContent = typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
+        } else {
+            pre.textContent = `Error: ${data.message}`;
+        }
+    } catch(e) {
+        pre.textContent = `Error: ${e.message}`;
+    }
+}
+
+async function runSkill(name) {
+    const input = prompt('Enter your one-sentence premise:');
+    if (!input) return;
+    document.getElementById('skill-select').value = name;
+    document.getElementById('skill-input').value = input;
+    runSelectedSkill();
+}
+
+async function loadProviders() {
+    try {
+        const resp = await fetch('/api/providers');
+        const data = await resp.json();
+        const container = document.getElementById('provider-status');
+        container.innerHTML = Object.entries(data).map(([name, ok]) =>
+            `<div class="stat-card">
+                <div class="label">
+                    <span class="status-dot ${ok ? 'status-ok' : 'status-fail'}"></span>
+                    ${name}
+                </div>
+            </div>`
+        ).join('');
+    } catch(e) {
+        document.getElementById('provider-status').innerHTML =
+            '<div class="stat-card"><div class="label">Failed to load</div></div>';
+    }
+}
+
+function showToast(msg, isError) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.style.borderColor = isError ? '#ff4757' : '#2ebd59';
+    setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+loadProviders();
+</script>
+{% endblock %}

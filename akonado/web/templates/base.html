@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Akonado{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        nav {
+            background: #1a1a2e;
+            border-bottom: 1px solid #333;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            height: 56px;
+        }
+        nav .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #7c5cff;
+            text-decoration: none;
+            margin-right: 2rem;
+        }
+        nav a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        nav a:hover, nav a.active {
+            color: #fff;
+            background: #2a2a4a;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: #7c5cff; }
+        .card h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .card p {
+            color: #888;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .card .badge {
+            display: inline-block;
+            background: #2a2a4a;
+            color: #7c5cff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #7c5cff;
+        }
+        .stat-card .label {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: #7c5cff;
+            color: #fff;
+        }
+        .btn-primary:hover { background: #6a4ae8; }
+        .btn-secondary {
+            background: #2a2a4a;
+            color: #ccc;
+        }
+        .btn-secondary:hover { background: #3a3a5a; }
+        .btn-danger {
+            background: #ff4757;
+            color: #fff;
+        }
+        .btn-danger:hover { background: #e8384f; }
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #7c5cff;
+        }
+        .error {
+            background: #ff475720;
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        h1 { margin-bottom: 1.5rem; }
+        h2 { margin-bottom: 1rem; color: #fff; }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-ok { background: #2ebd59; }
+        .status-fail { background: #ff4757; }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">Akonado</a>
+        <a href="/" class="{% if active == 'dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="/manifests" class="{% if active == 'manifests' %}active{% endif %}">Manifests</a>
+        <a href="/skills" class="{% if active == 'skills' %}active{% endif %}">Skills</a>
+    </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <div id="toast" class="toast"></div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
