@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.venv/
+venv/
+
+# Output
+output/
+manifests/*.json
+!manifests/.gitkeep
+
+# ComfyUI workflows (user-specific)
+comfyui/*.json
+!comfyui/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
