@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% set active = "skills" %}
+{% block title %}{{ name }} - Skills - Akonado{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <h1>{{ name }}</h1>
+    <a href="/skills" class="btn btn-secondary">Back</a>
+</div>
+
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<form method="POST">
+    <textarea name="content">{{ content }}</textarea>
+    <div class="toolbar" style="margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="formatJSON()">Format JSON</button>
+    </div>
+</form>
+
+<div class="card" style="margin-top:2rem;">
+    <h3>Test this skill</h3>
+    <textarea id="test-input" placeholder="Enter test input..." style="min-height:80px;margin:0.5rem 0;"></textarea>
+    <button class="btn btn-primary" onclick="testSkill()">Run Test</button>
+    <div id="test-result" style="margin-top:1rem;display:none;">
+        <pre style="background:#0f0f0f;padding:1rem;border-radius:8px;overflow-x:auto;max-height:400px;overflow-y:auto;white-space:pre-wrap;font-size:0.8rem;"></pre>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function formatJSON() {
+    const ta = document.querySelector('textarea[name="content"]');
+    try {
+        const parsed = JSON.parse(ta.value);
+        ta.value = JSON.stringify(parsed, null, 2);
+    } catch(e) {
+        alert('Invalid JSON: ' + e.message);
+    }
+}
+
+async function testSkill() {
+    const input = document.getElementById('test-input').value;
+    if (!input.trim()) { alert('Please enter test input'); return; }
+
+    const resultDiv = document.getElementById('test-result');
+    const pre = resultDiv.querySelector('pre');
+    resultDiv.style.display = 'block';
+    pre.textContent = 'Running...';
+
+    try {
+        const resp = await fetch('/api/skill/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: '{{ name }}', input, temperature: 0.7})
+        });
+        const data = await resp.json();
+        if (data.status === 'ok') {
+            pre.textContent = typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
+        } else {
+            pre.textContent = `Error: ${data.message}`;
+        }
+    } catch(e) {
+        pre.textContent = `Error: ${e.message}`;
+    }
+}
+</script>
+{% endblock %}

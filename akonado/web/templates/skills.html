@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% set active = "skills" %}
+{% block title %}Skills - Akonado{% endblock %}
+
+{% block content %}
+<h1>Skills</h1>
+<p style="color:#888;margin-bottom:1.5rem;">Skills are LLM prompt templates that guide AI to generate visual novel content.</p>
+
+<div class="grid">
+    {% for s in skills %}
+    <a href="/skills/{{ s.name }}" class="card" style="text-decoration:none;color:inherit;">
+        <span class="badge">skill</span>
+        <h3>{{ s.name }}</h3>
+        <p>{{ s.description }}</p>
+    </a>
+    {% endfor %}
+    {% if not skills %}
+    <div class="card">
+        <h3>No skills found</h3>
+        <p>Create JSON files in the skills/ folder to get started.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
