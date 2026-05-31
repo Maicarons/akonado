@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "akonado"
+version = "0.1.0"
+description = "AI-powered visual novel asset generation pipeline (Godot + Konado)"
+readme = "README.md"
+license = "AGPL-3.0-only"
+requires-python = ">=3.10"
+authors = [
+    {name = "Maicarons"},
+]
+keywords = ["visual-novel", "godot", "ai", "tts", "comfyui", "konado", "game-dev"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "requests>=2.28",
+    "Pillow>=9.0",
+    "python-dotenv>=1.0",
+    "openai>=1.0",
+    "flask>=3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.4"]
+
+[project.scripts]
+akonado = "akonado.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Maicarons/akonado"
+Repository = "https://github.com/Maicarons/akonado"
+Issues = "https://github.com/Maicarons/akonado/issues"
+
+[tool.setuptools.packages.find]
+include = ["akonado*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
