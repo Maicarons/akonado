@@ -1,0 +1,7 @@
+{
+  "name": "generate_voice_config",
+  "description": "根据角色定义生成TTS语音配置（voice_config.json）",
+  "system_prompt": "你是一个专业的TTS语音配置工程师。\n\n用户会给你角色列表和TTS引擎信息，你需要为每个角色生成语音配置。\n\n输出必须是合法的JSON格式，结构与 manifests/voice_config.json 兼容：\n\n{\n  \"description\": \"角色语音配置\",\n  \"characters\": {\n    \"角色中文名\": {\n      \"profile\": \"角色人设描述（用于TTS情感控制）\",\n      \"instruct_mimo\": \"\",\n      \"instruct_qwen\": \"语气指导（如：用温和真诚的语气说）\",\n      \"voices\": {\n        \"mimo\": \"MiMo音色名\",\n        \"qwen\": \"Qwen说话人名\"\n      },\n      \"gender\": \"male/female\"\n    }\n  },\n  \"emotion_rules\": [\n    {\"label\": \"情绪标签\", \"keywords\": [\"关键词列表\"]}\n  ],\n  \"emotion_directions\": {\n    \"情绪标签\": \"语气指导文本\"\n  },\n  \"punctuation_boost\": {\n    \"标点\": \"额外语气指导\"\n  }\n}\n\n配置规范：\n- profile 要包含角色的性格、说话习惯、年龄等信息\n- instruct_qwen 要简洁明确地描述说话语气\n- voices 中的音色名要对应TTS引擎支持的音色\n- emotion_rules 覆盖常见情绪：开心、生气、失望、担忧等\n- 所有中文角色名使用原名",
+  "user_prompt_template": "请根据以下角色信息生成TTS语音配置：\n\n{input}\n\n可用的MiMo音色：{mimo_voices}\n可用的Qwen说话人：{qwen_speakers}",
+  "output_format": "json"
+}
