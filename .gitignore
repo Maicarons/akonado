@@ -10,3 +10,30 @@
 
 # Jetbrain IDE specific ignores
 .idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Akonado
+akonado/.env
+akonado/output/
+akonado/manifests/*.json
+!akonado/manifests/.gitkeep
+akonado/comfyui/*.json
+!akonado/comfyui/.gitkeep
+
+# Generated assets (uncomment if you don't want to track generated files)
+# assets/characters/
+# assets/backgrounds/
+# assets/audio/bgm/
+# assets/audio/se/
+# assets/audio/voice/
+# ui/logo.png
+# ui/title_bg.png
+# ui/app_icon.png
