@@ -360,7 +360,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 1: Generate script.json ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 1/7: Generating script from premise")
+    print("  Step 1/8: Generating script from premise")
     print("=" * 50)
     script_result = _run_skill(
         llm, "generate_script",
@@ -377,7 +377,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 2: Generate character manifest ───────────────────
     print("\n" + "=" * 50)
-    print("  Step 2/7: Generating character prompts")
+    print("  Step 2/8: Generating character prompts")
     print("=" * 50)
     char_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     char_result = _run_skill(
@@ -394,7 +394,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 3: Generate background manifest ──────────────────
     print("\n" + "=" * 50)
-    print("  Step 3/7: Generating background prompts")
+    print("  Step 3/8: Generating background prompts")
     print("=" * 50)
     bg_input = _json.dumps(script_data.get("backgrounds", []), ensure_ascii=False, indent=2)
     bg_result = _run_skill(
@@ -411,7 +411,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 4: Generate audio manifests ──────────────────────
     print("\n" + "=" * 50)
-    print("  Step 4/7: Generating audio prompts")
+    print("  Step 4/8: Generating audio prompts")
     print("=" * 50)
     audio_input_data = {
         "bgm": script_data.get("bgm", []),
@@ -438,7 +438,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 5: Generate voice config ─────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 5/7: Generating voice config")
+    print("  Step 5/8: Generating voice config")
     print("=" * 50)
     voice_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     voice_result = _run_skill(
@@ -453,9 +453,30 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         voice_data = {"raw": voice_result}
     _save_json(MANIFESTS_DIR / "voice_config.json", voice_data if isinstance(voice_data, dict) else {"raw": voice_data})
 
-    # ── Step 6a: Generate visual/audio assets (NOT voice/dialogue) ──
+    # ── Step 6: Generate UI manifest ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 6/7: Generating visual/audio assets")
+    print("  Step 6/8: Generating UI prompts")
+    print("=" * 50)
+    ui_input = _json.dumps({
+        "title": script_data.get("title", ""),
+        "premise": premise,
+        "characters": script_data.get("characters", []),
+    }, ensure_ascii=False, indent=2)
+    ui_result = _run_skill(
+        llm, "generate_ui_prompts",
+        {"input": ui_input, "style": "anime visual novel style"},
+        temperature,
+    )
+    try:
+        ui_data = _json.loads(ui_result)
+    except _json.JSONDecodeError:
+        print("Warning: Failed to parse UI JSON, saving raw output")
+        ui_data = {"raw": ui_result}
+    _save_json(MANIFESTS_DIR / "ui.json", ui_data if isinstance(ui_data, dict) else {"raw": ui_data})
+
+    # ── Step 7: Generate visual/audio assets (NOT voice/dialogue) ──
+    print("\n" + "=" * 50)
+    print("  Step 7/8: Generating visual/audio assets")
     print("=" * 50)
     from .generators import (
         generate_characters, generate_backgrounds,
@@ -482,9 +503,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         except Exception as e:
             print(f"  [error] {name}: {e}")
 
-    # ── Step 7a: Generate .ks scripts (BEFORE voice/dialogue) ──
+    # ── Step 8a: Generate .ks scripts (BEFORE voice/dialogue) ──
     print("\n" + "=" * 50)
-    print("  Step 7/7: Generating .ks scene scripts")
+    print("  Step 8/8: Generating .ks scripts, voice & dialogue")
     print("=" * 50)
     chapters = script_data.get("chapters", [])
     char_info = _json.dumps(script_data.get("characters", []), ensure_ascii=False)
@@ -509,7 +530,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
                 f.write(ks_result)
             print(f"  [saved] {ks_path}")
 
-    # ── Step 7b: Generate voice and dialogue (AFTER .ks scripts) ──
+    # ── Step 8b: Generate voice and dialogue (AFTER .ks scripts) ──
     print("\n--- voice ---")
     try:
         generate_voice_all(tts, skip_existing=skip)
