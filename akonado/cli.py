@@ -360,7 +360,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 1: Generate script.json ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 1/8: Generating script from premise")
+    print("  Step 1/9: Generating script from premise")
     print("=" * 50)
     script_result = _run_skill(
         llm, "generate_script",
@@ -377,7 +377,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 2: Generate character manifest ───────────────────
     print("\n" + "=" * 50)
-    print("  Step 2/8: Generating character prompts")
+    print("  Step 2/9: Generating character prompts")
     print("=" * 50)
     char_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     char_result = _run_skill(
@@ -394,7 +394,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 3: Generate background manifest ──────────────────
     print("\n" + "=" * 50)
-    print("  Step 3/8: Generating background prompts")
+    print("  Step 3/9: Generating background prompts")
     print("=" * 50)
     bg_input = _json.dumps(script_data.get("backgrounds", []), ensure_ascii=False, indent=2)
     bg_result = _run_skill(
@@ -411,7 +411,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 4: Generate audio manifests ──────────────────────
     print("\n" + "=" * 50)
-    print("  Step 4/8: Generating audio prompts")
+    print("  Step 4/9: Generating audio prompts")
     print("=" * 50)
     audio_input_data = {
         "bgm": script_data.get("bgm", []),
@@ -438,7 +438,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 5: Generate voice config ─────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 5/8: Generating voice config")
+    print("  Step 5/9: Generating voice config")
     print("=" * 50)
     voice_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     voice_result = _run_skill(
@@ -455,7 +455,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 6: Generate UI manifest ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 6/8: Generating UI prompts")
+    print("  Step 6/9: Generating UI prompts")
     print("=" * 50)
     ui_input = _json.dumps({
         "title": script_data.get("title", ""),
@@ -476,12 +476,12 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 7: Generate visual/audio assets (NOT voice/dialogue) ──
     print("\n" + "=" * 50)
-    print("  Step 7/8: Generating visual/audio assets")
+    print("  Step 7/9: Generating visual/audio assets")
     print("=" * 50)
     from .generators import (
         generate_characters, generate_backgrounds,
         generate_bgm, generate_se, generate_voice_all,
-        generate_ui, generate_dialogue,
+        generate_ui, generate_dialogue, generate_all_tres,
     )
     from .providers import ComfyUIImageProvider, MiMoTTS
 
@@ -503,9 +503,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         except Exception as e:
             print(f"  [error] {name}: {e}")
 
-    # ── Step 8a: Generate .ks scripts (BEFORE voice/dialogue) ──
+    # ── Step 8: Generate .ks scripts (BEFORE voice/dialogue) ──
     print("\n" + "=" * 50)
-    print("  Step 8/8: Generating .ks scripts, voice & dialogue")
+    print("  Step 8/9: Generating .ks scripts, voice & dialogue")
     print("=" * 50)
     chapters = script_data.get("chapters", [])
     char_info = _json.dumps(script_data.get("characters", []), ensure_ascii=False)
@@ -542,6 +542,15 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         generate_dialogue()
     except Exception as e:
         print(f"  [error] dialogue: {e}")
+
+    # ── Step 9: Generate .tres resource files ─────────────────
+    print("\n" + "=" * 50)
+    print("  Step 9/9: Generating Godot .tres resource files")
+    print("=" * 50)
+    try:
+        generate_all_tres()
+    except Exception as e:
+        print(f"  [error] godot_resources: {e}")
 
     # ── Summary ───────────────────────────────────────────────
     print("\n" + "=" * 50)
