@@ -29,7 +29,10 @@ akonado/comfyui/*.json
 !akonado/comfyui/.gitkeep
 !akonado/comfyui/image_generation.json
 !akonado/comfyui/audio_generation.json
+!akonado/comfyui/sfx_generation.json
 !akonado/comfyui/remove_background.json
+!akonado/comfyui/logo.json
+!akonado/comfyui/title_bg.json
 
 # Generated assets
 assets/characters/

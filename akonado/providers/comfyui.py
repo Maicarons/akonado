@@ -28,7 +28,10 @@ from .base import ImageProvider
 # Fixed workflow filenames — the pipeline expects these exact names
 WORKFLOW_IMAGE = "image_generation.json"
 WORKFLOW_AUDIO = "audio_generation.json"
+WORKFLOW_SFX = "sfx_generation.json"
 WORKFLOW_REMOVE_BG = "remove_background.json"
+WORKFLOW_LOGO = "logo.json"
+WORKFLOW_TITLE_BG = "title_bg.json"
 
 
 # ── Workflow Template ────────────────────────────────────────────
@@ -208,8 +211,11 @@ class ComfyUIClient(ImageProvider):
 
         Fixed filenames (used directly by the pipeline):
           - image_generation.json → image generation
-          - audio_generation.json → audio generation
+          - audio_generation.json → audio generation (music/BGM)
+          - sfx_generation.json → sound effects generation
           - remove_background.json → background removal
+          - logo.json → logo generation
+          - title_bg.json → title background generation
 
         Also discovers additional workflows by prefix classification.
         """
@@ -229,8 +235,14 @@ class ComfyUIClient(ImageProvider):
                 self._workflows["image:default"] = tpl
             elif path.name == WORKFLOW_AUDIO:
                 self._workflows["audio:default"] = tpl
+            elif path.name == WORKFLOW_SFX:
+                self._workflows["audio:sfx"] = tpl
             elif path.name == WORKFLOW_REMOVE_BG:
                 self._workflows["utility:remove_bg"] = tpl
+            elif path.name == WORKFLOW_LOGO:
+                self._workflows["image:logo"] = tpl
+            elif path.name == WORKFLOW_TITLE_BG:
+                self._workflows["image:title_bg"] = tpl
             else:
                 # Classify additional workflows by prefix
                 if stem.startswith("image_"):
@@ -411,13 +423,31 @@ class ComfyUIClient(ImageProvider):
         save_path: Path,
         *,
         category: str = "Music",
+        use_sfx: bool = False,
     ) -> None:
-        tpl = self._workflows.get("audio:default")
-        if tpl is None:
-            raise FileNotFoundError(
-                f"No audio workflow found in comfyui/.\n"
-                f"Add a workflow JSON file named {WORKFLOW_AUDIO}"
-            )
+        """Generate audio (BGM or SFX).
+
+        Args:
+            prompt: Text description of the audio.
+            duration: Duration in seconds.
+            save_path: Output file path.
+            category: Audio category (Music, SFX, etc.).
+            use_sfx: If True, use the SFX workflow instead of the default audio workflow.
+        """
+        if use_sfx:
+            tpl = self._workflows.get("audio:sfx")
+            if tpl is None:
+                raise FileNotFoundError(
+                    f"No SFX workflow found in comfyui/.\n"
+                    f"Add a workflow JSON file named {WORKFLOW_SFX}"
+                )
+        else:
+            tpl = self._workflows.get("audio:default")
+            if tpl is None:
+                raise FileNotFoundError(
+                    f"No audio workflow found in comfyui/.\n"
+                    f"Add a workflow JSON file named {WORKFLOW_AUDIO}"
+                )
 
         wf = tpl.inject(prompt=prompt, duration=duration, category=category)
 
