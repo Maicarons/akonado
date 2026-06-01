@@ -25,6 +25,11 @@ from PIL import Image
 from ..config import COMFYUI_URL, COMFYUI_DIR
 from .base import ImageProvider
 
+# Fixed workflow filenames — the pipeline expects these exact names
+WORKFLOW_IMAGE = "image_generation.json"
+WORKFLOW_AUDIO = "audio_generation.json"
+WORKFLOW_REMOVE_BG = "remove_background.json"
+
 
 # ── Workflow Template ────────────────────────────────────────────
 
@@ -199,42 +204,43 @@ class ComfyUIClient(ImageProvider):
     # ── Workflow Discovery ──────────────────────────────────────
 
     def _discover_workflows(self) -> None:
-        """Scan comfyui/ for workflow JSON files and classify by prefix.
+        """Scan comfyui/ for workflow JSON files.
 
-        Supports filenames with optional 'example_' prefix:
-          - image_*.json, example_image_*.json → image generation
-          - audio_*.json, example_audio_*.json → audio generation
-          - *_remove_background.json → background removal
+        Fixed filenames (used directly by the pipeline):
+          - image_generation.json → image generation
+          - audio_generation.json → audio generation
+          - remove_background.json → background removal
+
+        Also discovers additional workflows by prefix classification.
         """
         if not self._comfyui_dir.exists():
             return
 
         for path in sorted(self._comfyui_dir.glob("*.json")):
             stem = path.stem.lower()
-            # Strip 'example_' prefix for classification
-            classify_stem = stem.removeprefix("example_")
             try:
                 tpl = WorkflowTemplate.load(path)
             except (json.JSONDecodeError, OSError) as e:
                 print(f"  [warn] Skipping workflow {path.name}: {e}")
                 continue
 
-            # Classify by filename prefix
-            if classify_stem.startswith("image_"):
-                name = classify_stem.removeprefix("image_")
-                self._workflows.setdefault(f"image:{name}", tpl)
-            elif classify_stem.startswith("audio_"):
-                name = classify_stem.removeprefix("audio_")
-                self._workflows.setdefault(f"audio:{name}", tpl)
-            elif "_remove_background" in classify_stem:
-                self._workflows.setdefault("utility:remove_bg", tpl)
+            # Register by fixed name
+            if path.name == WORKFLOW_IMAGE:
+                self._workflows["image:default"] = tpl
+            elif path.name == WORKFLOW_AUDIO:
+                self._workflows["audio:default"] = tpl
+            elif path.name == WORKFLOW_REMOVE_BG:
+                self._workflows["utility:remove_bg"] = tpl
             else:
-                # Auto-detect by output node types
-                output_type = self._detect_workflow_type(tpl)
-                if output_type:
-                    self._workflows.setdefault(f"{output_type}:{stem}", tpl)
-                else:
-                    self._workflows.setdefault(f"other:{stem}", tpl)
+                # Classify additional workflows by prefix
+                if stem.startswith("image_"):
+                    name = stem.removeprefix("image_")
+                    self._workflows.setdefault(f"image:{name}", tpl)
+                elif stem.startswith("audio_"):
+                    name = stem.removeprefix("audio_")
+                    self._workflows.setdefault(f"audio:{name}", tpl)
+                elif "_remove_background" in stem:
+                    self._workflows.setdefault("utility:remove_bg", tpl)
 
     @staticmethod
     def _detect_workflow_type(tpl: WorkflowTemplate) -> str | None:
@@ -325,11 +331,11 @@ class ComfyUIClient(ImageProvider):
         *,
         seed: int | None = None,
     ) -> None:
-        tpl = self._find_first("image:")
+        tpl = self._workflows.get("image:default")
         if tpl is None:
             raise FileNotFoundError(
-                "No image workflow found in comfyui/.\n"
-                "Add a workflow JSON file named image_<model>.json"
+                f"No image workflow found in comfyui/.\n"
+                f"Add a workflow JSON file named {WORKFLOW_IMAGE}"
             )
 
         kwargs = {"prompt": prompt, "width": width, "height": height}
@@ -350,9 +356,10 @@ class ComfyUIClient(ImageProvider):
         print("  warning: no image output found")
 
     def remove_background(self, input_path: Path, output_path: Path) -> None:
-        tpl = self._find_first("utility:remove_bg")
+        tpl = self._workflows.get("utility:remove_bg")
         if tpl is None:
-            print("  warning: no remove_background workflow found in comfyui/")
+            print(f"  warning: no remove_background workflow found in comfyui/")
+            print(f"  Expected: {WORKFLOW_REMOVE_BG}")
             return
 
         uploaded_name = self._upload_image(input_path)
@@ -405,11 +412,11 @@ class ComfyUIClient(ImageProvider):
         *,
         category: str = "Music",
     ) -> None:
-        tpl = self._find_first("audio:")
+        tpl = self._workflows.get("audio:default")
         if tpl is None:
             raise FileNotFoundError(
-                "No audio workflow found in comfyui/.\n"
-                "Add a workflow JSON file named audio_<model>.json"
+                f"No audio workflow found in comfyui/.\n"
+                f"Add a workflow JSON file named {WORKFLOW_AUDIO}"
             )
 
         wf = tpl.inject(prompt=prompt, duration=duration, category=category)
