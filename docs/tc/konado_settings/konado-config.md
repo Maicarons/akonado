@@ -144,7 +144,7 @@ order: 1
 					"key": "language",
 					"label": "語言",
 					"type": 2,
-					"options": ["zh", "en", "ja"],
+					"options": ["zh", "tc", "en", "ja", "ko"],
 					"default_value": "zh"
 				},
 				{
