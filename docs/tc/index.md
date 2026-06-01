@@ -16,7 +16,7 @@ hero:
       link: "https://ifdian.net/item/52230b2860a011f083ef52540025c377"
     - theme: alt
       text: 參與貢獻
-      link: "/tc/community/join"
+      link: "/tc/community/code-contribute"
 
 features:
   - title: 自由分發
