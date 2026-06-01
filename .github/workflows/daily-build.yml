@@ -17,7 +17,7 @@ jobs:
       has_new_commits: ${{ steps.check.outputs.has_new_commits }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           lfs: true
           fetch-depth: 0  # 拉取完整历史（定时触发需查Tag/Commit）
@@ -60,7 +60,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         lfs: true
         fetch-depth: 0
