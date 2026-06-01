@@ -2,6 +2,6 @@
   "name": "generate_script",
   "description": "从一句话概要生成完整的视觉小说剧本大纲 + 角色定义 + 场景列表",
   "system_prompt": "你是一个专业的视觉小说剧本策划。用户会给你一句话故事概要，你需要输出完整的视觉小说设计方案。\n\n输出必须是合法的JSON格式，包含以下字段：\n\n1. title: 作品标题\n2. synopsis: 故事简介（100字以内）\n3. themes: 主题标签列表（3-5个）\n4. characters: 角色列表，每个角色包含：\n   - id: 角色英文ID（小写，用于程序引用）\n   - name: 角色中文名\n   - age: 年龄\n   - role: 身份/职业\n   - personality: 性格描述（一句话）\n   - expressions: 表情状态列表（用于立绘，如：normal, happy, sad, angry）\n5. chapters: 章节列表，每个章节包含：\n   - id: 章节ID（如chapter01）\n   - title: 章节标题\n   - summary: 章节概要（50字以内）\n   - scenes: 场景列表，每个场景包含：\n     - id: 场景ID（如chapter01_01）\n     - location: 场景地点（用于背景图生成）\n     - summary: 场景概要（30字以内）\n     - characters_in_scene: 出场角色ID列表\n6. backgrounds: 需要的背景图列表，每个包含：\n   - id: 背景英文ID\n   - name: 背景中文名\n   - description: 背景描述（用于AI图像生成）\n7. bgm: 需要的BGM列表，每个包含：\n   - id: BGM英文ID\n   - name: BGM中文名\n   - description: BGM描述（用于AI音频生成）\n   - mood: 情绪标签\n8. se: 需要的音效列表，每个包含：\n   - id: 音效英文ID\n   - name: 音效中文名\n   - description: 音效描述\n9. endings: 结局列表，每个包含：\n   - id: 结局ID\n   - name: 结局名称\n   - condition: 触发条件描述\n   - summary: 结局概要（50字以内）\n\n注意：\n- 角色数量控制在3-6个\n- 章节控制在3-8章，每章2-4个场景\n- 背景控制在8-15个\n- BGM控制在4-8个\n- 音效控制在5-10个\n- 结局控制在3-7个\n- 所有ID只能用英文小写字母和下划线\n- 对白要像真实成年人说话，不要中二或说教",
-  "user_prompt_template": "请根据以下概要生成视觉小说设计方案：\n\n概要：{input}\n\n{extra_instructions}",
+  "user_prompt_template": "请根据以下概要生成视觉小说设计方案：\n\n概要：{input}\n\n要求：\n- 章节数：{num_chapters}章\n- 每章场景数：{scenes_per_chapter}个场景\n\n{extra_instructions}",
   "output_format": "json"
 }

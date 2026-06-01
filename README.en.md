@@ -49,10 +49,20 @@ cp .env.example .env
 # Check provider availability
 python -m akonado check
 
-# Generate script from one sentence
-python -m akonado skill run -n generate_script -i "a story about a milk tea shop"
+# Generate everything from one sentence (recommended)
+python -m akonado pipeline "a story about war and peace"
 
-# Generate all assets
+# Customize chapters and scenes
+python -m akonado pipeline "a milk tea shop story" --chapters 5 --scenes-per-chapter 4
+
+# Use Qwen TTS engine
+python -m akonado pipeline "sci-fi adventure" --engine qwen
+
+# Specify Godot engine directory
+python -m akonado pipeline "story premise" --godot-dir "C:\path\to\Godot"
+
+# Step-by-step generation
+python -m akonado skill run -n generate_script -i "a story about a milk tea shop"
 python -m akonado generate all
 
 # Launch Web GUI
@@ -82,27 +92,53 @@ akonado/                  # Project root (Godot project)
 
 | Command | Description |
 |---------|-------------|
+| `python -m akonado pipeline "<premise>"` | Generate all assets from one sentence (recommended) |
 | `python -m akonado check` | Check provider availability |
 | `python -m akonado generate <type>` | Generate assets (characters/backgrounds/bgm/se/voice/ui/dialogue/all) |
 | `python -m akonado list [type]` | View manifest contents |
-| `python -m akonado clean <type>` | Delete generated files |
+| `python -m akonado clean <type>` | Delete generated files (supports all/manifests/scripts/type, `--deep` for full cleanup) |
 | `python -m akonado skill list` | List available skills |
 | `python -m akonado skill run -n <name> -i <input>` | Run an LLM skill |
+| `python -m akonado workflows` | List ComfyUI workflows |
 | `python -m akonado web` | Launch Web GUI |
+
+### Pipeline Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--chapters` | Number of chapters | 4 |
+| `--scenes-per-chapter` | Scenes per chapter | 3 |
+| `--engine` | TTS engine (mimo/qwen) | mimo |
+| `--godot-dir` | Godot engine directory | `G:\SteamLibrary\steamapps\common\Godot Engine` |
+| `--force` | Force regeneration (don't skip existing files) | false |
+| `--temperature` | LLM temperature parameter | 0.7 |
 
 ## Documentation
 
-- [Getting Started](docs/akonado/getting-started.md)
-- [Architecture](docs/akonado/architecture.md)
-- [Providers](docs/akonado/providers.md)
-- [Skills](docs/akonado/skills.md)
-- [Manifests](docs/akonado/manifests.md)
-- [Web GUI](docs/akonado/web-gui.md)
+- [Getting Started](docs/akonado/en/getting-started.md) -- Installation, configuration, first project
+- [ComfyUI Setup Guide](docs/akonado/en/comfyui-setup.md) -- Image/audio generation backend
+- [TTS Setup Guide](docs/akonado/en/tts-setup.md) -- MiMo TTS / Qwen TTS configuration
+- [Architecture](docs/akonado/en/architecture.md)
+- [Providers](docs/akonado/en/providers.md)
+- [Skills](docs/akonado/en/skills.md)
+- [Manifests](docs/akonado/en/manifests.md)
+- [Web GUI](docs/akonado/en/web-gui.md)
+- [Chinese Documentation](docs/akonado/)
 - [Konado Framework Docs](docs/konado/)
 
 ## Dependencies
 
 - [Konado](https://github.com/DSOE1024/Konado) — Godot visual novel dialogue framework (BSD-3-Clause)
+
+## AI Usage Disclaimer
+
+This project uses AI technology to generate visual novel assets (including but not limited to text, images, and audio). Please note:
+
+- **AI-Generated Content**: All scripts, characters, backgrounds, music, and other content generated through this tool are produced by AI models and may contain inaccurate, inappropriate, or unexpected content.
+- **Human Review Recommended**: It is recommended to review and edit generated content before use to ensure it meets project requirements and quality standards.
+- **Copyright & Licensing**: The copyright of AI-generated content depends on the terms of service of the AI services used. Please review the relevant service terms before use.
+- **Model Limitations**: Generation quality is limited by the capabilities of the AI models used; different models may produce different results.
+- **Responsibility**: This tool is intended for assistive creation purposes only; users are responsible for the final content.
 
 ## License
 

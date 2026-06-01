@@ -27,13 +27,21 @@ akonado/manifests/*.json
 !akonado/manifests/.gitkeep
 akonado/comfyui/*.json
 !akonado/comfyui/.gitkeep
+!akonado/comfyui/example_*
 
-# Generated assets (uncomment if you don't want to track generated files)
-# assets/characters/
-# assets/backgrounds/
-# assets/audio/bgm/
-# assets/audio/se/
-# assets/audio/voice/
-# ui/logo.png
-# ui/title_bg.png
-# ui/app_icon.png
+# Generated assets
+assets/characters/
+assets/backgrounds/
+assets/audio/bgm/
+assets/audio/se/
+assets/audio/voice/
+ui/logo.png
+ui/title_bg.png
+ui/app_icon.png
+
+# Generated story scripts
+story/
+
+# Test/temp
+*.bak
+*.orig

@@ -18,13 +18,13 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="Konado Project"
+config/name="Akonado - 雨夜等待"
 config/description="Konado is a dialogue creation toolkit for the Godot Engine, with templates and a dialogue manager to help you quickly build Visual Novels, Gal Games, RPGs and other story‑driven projects."
 config/version="2.4.3"
-run/main_scene="uid://bcl2e6o0kb5dm"
+run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
-boot_splash/image="uid://b7rb283oriti5"
-config/icon="uid://b5olx2vwoscbr"
+boot_splash/image="res://ui/splash.png"
+config/icon="res://ui/icon.png"
 boot_splash/minimum_display_time=500
 
 [autoload]

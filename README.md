@@ -49,10 +49,20 @@ cp .env.example .env
 # 检查 provider 可用性
 python -m akonado check
 
-# 从一句话生成剧本
-python -m akonado skill run -n generate_script -i "一个关于奶茶店的故事"
+# 一键生成全部（从一句话开始）
+python -m akonado pipeline "这个故事是关于战争与和平的故事"
 
-# 生成所有资产
+# 自定义章节和场景数
+python -m akonado pipeline "一个关于奶茶店的故事" --chapters 5 --scenes-per-chapter 4
+
+# 使用 Qwen TTS 引擎
+python -m akonado pipeline "科幻冒险故事" --engine qwen
+
+# 指定 Godot 引擎目录
+python -m akonado pipeline "故事概要" --godot-dir "C:\path\to\Godot"
+
+# 分步操作
+python -m akonado skill run -n generate_script -i "一个关于奶茶店的故事"
 python -m akonado generate all
 
 # 启动 Web GUI
@@ -82,27 +92,53 @@ akonado/                  # 本项目根目录（Godot 项目）
 
 | 命令 | 说明 |
 |------|------|
+| `python -m akonado pipeline "<premise>"` | 一键生成全部资产（推荐） |
 | `python -m akonado check` | 检查 provider 可用性 |
 | `python -m akonado generate <type>` | 生成资产（characters/backgrounds/bgm/se/voice/ui/dialogue/all） |
 | `python -m akonado list [type]` | 查看 manifest 内容 |
-| `python -m akonado clean <type>` | 删除生成的文件 |
+| `python -m akonado clean <type>` | 删除生成的文件（支持 all/manifests/scripts/类型名，`--deep` 清理全部） |
 | `python -m akonado skill list` | 列出可用 skills |
 | `python -m akonado skill run -n <name> -i <input>` | 运行 LLM skill |
+| `python -m akonado workflows` | 列出 ComfyUI 工作流 |
 | `python -m akonado web` | 启动 Web GUI |
+
+### Pipeline 参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--chapters` | 章节数 | 4 |
+| `--scenes-per-chapter` | 每章场景数 | 3 |
+| `--engine` | TTS 引擎（mimo/qwen） | mimo |
+| `--godot-dir` | Godot 引擎目录 | `G:\SteamLibrary\steamapps\common\Godot Engine` |
+| `--force` | 强制重新生成（不跳过已有文件） | false |
+| `--temperature` | LLM 温度参数 | 0.7 |
 
 ## 文档
 
-- [快速开始](docs/akonado/getting-started.md)
+- [快速开始](docs/akonado/getting-started.md) — 安装、配置、第一个项目
+- [ComfyUI 搭建指南](docs/akonado/comfyui-setup.md) — 图像/音频生成后端
+- [TTS 配音搭建指南](docs/akonado/tts-setup.md) — MiMo TTS / Qwen TTS 配置
 - [架构设计](docs/akonado/architecture.md)
 - [后端 Providers](docs/akonado/providers.md)
 - [技能 Skills](docs/akonado/skills.md)
 - [资产清单 Manifests](docs/akonado/manifests.md)
 - [Web GUI](docs/akonado/web-gui.md)
+- [English Documentation](docs/akonado/en/)
 - [Konado 框架文档](docs/konado/)
 
 ## 依赖项目
 
 - [Konado](https://github.com/DSOE1024/Konado) — Godot 视觉小说对话框架（BSD-3-Clause）
+
+## AI 使用免责声明
+
+本项目使用 AI 技术生成视觉小说资产（包括但不限于文本、图像、音频）。请注意：
+
+- **内容由 AI 生成**：所有通过本工具生成的剧本、角色、背景、音乐等内容均由 AI 模型生成，可能存在不准确、不恰当或不符合预期的内容。
+- **人工审核建议**：建议在使用生成内容前进行人工审核和编辑，确保内容符合项目需求和质量标准。
+- **版权与许可**：AI 生成内容的版权归属取决于所使用的 AI 服务条款。请在使用前了解相关服务的使用条款。
+- **模型限制**：生成质量受所用 AI 模型能力限制，不同模型可能产生不同效果。
+- **责任声明**：本工具仅供辅助创作使用，使用者应对最终内容负责。
 
 ## 许可证
 

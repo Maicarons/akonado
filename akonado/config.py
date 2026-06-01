@@ -38,7 +38,7 @@ ENV_FILE = _AKONADO_ROOT / ".env"
 # ── LLM Provider (OpenAI-compatible) ──────────────────────────
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-5.5")
 
 # ── MiMo TTS (Xiaomi Cloud) ──────────────────────────────────
 MIMO_API_KEY = os.getenv("MIMO_API_KEY", "")
@@ -53,10 +53,11 @@ QWEN_TTS_DTYPE = os.getenv("QWEN_TTS_DTYPE", "bfloat16")
 # ── ComfyUI ───────────────────────────────────────────────────
 COMFYUI_URL = os.getenv("COMFYUI_URL", "http://127.0.0.1:8188")
 
-# ── Workflow Templates ────────────────────────────────────────
-IMAGE_WORKFLOW = COMFYUI_DIR / "image_workflow.json"
-REMOVE_BG_WORKFLOW = COMFYUI_DIR / "remove_bg_workflow.json"
-AUDIO_WORKFLOW = COMFYUI_DIR / "audio_workflow.json"
+# ── Godot Engine ──────────────────────────────────────────────
+GODOT_DIR = Path(os.getenv(
+    "GODOT_DIR",
+    r"G:\SteamLibrary\steamapps\common\Godot Engine",
+))
 
 # ── Web GUI ───────────────────────────────────────────────────
 WEB_HOST = os.getenv("WEB_HOST", "127.0.0.1")

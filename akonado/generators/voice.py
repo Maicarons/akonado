@@ -129,7 +129,7 @@ def insert_voice_labels() -> None:
             text = entry["text"]
             voice_id = entry["id"]
 
-            pattern = rf'^("{re.escape(character)}"\s+"{re.escape(text)}")\s*(\S+)?$'
+            pattern = rf'^\s*("{re.escape(character)}"\s+"{re.escape(text)}")\s*(\S+)?$'
             match = re.search(pattern, content, re.MULTILINE)
 
             if match:

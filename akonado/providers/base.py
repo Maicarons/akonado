@@ -32,6 +32,8 @@ class LLMProvider(ABC):
 class ImageProvider(ABC):
     """Image generation provider (e.g. ComfyUI)."""
 
+    name: str = "base"
+
     @abstractmethod
     def available(self) -> bool:
         """Return True if the provider is configured and ready."""

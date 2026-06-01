@@ -1,7 +1,7 @@
 """akonado providers — backend abstraction for generation services.
 
 Usage:
-    from akonado.providers import OpenAICompatibleLLM, ComfyUIImageProvider, MiMoTTS
+    from akonado.providers import OpenAICompatibleLLM, ComfyUIClient, MiMoTTS
 
     llm = OpenAICompatibleLLM()
     if llm.available():
@@ -10,9 +10,12 @@ Usage:
 
 from .base import LLMProvider, ImageProvider, TTSProvider
 from .llm import OpenAICompatibleLLM
-from .image import ComfyUIImageProvider
+from .comfyui import ComfyUIClient, WorkflowTemplate
 from .tts_mimo import MiMoTTS
 from .tts_qwen import QwenTTS
+
+# Backward-compatible alias
+ComfyUIImageProvider = ComfyUIClient
 
 __all__ = [
     # Base classes
@@ -21,7 +24,9 @@ __all__ = [
     "TTSProvider",
     # Concrete providers
     "OpenAICompatibleLLM",
-    "ComfyUIImageProvider",
+    "ComfyUIClient",
+    "ComfyUIImageProvider",  # backward compat alias
+    "WorkflowTemplate",
     "MiMoTTS",
     "QwenTTS",
 ]
