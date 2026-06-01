@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://addons/konado/template/konado_dialogue.tscn" id="1_main"]
 [ext_resource type="Resource" path="res://assets/characters/characters.tres" id="2_chars"]
@@ -7,7 +7,6 @@
 [ext_resource type="Resource" path="res://assets/audio/voice/voice.tres" id="5_voice"]
 [ext_resource type="Resource" path="res://assets/audio/se/se.tres" id="6_se"]
 [ext_resource type="Script" path="res://main.gd" id="7_main_script"]
-[ext_resource type="Resource" path="res://story/chapter01/chapter01_01.ks" id="8_shot"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -25,4 +24,3 @@ background_list = ExtResource("3_bgs")
 bgm_list = ExtResource("4_bgm")
 voice_list = ExtResource("5_voice")
 soundeffect_list = ExtResource("6_se")
-start_dialogue_shot = ExtResource("8_shot")

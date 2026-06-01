@@ -256,13 +256,20 @@ def generate_audio_tres(
 
     ext_id = 3
     audio_ids = {}
-    # Convert absolute path to Godot res:// path
-    from ..config import PROJECT_ROOT
+    # Determine the res:// path based on asset_dir
+    if asset_dir.name == "bgm":
+        res_prefix = "res://assets/audio/bgm"
+    elif asset_dir.name == "se":
+        res_prefix = "res://assets/audio/se"
+    elif asset_dir.name == "voice":
+        res_prefix = "res://assets/audio/voice"
+    else:
+        res_prefix = f"res://assets/{asset_dir.name}"
+
     for item_id, ext in audio_items:
         audio_ids[item_id] = ext_id
-        rel_path = asset_dir.relative_to(PROJECT_ROOT)
         lines.append(_ext_resource_audio(
-            f"res://{rel_path}/{item_id}.{ext}", f"ext_{ext_id}"
+            f"{res_prefix}/{item_id}.{ext}", f"ext_{ext_id}"
         ))
         ext_id += 1
 
