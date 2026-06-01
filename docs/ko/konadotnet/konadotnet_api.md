@@ -5,254 +5,260 @@ order: 2
 
 # Konado .NET API
 
-> 이 기능은 아직 실험적 기능이며 일부 문제가 있을 수 있습니다.
+> 이 기능은 아직 실험적입니다. 
 
 ## 소개
 
-Konado.NET은 Konado 대화 시스템의 C# API 확장입니다. Konado.NET을 사용하면 개발자가 C# 프로젝트에서 대화 내용을 쉽게 생성, 관리, 실행할 수 있습니다.
+Konado.NET은 Konado 대화 시스템의 C# API 확장입니다. Konado 기본 플러그인을 대체하는 것이 아니라, C#에서 `KND_DialogueManager`를 제어하고, 대화 흐름 신호를 구독하고, `.ks` 스크립트를 파싱하며, Konado GDScript 데이터 리소스를 다루기 위한 얇은 레이어입니다.
 
-## 사용 방법
+진입점은 자동 로드 노드 `KonadoAPI`입니다. 일반적으로 `KonadoAPI.DialogueManagerApi`에서 시작합니다.
 
-### 비 .NET 프로젝트
+## 사용 조건
 
-비 .NET 프로젝트에서 Konado .NET API를 사용하면 다음 오류가 발생할 수 있으며, 이는 정상적인 현상입니다.
-```
- ERROR: core/io/resource_loader.cpp:568 - Condition "local_path.is_empty()" is true. Returning: Ref<ResourceLoader::LoadToken>()
-  ERROR: Failed to create an autoload, can't load from UID or path: uid://ptylvcqylq7j.
-  ERROR: editor/settings/editor_autoload_settings.cpp:571 - Condition "!info->node" is true. Continuing.
+Konado.NET은 C#을 지원하는 Godot 프로젝트에서만 사용할 수 있습니다. Godot 4.6 이상의 .NET 에디터를 사용하세요. 비 .NET 프로젝트에서 활성화하면 `res://addons/konadotnet/Konadotnet.cs`를 로드하지 못할 수 있습니다. 이 경우 Konado 기본 플러그인은 사용할 수 있지만 C# API는 사용할 수 없습니다.
 
-```
+먼저 `Konado` 플러그인을 활성화하고, 그다음 `Konadotnet`을 활성화하세요. 장면에는 `KND_DialogueManager` 노드가 필요합니다. Konado.NET은 스크립트 타입으로 검색하며 `DialogManager`, `DialogueManager`, `KonadoDialogueManager` 같은 일반적인 노드 이름도 지원합니다. 대화 관리자가 여러 개라면 `BindDialogueManager(Node source)`로 명시적으로 지정하세요.
 
-이 문제는 Konado 기본 기능 사용에는 영향을 주지 않지만, Konado .NET API는 사용할 수 없습니다.
-
-### 플러그인 활성화
-
-먼저 Konado 플러그인을 활성화한 뒤 Konado .NET API 플러그인을 활성화하세요.
-
-장면에는 DialogueManager 노드가 포함되어야 합니다. 그렇지 않으면 Konado .NET API가 정상적으로 동작하지 않습니다.
-
-Konado.NET을 처음 활성화할 때 다음 오류가 발생할 수 있습니다.
-
-```
-“res://addons/konadotnet/Konadotnet.cs” 경로에서 애드온 스크립트를 로드할 수 없습니다. 스크립트에 코드 오류가 있을 수 있습니다.
-추가 오류를 막기 위해 “res://addons/konadotnet/plugin.cfg” 위치의 애드온을 비활성화합니다.
-```
-
-```
-Unable to load addon script from path: 'res://addons/konadotnet/Konadotnet.cs'.
-```
-
-이는 정상적인 현상입니다. Godot에서 Konado.NET을 다시 빌드한 다음 프로젝트를 다시 열면 해결됩니다.
-
-플러그인을 활성화할 수 없고 MSBuild에 아무 오류도 없다면, 프로젝트를 닫은 뒤 프로젝트 루트 디렉터리의 `.godot/` 폴더를 삭제하고 프로젝트를 다시 생성해 보세요.
-
-## API 참조
-
-### KonadoAPI
-
-Konado 시스템에 접근하기 위한 핵심 API 클래스입니다.
-
-#### 속성
-
-- `bool IsApiReady`: API가 준비되었는지 나타냅니다
-- `KonadoAPI API`: Konado API 접근을 제공하는 정적 인스턴스
-- `DialogueManagerAPI DialogueManagerApi`: 대화 관리자 API 인스턴스
-
-### DialogueManagerAPI
-
-대화 실행을 제어하는 대화 관리자 API입니다.
-
-#### 메서드
-
-- `InitDialogue()`: 대화 초기화
-- `StartDialogue()`: 대화 시작
-- `StopDialogue()`: 대화 정지
-
-#### 이벤트
-
-- `ShotStart`: 대화 장면이 시작될 때 트리거됩니다
-- `ShotEnd`: 대화 장면이 끝날 때 트리거됩니다
-- `DialogueLineStart(int line)`: 대화 줄이 시작될 때 트리거됩니다
-- `DialogueLineEnd(int line)`: 대화 줄이 끝날 때 트리거됩니다
-
-### ActingInterface
-
-배경 전환 효과 유형을 정의하는 연출 인터페이스입니다.
-
-#### 열거형
-
-- `BackgroundTransitionEffectsType`: 배경 전환 효과 유형
-  - `NoneEffect`: 효과 없음
-  - `EraseEffect`: 지우기 효과
-  - `BlindsEffect`: 블라인드 효과
-  - `WaveEffect`: 파동 효과
-  - `AlphaFadeEffect`: 투명도 페이드 효과
-  - `VortexSwapEffect`: 소용돌이 전환 효과
-  - `WindmillEffect`: 풍차 효과
-  - `CyberGlitchEffect`: 사이버 글리치 효과
-
-### Wrapper 클래스
-
-Wrapper 클래스는 GDScript 객체에 대한 C# 래퍼를 제공하여 개발자가 C#에서 Konado의 다양한 데이터 구조를 조작할 수 있게 합니다. 다만 현재 이 클래스들은 완전히 구현되어 있지 않으며 일부 속성과 메서드만 제공합니다. 앞으로 더 개선될 예정입니다.
-
-#### Dialogue
-
-단일 대화 요소를 나타내는 대화 객체 래퍼입니다.
-
-##### 속성
-
-- `Type DialogueType`: 대화 유형(열거형)
-- `string BranchId`: 분기 ID
-- `Array<Dialogue> BranchDialogue`: 분기 대화
-- `bool IsBranchLoaded`: 분기 로드 여부
-- `string CharacterId`: 캐릭터 ID
-- `string DialogueContent`: 대화 내용
-- `DialogueActor ShowActor`: 표시할 캐릭터
-- `string ExitActor`: 퇴장할 캐릭터
-- `string ChangeStateActor`: 상태가 변경되는 캐릭터
-- `string TargetMoveChara`: 이동 대상 캐릭터
-- `Vector2 TargetMovePos`: 이동 목표 위치
-- `Array<DialogueChoice> Choices`: 대화 선택지
-- `string BgmName`: 배경 음악 이름
-- `string VoiceId`: 음성 ID
-- `string SoundeffectName`: 효과음 이름
-- `string BackgroundImageName`: 배경 이미지 이름
-- `BackgroundTransitionEffectsType BackgroundToggleEffects`: 배경 전환 효과
-- `string JumpShotId`: 이동할 장면 ID
-- `string LabelNotes`: 라벨 주석
-- `Dictionary ActorSnapshots`: 캐릭터 스냅샷
-
-##### 대화 유형 열거형
-
-- `Start`: 시작
-- `OrdinaryDialog`: 일반 대화
-- `DisplayActor`: 캐릭터 표시
-- `ActorChangeState`: 캐릭터 상태 변경
-- `MoveActor`: 캐릭터 이동
-- `SwitchBackground`: 배경 전환
-- `ExitActor`: 캐릭터 퇴장
-- `PlayBgm`: 배경 음악 재생
-- `StopBgm`: 배경 음악 정지
-- `PlaySoundEffect`: 효과음 재생
-- `ShowChoice`: 선택지 표시
-- `Branch`: 분기
-- `JumpTag`: 태그로 점프
-- `JumpShot`: 장면으로 점프
-- `TheEnd`: 종료
-- `Label`: 라벨
-
-#### DialogueActor
-
-대화 안의 캐릭터 객체를 나타내는 대화 캐릭터 래퍼입니다.
-
-##### 속성
-
-- `string CharacterName`: 캐릭터 이름
-- `string CharacterState`: 캐릭터 상태
-- `Vector2 ActorPosition`: 캐릭터 위치
-- `Vector2 ActorScale`: 캐릭터 스케일
-- `bool ActorMirror`: 캐릭터 미러링
-
-#### DialogueChoice
-
-대화 안의 선택지 객체를 나타내는 대화 선택지 래퍼입니다.
-
-##### 속성
-
-- `string ChoiceText`: 선택지 텍스트
-- `string JumpTag`: 점프 태그
-
-#### KndData
-
-Konado KND_Data 데이터 기반 클래스 래퍼입니다.
-
-##### 속성
-
-- `string Type`: 데이터 유형
-- `bool Love`: 선호 콘텐츠 여부
-- `string Tip`: 안내 정보
-
-#### KndShot
-
-KndData를 상속하는 Konado KND_Shot 샷 래퍼입니다.
-
-##### 속성
-
-- `string Name`: 장면 이름
-- `string ShotId`: 장면 ID
-- `string SourceStory`: 원본 이야기
-- `Array<Dictionary> DialoguesSourceData`: 대화 원본 데이터
-- `Dictionary Branches`: 분기
-- `Dictionary<string, Dictionary> SourceBranches`: 원본 분기
-- `Dictionary<string, int> ActorCharacterMap`: 캐릭터 매핑
-
-#### KonadoScriptsInterpreter
-
-Konado 스크립트 파일을 파싱하는 데 사용되는 KonadoScriptsInterpreter 스크립트 인터프리터 래퍼입니다.
-
-##### 메서드
-
-- `KndShot ProcessScriptsToData(string path)`: 스크립트 파일을 데이터로 처리
-- `Dialogue ParseSingleLine(string line, long lineNumber, string path)`: 단일 스크립트 줄 파싱
-
-## 예시 코드
-
-### 대화 관리
+## 빠른 시작
 
 ```csharp
+using Godot;
 using Konado.Runtime.API;
+using Konado.Wrapper;
 
-// Konado API 인스턴스 가져오기
-var konadoAPI = KonadoAPI.API;
-var dialogueManager = KonadoAPI.DialogueManagerApi;
-
-// API 준비 여부 확인
-if (dialogueManager.IsReady)
+public partial class DialogueExample : Node
 {
-    // 대화 초기화
-    dialogueManager.InitDialogue();
+    public override void _Ready()
+    {
+        var dialogueManager = KonadoAPI.DialogueManagerApi;
 
-    // 대화 시작
-    dialogueManager.StartDialogue();
+        dialogueManager.DialogueLineStart += (string nodeId) =>
+        {
+            GD.Print($"Node started: {nodeId}");
+        };
 
-    // 대화 정지
-    dialogueManager.StopDialogue();
+        dialogueManager.CustomSignal += (string content) =>
+        {
+            GD.Print($"Custom signal: {content}");
+        };
+
+        var interpreter = new KonadoScriptsInterpreter();
+        var shot = interpreter.ProcessScriptsToData("res://sample/demo/demo_01.ks");
+
+        dialogueManager.SetShot(shot.SourceResource);
+        dialogueManager.InitDialogue();
+        dialogueManager.StartDialogue();
+    }
 }
 ```
 
-### 대화 이벤트 감시
+## KonadoAPI
+
+| 멤버 | 타입 | 설명 |
+| --- | --- | --- |
+| `IsApiReady` | `bool` | `KonadoAPI` 자동 로드 노드가 초기화되었는지 여부입니다. `KND_DialogueManager`를 찾았다는 뜻은 아닙니다. |
+| `API` | `static KonadoAPI` | 현재 자동 로드 인스턴스의 정적 참조입니다. |
+| `DialogueManagerApi` | `static DialogueManagerAPI` | 대화 관리자 API 인스턴스이며 주요 런타임 진입점입니다. |
+
+## DialogueManagerAPI
+
+`DialogueManagerAPI`는 `KND_DialogueManager`의 C# 제어 레이어이며 호출을 GDScript 노드로 전달합니다.
+
+### 속성
+
+| 속성 | 타입 | 설명 |
+| --- | --- | --- |
+| `IsReady` | `bool` | 사용할 수 있는 `KND_DialogueManager`에 바인딩되었는지 여부입니다. |
+| `Source` | `Node` | 현재 바인딩된 원본 Godot 노드입니다. |
+
+### 메서드
+
+| 메서드 | 설명 |
+| --- | --- |
+| `bool BindDialogueManager(Node source = null)` | 지정한 대화 관리자에 바인딩합니다. 생략하면 장면 트리를 순회합니다. 성공하면 `true`를 반환합니다. |
+| `void InitDialogue()` | `init_dialogue()`를 호출합니다. 보통 `SetShot()` 뒤, `StartDialogue()` 앞에서 호출합니다. |
+| `void SetShot(Resource shot)` | `set_shot()`으로 현재 `KND_Shot`을 변경합니다. 래퍼를 전달할 때는 `KndShot.SourceResource`를 사용합니다. |
+| `void StartDialogue()` | `start_dialogue()`를 호출해 재생을 시작합니다. |
+| `void StopDialogue()` | `stop_dialogue()`를 호출해 재생을 중지합니다. |
+| `void StartAutoplay(bool value)` | 자동 재생을 전환합니다. |
+| `bool SaveGame(int saveId)` | 진행 상황을 저장합니다. API가 준비되지 않았거나 저장에 실패하면 `false`를 반환합니다. |
+| `bool LoadGame(int saveId)` | 지정한 저장 슬롯을 불러옵니다. |
+| `bool DeleteSave(int saveId)` | 지정한 저장 슬롯을 삭제합니다. |
+| `Dictionary GetSaveInfo(int saveId)` | 단일 저장 정보를 가져옵니다. API가 준비되지 않았으면 빈 딕셔너리를 반환합니다. |
+| `Array<Dictionary> GetAllSaveInfo()` | 모든 저장 정보를 가져옵니다. API가 준비되지 않았으면 빈 배열을 반환합니다. |
+
+일반적인 재생 순서:
 
 ```csharp
-// 대화 시작 이벤트 감시
-dialogueManager.ShotStart += () => {
-    GD.Print("대화 장면 시작");
-};
-
-// 대화 종료 이벤트 감시
-dialogueManager.ShotEnd += () => {
-    GD.Print("대화 장면 종료");
-};
-
-// 대화 줄 시작 이벤트 감시
-dialogueManager.DialogueLineStart += (int line) => {
-    GD.Print($"대화 줄 {line} 시작");
-};
-
-// 대화 줄 종료 이벤트 감시
-dialogueManager.DialogueLineEnd += (int line) => {
-    GD.Print($"대화 줄 {line} 종료");
-};
+var shot = interpreter.ProcessScriptsToData("res://dialogues/chapter_01.ks");
+dialogueManager.SetShot(shot.SourceResource);
+dialogueManager.InitDialogue();
+dialogueManager.StartDialogue();
 ```
 
-### Konado 스크립트 파싱
+### 이벤트
+
+| 이벤트 | 설명 |
+| --- | --- |
+| `ShotStart` | `shot_start`에 연결됩니다. 샷이 시작될 때 발생합니다. |
+| `ShotEnd` | `shot_end`에 연결됩니다. 샷이 끝날 때 발생합니다. |
+| `DialogueLineStart(string nodeId)` | `dialogue_line_start(node_id)`에 연결됩니다. Konado 2.4는 이전 줄 번호 대신 노드 ID를 사용합니다. |
+| `DialogueLineEnd(string nodeId)` | `dialogue_line_end(node_id)`에 연결됩니다. |
+| `CustomSignal(string content)` | `custom_signal(content)`에 연결됩니다. `.ks`의 `signal` 문에서 발생합니다. |
+
+## ActingInterface
+
+| 열거값 | 효과 |
+| --- | --- |
+| `NoneEffect` | 효과 없음 |
+| `EraseEffect` | 지우기 효과 |
+| `BlindsEffect` | 블라인드 효과 |
+| `WaveEffect` | 웨이브 효과 |
+| `AlphaFadeEffect` | 알파 페이드 효과 |
+| `VortexSwapEffect` | 소용돌이 전환 효과 |
+| `WindmillEffect` | 풍차 효과 |
+| `CyberGlitchEffect` | 사이버 글리치 효과 |
+
+## Wrapper 클래스
+
+Wrapper 클래스는 Konado GDScript 리소스를 감싸는 가벼운 C# 래퍼입니다. 기존 리소스를 감쌀 때는 스크립트 타입을 검증하고, 새 래퍼를 만들 때는 대응하는 GDScript 리소스를 생성합니다. Konado API에 다시 전달할 때는 `SourceResource`를 사용하세요.
+
+## Dialogue
+
+`Dialogue`는 `KND_Dialogue`를 감쌉니다: `res://addons/konado/scripts/dialogue/knd_dialogue.gd`.
+
+| 멤버 | 설명 |
+| --- | --- |
+| `Dialogue()` | 새 `KND_Dialogue` 리소스를 생성합니다. |
+| `Dialogue(GodotObject source)` | 기존 `KND_Dialogue`를 감쌉니다. 잘못된 소스면 예외를 던집니다. |
+| `SourceResource` | 원본 `Resource`를 반환합니다. |
+
+| 속성 | 타입 | 설명 |
+| --- | --- | --- |
+| `SourceFileLine` | `int` | 원본 `.ks` 줄 번호입니다. 디버깅과 오류 위치에 사용합니다. |
+| `DialogueType` | `Dialogue.Type` | 노드 타입이며 재생 처리 방식을 결정합니다. |
+| `NodeId` | `string` | 대화 그래프 노드 ID입니다. |
+| `NextId` | `string` | 기본 다음 노드 ID입니다. |
+| `IfNextId` | `string` | 조건이 참일 때 이동할 노드입니다. |
+| `ElseNextId` | `string` | 조건이 거짓일 때 이동할 노드입니다. |
+| `VarName` | `string` | 조건 판단에 사용할 변수명입니다. |
+| `ConditionOperator` | `int` | 조건 연산자: `0 ==`, `1 >`, `2 <`, `3 >=`, `4 <=`. |
+| `TargetValue` | `int` | 조건 비교 대상 값입니다. |
+| `CharacterId` | `string` | 말하는 캐릭터 ID입니다. |
+| `DialogueContent` | `string` | 대화 텍스트입니다. |
+| `VoiceId` | `string` | 음성 ID입니다. |
+| `CharacterName` | `string` | 표시하거나 생성할 캐릭터 ID입니다. |
+| `CharacterState` | `string` | 캐릭터 상태 또는 일러스트 상태 ID입니다. |
+| `ActorPosition` | `Vector2` | 캐릭터 위치입니다. Konado 2.4는 그리드 기반 배치를 사용합니다. |
+| `ExitActor` | `string` | 퇴장 또는 숨길 캐릭터 ID입니다. |
+| `ChangeStateActor` | `string` | 상태를 변경할 캐릭터 ID입니다. |
+| `ChangeState` | `string` | 대상 상태 ID입니다. |
+| `TargetMoveChara` | `string` | 이동할 캐릭터 ID입니다. |
+| `TargetMovePos` | `Vector2` | 이동 목표 위치입니다. |
+| `Choices` | `Array<DialogueChoice>` | 선택지 목록입니다. 각 선택지는 `NextId`로 대상 노드를 가리킵니다. |
+| `JumpShotPath` | `string` | 다른 `KND_Shot`으로 이동할 리소스 경로입니다. |
+| `JumpBranchTarget` | `string` | 현재 샷 내부의 분기 라벨입니다. |
+| `BgmName` | `string` | 재생할 BGM 이름입니다. |
+| `SoundeffectName` | `string` | 재생할 효과음 이름입니다. |
+| `BackgroundImageName` | `string` | 전환할 배경 이미지 이름입니다. |
+| `BackgroundToggleEffects` | `BackgroundTransitionEffectsType` | 배경 전환 효과입니다. |
+| `CustomSignalName` | `string` | `CustomSignal` 이벤트로 전달되는 내용입니다. |
+| `AchievementId` | `string` | 업적 ID입니다. |
+| `AchievementValue` | `int` | 업적 진행 값입니다. |
+| `AchievementFlagName` | `string` | 업적 플래그 이름입니다. |
+| `AchievementFlagValue` | `bool` | 업적 플래그 값입니다. |
+| `VariableName` | `string` | 조작할 변수명입니다. |
+| `VariableOperation` | `int` | 변수 연산: `0 SET`, `1 ADD`, `2 SUB`, `3 MUL`, `4 DIV`. |
+| `VariableOperand` | `string` | 문자열로 저장되며 런타임에 기본 플러그인이 해석하는 피연산자입니다. |
+| `IsPersistent` | `bool` | 지속 변수 여부입니다. 보통 `%`는 지속 변수, `$`는 임시 변수입니다. |
+
+### Dialogue.Type
+
+| 값 | 설명 |
+| --- | --- |
+| `OrdinaryDialog` | 일반 대화. |
+| `DisplayActor` | 캐릭터 표시 또는 생성. |
+| `ActorChangeState` | 캐릭터 상태 변경. |
+| `MoveActor` | 캐릭터 이동. |
+| `SwitchBackground` | 배경 전환. |
+| `ExitActor` | 캐릭터 퇴장. |
+| `PlayBgm` | BGM 재생. |
+| `StopBgm` | BGM 중지. |
+| `PlaySoundEffect` | 효과음 재생. |
+| `ShowChoice` | 선택지 표시. |
+| `IfElseBranch` | 조건 분기. |
+| `Branch` | 호환성을 위해 남겨진 이전 분기 값. |
+| `Jump` | 점프 노드. |
+| `JumpBranch` | 분기 라벨로 점프. |
+| `Signal` | 사용자 정의 신호 노드. |
+| `AchievementUnlock` | 업적 잠금 해제. |
+| `AchievementProgress` | 업적 진행 업데이트. |
+| `AchievementFlag` | 업적 플래그 설정. |
+| `SetVariable` | 변수 설정 또는 변경. |
+| `TheEnd` | 종료 노드. |
+
+## DialogueChoice
+
+| 속성 | 타입 | 설명 |
+| --- | --- | --- |
+| `ChoiceText` | `string` | 플레이어에게 표시되는 선택지 텍스트입니다. |
+| `NextId` | `string` | 선택 후 이동할 대상 노드 ID입니다. |
+
+## KndData
+
+`KndData`는 Konado 데이터 리소스의 기본 래퍼입니다. 대부분의 경우 `KndShot`, `Dialogue`, `DialogueChoice` 같은 구체 클래스를 사용합니다.
+
+## KndShot
+
+| 속성 | 타입 | 설명 |
+| --- | --- | --- |
+| `KsPath` | `string` | 원본 `.ks` 경로입니다. |
+| `ShotId` | `string` | 샷 ID입니다. |
+| `StartNodeId` | `string` | 시작 노드 ID입니다. 비어 있으면 보통 첫 노드를 사용합니다. |
+| `Dialogues` | `Array<Dialogue>` | 샷에 포함된 모든 대화 노드입니다. |
+
+| 메서드 | 설명 |
+| --- | --- |
+| `Dialogue FindNode(string nodeId)` | `node_id`로 노드를 찾습니다. 없으면 `null`을 반환합니다. |
+| `Dialogue GetStartNode()` | 시작 노드를 가져옵니다. |
+
+## KonadoScriptsInterpreter
+
+| 멤버 | 설명 |
+| --- | --- |
+| `KonadoScriptsInterpreter(Dictionary<string, Variant> flags = null)` | 새 인터프리터를 생성합니다. `flags`는 호환성을 위해 남겨져 있습니다. |
+| `KonadoScriptsInterpreter(GodotObject source)` | 기존 인터프리터 객체를 감쌉니다. |
+| `KndShot ProcessScriptsToData(string path)` | `.ks` 파일을 `KND_Shot`으로 파싱합니다. |
+| `Dialogue ParseSingleLine(string line, long lineNumber, string path)` | Konado 스크립트 한 줄을 파싱합니다. |
+
+## 예시
 
 ```csharp
-using Konado.Wrapper;
+var interpreter = new KonadoScriptsInterpreter();
+var shot = interpreter.ProcessScriptsToData("res://sample/demo/demo_01.ks");
 
-// 스크립트 인터프리터 생성
-var flags = new Godot.Collections.Dictionary<string, Variant>();
-var interpreter = new KonadoScriptsInterpreter(flags);
+var api = KonadoAPI.DialogueManagerApi;
+api.SetShot(shot.SourceResource);
+api.InitDialogue();
+api.StartDialogue();
+```
 
-// 전체 스크립트 파일 파싱
-var shot = interpreter.ProcessScriptsToData("res://dialogues/example.ks");
+## FAQ
+
+### `IsApiReady`는 true이지만 `DialogueManagerApi.IsReady`가 false입니다
+
+`IsApiReady`는 Konado.NET 자동 로드 노드 초기화 상태만 의미합니다. 현재 장면에 `KND_DialogueManager`가 있는지 확인하거나 수동으로 바인딩하세요.
+
+```csharp
+KonadoAPI.DialogueManagerApi.BindDialogueManager(GetNode<Node>("path/to/manager"));
+```
+
+### `SetShot` 후 재생되지 않습니다
+
+`SetShot()`은 샷만 변경합니다. 다음 순서로 호출하세요.
+
+```csharp
+api.SetShot(shot.SourceResource);
+api.InitDialogue();
+api.StartDialogue();
 ```
