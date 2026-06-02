@@ -508,9 +508,33 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     print("  Step 8/9: Generating .ks scripts, voice & dialogue")
     print("=" * 50)
     chapters = script_data.get("chapters", [])
-    char_info = _json.dumps(script_data.get("characters", []), ensure_ascii=False)
-    bg_info = _json.dumps(script_data.get("backgrounds", []), ensure_ascii=False)
-    bgm_info = _json.dumps(script_data.get("bgm", []), ensure_ascii=False)
+
+    # Load actual manifest IDs (not script.json IDs which may differ)
+    char_manifest = _load_json(MANIFESTS_DIR / "characters.json")
+    bg_manifest = _load_json(MANIFESTS_DIR / "backgrounds.json")
+    bgm_manifest = _load_json(MANIFESTS_DIR / "bgm.json")
+    se_manifest = _load_json(MANIFESTS_DIR / "se.json")
+
+    char_ids = list(char_manifest.get("items", {}).keys())
+    bg_ids = list(bg_manifest.get("items", {}).keys())
+    bgm_ids = list(bgm_manifest.get("items", {}).keys())
+    se_ids = list(se_manifest.get("items", {}).keys())
+
+    # Build character info with actual IDs and expressions
+    char_info = []
+    for cid in char_ids:
+        cdata = char_manifest["items"][cid]
+        char_info.append({
+            "id": cid,
+            "name": cdata.get("name", cid),
+            "expressions": list(cdata.get("expressions", {}).keys()),
+        })
+    char_info_str = _json.dumps(char_info, ensure_ascii=False)
+
+    print(f"  Characters: {char_ids}")
+    print(f"  Backgrounds: {bg_ids}")
+    print(f"  BGM: {bgm_ids}")
+    print(f"  SE: {se_ids}")
 
     for chapter in chapters:
         chapter_dir = STORY_DIR / chapter["id"]
@@ -518,11 +542,17 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         for scene in chapter.get("scenes", []):
             scene_vars = {
                 "scene_summary": scene.get("summary", ""),
-                "characters": char_info,
-                "backgrounds": bg_info,
-                "bgm_list": bgm_info,
+                "characters": char_info_str,
+                "backgrounds": _json.dumps(bg_ids, ensure_ascii=False),
+                "bgm_list": _json.dumps(bgm_ids, ensure_ascii=False),
                 "context": chapter.get("summary", ""),
-                "extra_instructions": f"这是第{chapter['id']}章「{chapter.get('title', '')}」的场景。背景ID: {scene.get('location', '')}",
+                "extra_instructions": f"""重要：必须使用以下ID，不要自行发明！
+背景ID: {', '.join(bg_ids)}
+BGM ID: {', '.join(bgm_ids)}
+SE ID: {', '.join(se_ids)}
+角色ID: {', '.join(char_ids)}
+角色表情: {_json.dumps({c: list(char_manifest['items'][c]['expressions'].keys()) for c in char_ids}, ensure_ascii=False)}
+""",
             }
             ks_result = _run_skill(llm, "generate_scene_script", scene_vars, temperature)
             ks_path = chapter_dir / f"{scene['id']}.ks"
