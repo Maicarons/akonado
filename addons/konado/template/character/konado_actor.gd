@@ -48,16 +48,28 @@ func _on_resized() -> void:
 	if not texture_rect:
 		print("警告：texture_rect未赋值")
 		return
-	
+
+	var division_size: float = size.x / h_division
+	var division_center: float = (h_character_position + 0.5) * division_size
+	# Calculate rendered sprite width from texture aspect ratio
+	# expand_mode=3 + stretch_mode=5: sprite scales to fit viewport height, preserving aspect ratio
+	var sprite_w: float = size.x  # fallback: full viewport width
+	if texture_rect.texture:
+		var tex_size: Vector2 = texture_rect.texture.get_size()
+		if tex_size.y > 0:
+			sprite_w = tex_size.x * (size.y / tex_size.y)
+	# Offset so sprite center = division center, sprite left edge >= 0, right edge <= viewport
+	var target_x: float = division_center - sprite_w / 2.0
+	target_x = clampf(target_x, 0.0, size.x - sprite_w)
+
 	if use_tween:
 		var tween: Tween = slot.create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(slot, "position:x", -size.x / h_division * (h_division - h_character_position ) + slot.size.x/2, animation_time)
+		tween.tween_property(slot, "position:x", target_x, animation_time)
 		await tween.finished
 		actor_moved.emit()
 	else:
-		slot.position.x = -size.x / h_division * (h_division - h_character_position ) + slot.size.x/2
-	
+		slot.position.x = target_x
 		actor_moved.emit()
 
 ## 高亮
