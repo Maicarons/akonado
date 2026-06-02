@@ -25,9 +25,31 @@ def _content_hash(character: str, text: str) -> str:
     return hashlib.md5(raw).hexdigest()[:8]
 
 
+def _load_char_id_name_map() -> tuple[set[str], dict[str, str]]:
+    """Load character ID ↔ name mapping from manifests.
+
+    Returns (voiced_ids, id_to_name) where:
+    - voiced_ids: set of character IDs that have voice config
+    - id_to_name: mapping from character ID to Chinese name
+    """
+    voiced_names = get_voice_character_names()
+    char_manifest_path = MANIFESTS_DIR / "characters.json"
+
+    id_to_name: dict[str, str] = {}
+    if char_manifest_path.exists():
+        with open(char_manifest_path, encoding="utf-8") as f:
+            char_data = json.load(f)
+        for cid, cdata in char_data.get("items", {}).items():
+            id_to_name[cid] = cdata.get("name", cid)
+
+    name_to_id = {v: k for k, v in id_to_name.items()}
+    voiced_ids = {name_to_id.get(name, name) for name in voiced_names}
+    return voiced_ids, id_to_name
+
+
 def extract_voice() -> list[dict]:
     """Extract dialogue lines from all .ks scripts into voice.json."""
-    voiced_chars = get_voice_character_names()
+    voiced_ids, id_to_name = _load_char_id_name_map()
     lines = []
     ks_files = sorted(STORY_DIR.rglob("*.ks"))
 
@@ -39,7 +61,7 @@ def extract_voice() -> list[dict]:
             character = match.group(1)
             text = match.group(2)
 
-            if character not in voiced_chars:
+            if character not in voiced_ids:
                 continue
             if "%" in text or "$" in text:
                 continue
@@ -49,6 +71,7 @@ def extract_voice() -> list[dict]:
                 "id": voice_id,
                 "file": str(ks_path.relative_to(STORY_DIR.parent)),
                 "character": character,
+                "character_name": id_to_name.get(character, character),
                 "text": text,
             })
 
@@ -88,8 +111,9 @@ def generate_voice_audio(tts: TTSProvider, *, skip_existing: bool = True) -> Non
             skipped += 1
             continue
 
-        print(f"[voice] ({i+1}/{total}) {entry['character']}: {entry['text'][:30]}...")
-        ok = tts.synthesize(entry["text"], entry["character"], out_path)
+        char_name = entry.get("character_name", entry["character"])
+        print(f"[voice] ({i+1}/{total}) {char_name}: {entry['text'][:30]}...")
+        ok = tts.synthesize(entry["text"], char_name, out_path)
         if ok:
             generated += 1
         else:

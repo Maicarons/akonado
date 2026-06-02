@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://dgmn5gwt4kuwg"]
 
 [ext_resource type="PackedScene" uid="uid://bj8ynu8013j4j" path="res://addons/konado/template/konado_dialogue.tscn" id="1_main"]
-[ext_resource type="Resource" path="res://assets/characters/characters.tres" id="2_chars"]
-[ext_resource type="Resource" path="res://assets/backgrounds/backgrounds.tres" id="3_bgs"]
-[ext_resource type="Resource" path="res://assets/audio/bgm/bgm.tres" id="4_bgm"]
-[ext_resource type="Resource" path="res://assets/audio/voice/voice.tres" id="5_voice"]
-[ext_resource type="Resource" path="res://assets/audio/se/se.tres" id="6_se"]
+[ext_resource type="Resource" uid="uid://cgd2js4jqj8vh" path="res://assets/characters/characters.tres" id="2_chars"]
+[ext_resource type="Resource" uid="uid://db84j21u416dd" path="res://assets/backgrounds/backgrounds.tres" id="3_bgs"]
+[ext_resource type="Resource" uid="uid://8rbyuotvkyh1" path="res://assets/audio/bgm/bgm.tres" id="4_bgm"]
+[ext_resource type="Resource" uid="uid://5e8npsyflrs3" path="res://assets/audio/voice/voice.tres" id="5_voice"]
+[ext_resource type="Resource" uid="uid://b2a1pap853y64" path="res://assets/audio/se/se.tres" id="6_se"]
 [ext_resource type="Script" uid="uid://0i1byno15c3" path="res://main.gd" id="7_main_script"]
 
 [node name="Main" type="Control" unique_id=1813807549]
@@ -19,6 +19,7 @@ script = ExtResource("7_main_script")
 
 [node name="KonadoDialogueManager" parent="." unique_id=1099276605 instance=ExtResource("1_main")]
 layout_mode = 1
+init_onstart = false
 chara_list = ExtResource("2_chars")
 background_list = ExtResource("3_bgs")
 bgm_list = ExtResource("4_bgm")

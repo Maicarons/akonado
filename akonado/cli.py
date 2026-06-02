@@ -443,7 +443,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     voice_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     voice_result = _run_skill(
         llm, "generate_voice_config",
-        {"input": voice_input, "mimo_voices": "default", "qwen_speakers": "default"},
+        {"input": voice_input, "mimo_voices": "冰糖(女), 茉莉(女), 苏打(男), 白桦(男)", "qwen_speakers": "Ethan(晨煦/男), Cherry(芊悦/女), Serena(苏瑶/女), Eldric Sage(沧明子/老者男), Vincent(田叔/沙哑男), Kai(凯/男), Moon(月白/男), Maia(四月/女), Ryan(甜茶/男), Chelsie(千雪/女), Nofish(不吃鱼/男)"},
         temperature,
     )
     try:
