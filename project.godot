@@ -20,7 +20,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Akonado - 雨夜等待"
 config/description="Konado is a dialogue creation toolkit for the Godot Engine, with templates and a dialogue manager to help you quickly build Visual Novels, Gal Games, RPGs and other story‑driven projects."
-config/version="2.4.3"
+config/version="2.4.4"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/image="res://ui/splash.png"
@@ -29,11 +29,21 @@ boot_splash/minimum_display_time=500
 
 [autoload]
 
+KND_AchievementManager="*uid://dlhxd0ixnuo6i"
+KND_WebTool="*uid://b4rup11rlc0uk"
+KND_Settings="*uid://crc32ueqs8u1w"
+
+
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="viewport"
+
+[dotnet]
+
+project/assembly_name="Konado Project"
+
 
 [editor_plugins]
 
