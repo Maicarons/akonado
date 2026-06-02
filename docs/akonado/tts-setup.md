@@ -118,26 +118,57 @@ python -m akonado generate voice --engine qwen
 
 两种 TTS 引擎都通过 `akonado/manifests/voice_config.json` 配置角色声音。Pipeline 会自动生成此文件，你也可以手动编辑。
 
+### MiMo 预置音色（中文）
+
+MiMo TTS 中文必须使用以下预置音色名，**不要使用英文音色**（Dean、Mia 等是英文音色，不适合中文配音）：
+
+| 音色名 | 性别 | 描述 |
+|--------|------|------|
+| `冰糖` | 女性 | 阳光积极、亲切自然 |
+| `茉莉` | 女性 | 温柔知性 |
+| `苏打` | 男性 | 标准普通话、温暖阳光 |
+| `白桦` | 男性 | 沉稳、低音、有磁性 |
+
+### Qwen 常用中文音色
+
+| 参数名 | 中文名 | 性别 | 描述 |
+|--------|--------|------|------|
+| `Ethan` | 晨煦 | 男 | 阳光温暖、标准普通话 |
+| `Cherry` | 芊悦 | 女 | 阳光亲切 |
+| `Serena` | 苏瑶 | 女 | 温柔 |
+| `Eldric Sage` | 沧明子 | 男 | 沉稳睿智老者 |
+| `Vincent` | 田叔 | 男 | 沙哑烟嗓 |
+| `Kai` | 凯 | 男 | 沉稳 |
+| `Moon` | 月白 | 男 | 率性帅气 |
+| `Maia` | 四月 | 女 | 知性温柔 |
+| `Ryan` | 甜茶 | 男 | 戏感十足 |
+| `Chelsie` | 千雪 | 女 | 二次元 |
+| `Nofish` | 不吃鱼 | 男 | 设计师口音 |
+
 ### 配置结构
 
 ```json
 {
   "characters": {
-    "girl": {
-      "profile": "你是少女，声音温柔清澈。",
+    "陈默": {
+      "profile": "28岁男性摄影师，沉默寡言，内心细腻敏感。",
+      "instruct_mimo": "角色: 28岁男性摄影师，沉默寡言，内心细腻敏感。语速偏慢，语气平静中带有淡淡的疏离感。",
+      "instruct_qwen": "用沉稳、略带距离感，但内在细腻温和的语气说。",
       "voices": {
-        "mimo": "zh-CN-XiaoyiNeural",
-        "qwen": "female-1"
+        "mimo": "白桦",
+        "qwen": "Ethan"
       },
-      "instruct_qwen": "温柔的年轻女性声音"
+      "gender": "male"
     },
-    "returnee": {
-      "profile": "你是归来的青年，声音沉稳温和。",
+    "林晚": {
+      "profile": "27岁女性建筑设计师，外表干练，内心温柔。",
+      "instruct_mimo": "角色: 27岁女性建筑设计师，外表干练专业，内心温柔怀旧。语速适中，表达情感时语速放缓。",
+      "instruct_qwen": "用清晰、专业、干练的语气说，表达情感时转为温和。",
       "voices": {
-        "mimo": "zh-CN-YunxiNeural",
-        "qwen": "male-1"
+        "mimo": "冰糖",
+        "qwen": "Cherry"
       },
-      "instruct_qwen": "沉稳的年轻男性声音"
+      "gender": "female"
     }
   },
   "emotion_rules": [
@@ -156,10 +187,11 @@ python -m akonado generate voice --engine qwen
 
 | 字段 | 说明 |
 |------|------|
-| `profile` | 角色声音描述，传给 TTS 引擎作为说话人人设 |
-| `voices.mimo` | MiMo TTS 使用的语音 ID |
-| `voices.qwen` | Qwen TTS 使用的说话人名称 |
-| `instruct_qwen` | Qwen TTS 的音色指令（仅 Qwen 引擎使用） |
+| `profile` | 角色声音描述，用于 TTS 情感控制 |
+| `voices.mimo` | MiMo TTS 音色名（必须是中文预置音色：冰糖/茉莉/苏打/白桦） |
+| `voices.qwen` | Qwen TTS 音色参数名（如 Ethan、Cherry） |
+| `instruct_mimo` | MiMo TTS 风格指令（自然语言描述角色说话风格、情绪、语速） |
+| `instruct_qwen` | Qwen TTS 的语气指导 |
 | `emotion_rules` | 根据关键词自动判断台词情绪 |
 | `emotion_directions` | 不同情绪对应的语气指导 |
 

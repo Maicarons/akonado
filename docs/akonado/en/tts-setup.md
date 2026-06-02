@@ -118,26 +118,57 @@ python -m akonado generate voice --engine qwen
 
 Both TTS engines are configured through `akonado/manifests/voice_config.json`. The pipeline auto-generates this file; you can also edit it manually.
 
+### MiMo Preset Voices (Chinese)
+
+MiMo TTS Chinese **must** use these preset voice names. Do **not** use English voices (Dean, Mia, etc.) — they are English-only and produce garbled Chinese speech.
+
+| Voice Name | Gender | Description |
+|------------|--------|-------------|
+| `冰糖` (Bingtang) | Female | Bright, positive, natural |
+| `茉莉` (Moli) | Female | Gentle, intellectual |
+| `苏打` (Suda) | Male | Standard Mandarin, warm |
+| `白桦` (Baihua) | Male | Deep, calm, magnetic |
+
+### Qwen Common Chinese Voices
+
+| Parameter | Chinese Name | Gender | Description |
+|-----------|-------------|--------|-------------|
+| `Ethan` | 晨煦 | Male | Warm, standard Mandarin |
+| `Cherry` | 芊悦 | Female | Bright, friendly |
+| `Serena` | 苏瑶 | Female | Gentle |
+| `Eldric Sage` | 沧明子 | Male | Wise elder |
+| `Vincent` | 田叔 | Male | Husky voice |
+| `Kai` | 凯 | Male | Calm |
+| `Moon` | 月白 | Male | Dashing |
+| `Maia` | 四月 | Female | Intellectual, gentle |
+| `Ryan` | 甜茶 | Male | Dramatic |
+| `Chelsie` | 千雪 | Female | Anime-style |
+| `Nofish` | 不吃鱼 | Male | Designer accent |
+
 ### Configuration Structure
 
 ```json
 {
   "characters": {
-    "girl": {
-      "profile": "You are a young girl with a gentle, clear voice.",
+    "chenmo": {
+      "profile": "28-year-old male photographer, quiet and introverted,细腻 sensitive.",
+      "instruct_mimo": "Character: 28-year-old male photographer, quiet. Slow pace, calm tone with subtle detachment.",
+      "instruct_qwen": "Speak in a calm, slightly distant but internally warm tone.",
       "voices": {
-        "mimo": "zh-CN-XiaoyiNeural",
-        "qwen": "female-1"
+        "mimo": "白桦",
+        "qwen": "Ethan"
       },
-      "instruct_qwen": "A gentle young female voice"
+      "gender": "male"
     },
-    "returnee": {
-      "profile": "You are a returning young man with a calm, warm voice.",
+    "linwan": {
+      "profile": "27-year-old female architect, outwardly capable, inwardly gentle.",
+      "instruct_mimo": "Character: 27-year-old female architect, professional and capable, gentle when expressing emotions.",
+      "instruct_qwen": "Speak in a clear, professional tone; soften when expressing emotions.",
       "voices": {
-        "mimo": "zh-CN-YunxiNeural",
-        "qwen": "male-1"
+        "mimo": "冰糖",
+        "qwen": "Cherry"
       },
-      "instruct_qwen": "A calm young male voice"
+      "gender": "female"
     }
   },
   "emotion_rules": [
@@ -156,10 +187,11 @@ Both TTS engines are configured through `akonado/manifests/voice_config.json`. T
 
 | Field | Description |
 |-------|-------------|
-| `profile` | Character voice description, passed to TTS engine as speaker persona |
-| `voices.mimo` | Voice ID for MiMo TTS |
-| `voices.qwen` | Speaker name for Qwen TTS |
-| `instruct_qwen` | Voice timbre instruction (Qwen engine only) |
+| `profile` | Character voice description, used for TTS emotion control |
+| `voices.mimo` | MiMo TTS voice name (must be Chinese preset: 冰糖/茉莉/苏打/白桦) |
+| `voices.qwen` | Qwen TTS speaker parameter name (e.g. Ethan, Cherry) |
+| `instruct_mimo` | MiMo TTS style instruction (natural language describing speaking style, emotion, pace) |
+| `instruct_qwen` | Qwen TTS tone guidance |
 | `emotion_rules` | Auto-detect line emotion from keywords |
 | `emotion_directions` | Tone guidance for each emotion |
 

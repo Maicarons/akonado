@@ -4,9 +4,9 @@ Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4
 
 ## Getting Started
 
-- [Getting Started](getting-started.md) -- Installation, configuration, first project
-- [ComfyUI Setup Guide](comfyui-setup.md) -- Image/audio generation backend setup
-- [TTS Setup Guide](tts-setup.md) -- MiMo TTS (cloud) / Qwen TTS (local) configuration
+- [Environment Setup Guide](getting-started.md) -- Full environment setup from scratch: Python, LLM API, ComfyUI, TTS, Godot
+- [ComfyUI Setup Guide](comfyui-setup.md) -- Image/audio generation backend setup (detailed)
+- [TTS Setup Guide](tts-setup.md) -- MiMo TTS (cloud) / Qwen TTS (local) configuration (detailed)
 
 ## Architecture & Design
 

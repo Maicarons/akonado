@@ -4,9 +4,9 @@ Akonado 是基于 Godot 4.6 + Konado 的全流程 AI 视觉小说生成管线。
 
 ## 入门
 
-- [快速开始](getting-started.md) — 安装、配置、第一个项目
-- [ComfyUI 搭建指南](comfyui-setup.md) — 图像/音频生成后端安装与配置
-- [TTS 配音搭建指南](tts-setup.md) — MiMo TTS（云端）/ Qwen TTS（本地）配置
+- [环境搭建指南](getting-started.md) — 从零搭建完整环境：Python、LLM API、ComfyUI、TTS、Godot
+- [ComfyUI 搭建指南](comfyui-setup.md) — 图像/音频生成后端安装与配置（详细版）
+- [TTS 配音搭建指南](tts-setup.md) — MiMo TTS（云端）/ Qwen TTS（本地）配置（详细版）
 
 ## 架构与设计
 

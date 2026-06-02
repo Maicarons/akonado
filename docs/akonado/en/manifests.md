@@ -124,12 +124,14 @@ Defines character TTS voice configuration. See [TTS Setup Guide](tts-setup.md#vo
 {
   "characters": {
     "girl": {
-      "profile": "You are a young girl with a gentle, clear voice.",
+      "profile": "18-year-old female high school student, gentle and clear voice, shy personality.",
+      "instruct_mimo": "Character: 18-year-old female student, gentle voice, shy. Slow pace, soft tone.",
+      "instruct_qwen": "Speak in a gentle, clear, slightly shy tone.",
       "voices": {
-        "mimo": "zh-CN-XiaoyiNeural",
-        "qwen": "female-1"
+        "mimo": "冰糖",
+        "qwen": "Cherry"
       },
-      "instruct_qwen": "A gentle young female voice"
+      "gender": "female"
     }
   },
   "emotion_rules": [
@@ -143,6 +145,8 @@ Defines character TTS voice configuration. See [TTS Setup Guide](tts-setup.md#vo
   }
 }
 ```
+
+> **Note**: MiMo TTS voices must use Chinese preset names (冰糖/茉莉/苏打/白桦). Do not use English names. See [TTS Setup Guide](tts-setup.md).
 
 ## dialogue.json
 

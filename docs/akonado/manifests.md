@@ -124,12 +124,14 @@ Manifests 是定义要生成哪些资产的 JSON 文件，位于 `akonado/manife
 {
   "characters": {
     "girl": {
-      "profile": "你是少女，声音温柔清澈。",
+      "profile": "18岁女性高中生，声音温柔清澈，性格内向害羞。",
+      "instruct_mimo": "角色: 18岁女性高中生，声音温柔清澈，性格内向害羞。语速偏慢，语气柔和。",
+      "instruct_qwen": "用温柔、清澈、略带羞涩的语气说。",
       "voices": {
-        "mimo": "zh-CN-XiaoyiNeural",
-        "qwen": "female-1"
+        "mimo": "冰糖",
+        "qwen": "Cherry"
       },
-      "instruct_qwen": "温柔的年轻女性声音"
+      "gender": "female"
     }
   },
   "emotion_rules": [
@@ -143,6 +145,8 @@ Manifests 是定义要生成哪些资产的 JSON 文件，位于 `akonado/manife
   }
 }
 ```
+
+> **注意**：MiMo TTS 音色必须使用中文预置音色名（冰糖/茉莉/苏打/白桦），不能使用英文名。详见 [TTS 配音搭建指南](tts-setup.md)。
 
 ## dialogue.json
 

@@ -57,6 +57,34 @@ Template variables:
 
 Generated .ks scripts follow Konado syntax and use `end` as the ending command (not `divider`).
 
+### Critical .ks Script Constraints
+
+These constraints are determined by the Konado parser implementation. Violating any of them will cause runtime parse failures:
+
+| Constraint | Reason |
+|------------|--------|
+| **Branch content must be indented 4 spaces** | `ks_interpreter.gd`'s `_parse_indented_block()` uses indentation to determine branch boundaries |
+| **All quotes must be ASCII straight quotes `"` (0x22)** | The dialogue regex only matches ASCII quotes; Unicode curly quotes `""` cause "unrecognized syntax" errors |
+| **LF line endings** | Mixed CRLF/LF causes parser line number offsets |
+| **No `actor show` inside branches** | The interpreter shares external character state when parsing branches, causing "character already exists" errors |
+| **No `actor exit` in ending branches** | The interpreter auto-clears character state; manual exit causes "cannot remove non-existent character" errors |
+| **Same character cannot `show` twice** | Must `actor exit` first, then `actor show` |
+| **`actor move` cannot move to current position** | Causes signal not to fire and state machine to freeze |
+| **`if/else/endif` does not support nesting** | Use flat structure |
+| **Ending branches should only have narration, background, BGM, end** | Do not add `actor exit`; the interpreter handles cleanup automatically |
+
+Branch indentation example:
+
+```
+branch my_branch
+    "chenmo" "dialogue text" voice_tag
+    "narrator" "narration text"
+    actor change chenmo sad
+    jump_branch ending
+```
+
+These constraints are built into the `generate_scene_script` system prompt, so the LLM will follow them automatically. If you need to manually edit .ks files, follow the rules above.
+
 ## Usage
 
 ### CLI
