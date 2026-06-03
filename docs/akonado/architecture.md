@@ -2,7 +2,7 @@
 
 ## 管线流程
 
-Akonado 采用七步管线架构，从一句话概要生成完整的视觉小说资产：
+Akonado 采用十步管线架构，从一句话概要生成完整的视觉小说资产：
 
 ```
 一句话概要
@@ -11,30 +11,32 @@ Akonado 采用七步管线架构，从一句话概要生成完整的视觉小说
 ┌─────────────────────────────────────────────────┐
 │  Step 1: LLM → script.json                      │
 │    generate_script skill                        │
-│    输出: 章节、场景、角色、背景、BGM、SE 定义     │
+│    输出: 章节、场景、角色、背景、CG、BGM、SE 定义  │
 └─────────────────────────────────────────────────┘
     │
     ▼
 ┌─────────────────────────────────────────────────┐
-│  Step 2-5: LLM → 各类 manifests                  │
+│  Step 2-7: LLM → 各类 manifests                  │
 │    characters.json / backgrounds.json            │
-│    bgm.json + se.json / voice_config.json        │
+│    cgs.json / bgm.json + se.json                 │
+│    voice_config.json / ui.json                   │
 └─────────────────────────────────────────────────┘
     │
     ▼
 ┌─────────────────────────────────────────────────┐
-│  Step 6: Providers → 生成视觉/音频资产            │
-│    ComfyUI → 角色立绘、背景图、BGM、SE、UI        │
+│  Step 8: Providers → 生成视觉/音频资产            │
+│    ComfyUI → 角色立绘、背景图、CG插画、           │
+│              BGM、SE、UI                          │
 │    输出到 assets/ 目录                            │
 └─────────────────────────────────────────────────┘
     │
     ▼
 ┌─────────────────────────────────────────────────┐
-│  Step 7a: LLM → .ks 脚本                         │
+│  Step 9a: LLM → .ks 脚本                         │
 │    generate_scene_script skill                   │
 │    输出到 story/ 目录                             │
 ├─────────────────────────────────────────────────┤
-│  Step 7b: TTS → 配音文件                          │
+│  Step 9b: TTS → 配音文件                          │
 │    从 .ks 提取台词 → 合成 → 注入 voice label       │
 │    输出到 assets/audio/voice/                     │
 └─────────────────────────────────────────────────┘
@@ -47,7 +49,7 @@ Akonado 采用七步管线架构，从一句话概要生成完整的视觉小说
 
 ### 执行顺序的重要性
 
-配音生成（Step 7b）必须在 .ks 脚本生成（Step 7a）之后执行，因为配音流程需要从 .ks 脚本中提取台词行。
+配音生成（Step 9b）必须在 .ks 脚本生成（Step 9a）之后执行，因为配音流程需要从 .ks 脚本中提取台词行。
 
 ## 核心模块
 
@@ -76,6 +78,7 @@ Akonado 采用七步管线架构，从一句话概要生成完整的视觉小说
 |-----------|--------------|------|
 | `characters.py` | characters.json | `assets/characters/<id>/<expr>.png`（透明背景） |
 | `backgrounds.py` | backgrounds.json | `assets/backgrounds/<id>.png` |
+| `cg.py` | cgs.json | `assets/cgs/<id>.png`（CG 插画，1920x1080） |
 | `bgm.py` | bgm.json | `assets/audio/bgm/<id>.mp3` |
 | `se.py` | se.json | `assets/audio/se/<id>.mp3` |
 | `voice.py` | .ks 脚本 + voice_config.json | `assets/audio/voice/<hash>.wav` |
@@ -109,6 +112,7 @@ akonado/                        # 项目根目录（Godot 项目）
 │   │       ├── happy.png
 │   │       └── ...
 │   ├── backgrounds/            #   背景图片（PNG，1920x1080）
+│   ├── cgs/                    #   CG 插画（PNG，1920x1080，角色+背景合一）
 │   └── audio/
 │       ├── bgm/                #   背景音乐（MP3）
 │       ├── se/                 #   音效（MP3）
@@ -130,6 +134,15 @@ akonado/                        # 项目根目录（Godot 项目）
 │   │   ├── tts_mimo.py         #     MiMo TTS（云端）
 │   │   └── tts_qwen.py         #     Qwen3 TTS（本地）
 │   ├── generators/             #   资产生成器
+│   │   ├── characters.py       #     角色精灵图
+│   │   ├── backgrounds.py      #     背景图片
+│   │   ├── cg.py               #     CG 插画
+│   │   ├── bgm.py              #     背景音乐
+│   │   ├── se.py               #     音效
+│   │   ├── voice.py            #     配音
+│   │   ├── ui.py               #     UI 资产
+│   │   ├── dialogue.py         #     台词提取
+│   │   └── godot_resources.py  #     .tres 资源文件
 │   ├── skills/                 #   LLM prompt 模板（JSON）
 │   ├── manifests/              #   资产清单定义（JSON）
 │   ├── comfyui/                #   ComfyUI 工作流模板

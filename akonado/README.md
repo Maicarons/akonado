@@ -6,7 +6,8 @@
 
 - 一句话生成完整剧本：从一句话概要生成完整的视觉小说剧本 + 角色 + 场景
 - 角色立绘生成：通过 ComfyUI 生成，自动去背景
-- 背景图、BGM、音效、UI 资产生成
+- 背景图、CG 插画、BGM、音效、UI 资产生成
+- CG 插画生成：重要剧情场景的高质量插画（角色+背景合一）
 - 配音合成：MiMo TTS（云端）或 Qwen3 TTS（本地 GPU）
 - JSON 管理资产清单，便于编辑和自动化
 - Web GUI 可视化编辑和生成控制
@@ -52,6 +53,7 @@ akonado/
   generators/         # 资产生成管线
     characters.py     # 角色精灵图生成器
     backgrounds.py    # 背景图片生成器
+    cg.py             # CG插画生成器（高质量场景插画）
     bgm.py            # 背景音乐生成器
     se.py             # 音效生成器
     voice.py          # 配音合成管线
@@ -61,6 +63,7 @@ akonado/
     generate_script.json
     generate_character_prompts.json
     generate_background_prompts.json
+    generate_cg_prompts.json
     generate_audio_prompts.json
     generate_scene_script.json
     generate_voice_config.json
@@ -76,7 +79,7 @@ akonado/
 | 命令 | 说明 |
 |------|------|
 | `python -m akonado check` | 检查 provider 可用性 |
-| `python -m akonado generate <type>` | 生成资产（characters/backgrounds/bgm/se/voice/ui/dialogue/all） |
+| `python -m akonado generate <type>` | 生成资产（characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all） |
 | `python -m akonado list [type]` | 查看 manifest 内容 |
 | `python -m akonado clean <type>` | 删除生成的文件 |
 | `python -m akonado skill list` | 列出可用 skills |

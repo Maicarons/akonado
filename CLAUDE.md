@@ -52,7 +52,8 @@ scripts/Windows/godot.cmd                 # open Godot editor
 - `tts_qwen.py` — Qwen3 TTS (local GPU)
 
 **Generators** (`generators/`): Asset pipelines that read manifests and call providers:
-- `characters.py`, `backgrounds.py`, `bgm.py`, `se.py`, `voice.py`, `ui.py` — produce files in `assets/`
+- `characters.py`, `backgrounds.py`, `cg.py`, `bgm.py`, `se.py`, `voice.py`, `ui.py` — produce files in `assets/`
+- `cg.py` — generates CG插画 (high-quality illustrations combining characters + backgrounds into a single image, used for key story moments). CGs are stored in `assets/cgs/` and registered as backgrounds in `backgrounds.tres` so they can be used with the `background` command in .ks scripts.
 - `dialogue.py` — extracts `.ks` script lines into `story/`
 
 **Skills** (`skills/`): JSON prompt templates with `system_prompt` + `user_prompt` (supports `{{input}}` placeholders). Run via `skill run -n <name>`.
@@ -117,6 +118,9 @@ with open('story/xxx.ks','wb') as f: f.write(c.replace(b'\r\n',b'\n'))
 
 **8. `_autoPlayButton` 必须在模板场景中绑定**
 `addons/konado/template/konado_dialogue.tscn` 的 `node_paths` 必须包含 `_autoPlayButton`，否则运行时报"未指定 _autoPlayButton"。
+
+**9. 使用CG前必须先actor exit所有角色**
+CG是完整插画（角色+背景在同一张图中），显示CG时如果角色立绘还在屏幕上会导致重叠。正确流程：先 `actor exit` 所有在场角色，再 `background cg_id fade`。CG显示完毕后如需继续对话，可重新 `actor show` 角色。
 
 ### GDScript Style (for any Godot-side changes)
 - Tabs for indentation, LF line endings, UTF-8

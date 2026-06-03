@@ -6,6 +6,7 @@ All generators accept provider instances for backend abstraction.
 
 from .characters import generate_characters
 from .backgrounds import generate_backgrounds
+from .cg import generate_cgs
 from .bgm import generate_bgm
 from .se import generate_se
 from .voice import generate_voice_all, extract_voice, generate_voice_audio, insert_voice_labels
@@ -23,6 +24,7 @@ from .godot_resources import (
 __all__ = [
     "generate_characters",
     "generate_backgrounds",
+    "generate_cgs",
     "generate_bgm",
     "generate_se",
     "generate_voice_all",

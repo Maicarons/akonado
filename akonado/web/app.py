@@ -16,7 +16,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 from ..config import (
     AKONADO_ROOT, MANIFESTS_DIR, SKILLS_DIR, CHARACTERS_DIR,
-    BACKGROUNDS_DIR, BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR,
+    BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR,
     STORY_DIR, ensure_dirs, ENV_FILE,
 )
 
@@ -125,8 +125,9 @@ def create_app() -> Flask:
 
         from ..providers import ComfyUIImageProvider, MiMoTTS, QwenTTS
         from ..generators import (
-            generate_characters, generate_backgrounds, generate_bgm,
-            generate_se, generate_voice_all, generate_ui, generate_dialogue,
+            generate_characters, generate_backgrounds, generate_cgs,
+            generate_bgm, generate_se, generate_voice_all, generate_ui,
+            generate_dialogue,
         )
 
         image = ComfyUIImageProvider()
@@ -135,6 +136,7 @@ def create_app() -> Flask:
         generators = {
             "characters": lambda: generate_characters(image, skip_existing=not force),
             "backgrounds": lambda: generate_backgrounds(image, skip_existing=not force),
+            "cgs": lambda: generate_cgs(image, skip_existing=not force),
             "bgm": lambda: generate_bgm(image, skip_existing=not force),
             "se": lambda: generate_se(image, skip_existing=not force),
             "voice": lambda: generate_voice_all(tts, skip_existing=not force),
@@ -261,6 +263,7 @@ def _get_stats() -> dict:
     return {
         "characters": count_dirs(CHARACTERS_DIR),
         "backgrounds": count_files(BACKGROUNDS_DIR),
+        "cgs": count_files(CGS_DIR),
         "bgm": count_files(BGM_DIR),
         "se": count_files(SE_DIR),
         "voice": count_files(VOICE_DIR),

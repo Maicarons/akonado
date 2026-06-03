@@ -89,6 +89,7 @@ def cmd_generate(args: argparse.Namespace) -> None:
     from .generators import (
         generate_characters,
         generate_backgrounds,
+        generate_cgs,
         generate_bgm,
         generate_se,
         generate_voice_all,
@@ -105,6 +106,7 @@ def cmd_generate(args: argparse.Namespace) -> None:
     generators = {
         "characters": lambda: generate_characters(image, skip_existing=skip),
         "backgrounds": lambda: generate_backgrounds(image, skip_existing=skip),
+        "cgs": lambda: generate_cgs(image, skip_existing=skip),
         "bgm": lambda: generate_bgm(image, skip_existing=skip),
         "se": lambda: generate_se(image, skip_existing=skip),
         "voice": lambda: generate_voice_all(tts, skip_existing=skip),
@@ -133,7 +135,7 @@ def cmd_list(args: argparse.Namespace) -> None:
     if args.type:
         types = [args.type]
     else:
-        types = ["characters", "backgrounds", "bgm", "se", "voice", "ui", "dialogue"]
+        types = ["characters", "backgrounds", "cgs", "bgm", "se", "voice", "ui", "dialogue"]
 
     for t in types:
         path = MANIFESTS_DIR / f"{t}.json"
@@ -154,6 +156,13 @@ def cmd_list(args: argparse.Namespace) -> None:
             items = data.get("items", data.get("backgrounds", {}))
             for bid in items:
                 print(f"  {bid}")
+        elif t == "cgs":
+            items = data.get("items", {})
+            for cg_id, cg_cfg in items.items():
+                name = cg_cfg.get("name", cg_id) if isinstance(cg_cfg, dict) else cg_id
+                scene = cg_cfg.get("scene_ref", "") if isinstance(cg_cfg, dict) else ""
+                ref = f" ({scene})" if scene else ""
+                print(f"  {cg_id}: {name}{ref}")
         elif t in ("bgm", "se"):
             items = data.get("items", {})
             for item_id in items:
@@ -252,13 +261,14 @@ def cmd_skill(args: argparse.Namespace) -> None:
 def cmd_clean(args: argparse.Namespace) -> None:
     """Remove generated files for a type or all types."""
     from .config import (
-        CHARACTERS_DIR, BACKGROUNDS_DIR, BGM_DIR, SE_DIR,
+        CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR,
         VOICE_DIR, UI_DIR, MANIFESTS_DIR, STORY_DIR,
     )
 
     asset_map = {
         "characters": CHARACTERS_DIR,
         "backgrounds": BACKGROUNDS_DIR,
+        "cgs": CGS_DIR,
         "bgm": BGM_DIR,
         "se": SE_DIR,
         "voice": VOICE_DIR,
@@ -360,7 +370,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 1: Generate script.json ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 1/9: Generating script from premise")
+    print("  Step 1/10: Generating script from premise")
     print("=" * 50)
     script_result = _run_skill(
         llm, "generate_script",
@@ -377,7 +387,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 2: Generate character manifest ───────────────────
     print("\n" + "=" * 50)
-    print("  Step 2/9: Generating character prompts")
+    print("  Step 2/10: Generating character prompts")
     print("=" * 50)
     char_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     char_result = _run_skill(
@@ -394,7 +404,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     # ── Step 3: Generate background manifest ──────────────────
     print("\n" + "=" * 50)
-    print("  Step 3/9: Generating background prompts")
+    print("  Step 3/10: Generating background prompts")
     print("=" * 50)
     bg_input = _json.dumps(script_data.get("backgrounds", []), ensure_ascii=False, indent=2)
     bg_result = _run_skill(
@@ -409,9 +419,32 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         bg_data = bg_result
     _save_json(MANIFESTS_DIR / "backgrounds.json", bg_data if isinstance(bg_data, dict) else {"raw": bg_data})
 
-    # ── Step 4: Generate audio manifests ──────────────────────
+    # ── Step 4: Generate CG manifest ─────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 4/9: Generating audio prompts")
+    print("  Step 4/10: Generating CG illustration prompts")
+    print("=" * 50)
+    cgs_input = _json.dumps(script_data.get("cgs", []), ensure_ascii=False, indent=2)
+    char_input_for_cg = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
+    cgs_result = _run_skill(
+        llm, "generate_cg_prompts",
+        {
+            "input": cgs_input,
+            "characters": char_input_for_cg,
+            "style": "anime visual novel CG illustration",
+            "style_keywords": "illustration, detailed, high quality, visual novel CG, anime art",
+        },
+        temperature,
+    )
+    try:
+        cgs_data = _json.loads(cgs_result)
+    except _json.JSONDecodeError:
+        print("Warning: Failed to parse CG JSON, saving raw output")
+        cgs_data = cgs_result
+    _save_json(MANIFESTS_DIR / "cgs.json", cgs_data if isinstance(cgs_data, dict) else {"raw": cgs_data})
+
+    # ── Step 5: Generate audio manifests ──────────────────────
+    print("\n" + "=" * 50)
+    print("  Step 5/10: Generating audio prompts")
     print("=" * 50)
     audio_input_data = {
         "bgm": script_data.get("bgm", []),
@@ -436,9 +469,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     else:
         _save_json(MANIFESTS_DIR / "audio.json", audio_data)
 
-    # ── Step 5: Generate voice config ─────────────────────────
+    # ── Step 6: Generate voice config ─────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 5/9: Generating voice config")
+    print("  Step 6/10: Generating voice config")
     print("=" * 50)
     voice_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     voice_result = _run_skill(
@@ -453,9 +486,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         voice_data = {"raw": voice_result}
     _save_json(MANIFESTS_DIR / "voice_config.json", voice_data if isinstance(voice_data, dict) else {"raw": voice_data})
 
-    # ── Step 6: Generate UI manifest ──────────────────────────
+    # ── Step 7: Generate UI manifest ──────────────────────────
     print("\n" + "=" * 50)
-    print("  Step 6/9: Generating UI prompts")
+    print("  Step 7/10: Generating UI prompts")
     print("=" * 50)
     ui_input = _json.dumps({
         "title": script_data.get("title", ""),
@@ -474,12 +507,12 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         ui_data = {"raw": ui_result}
     _save_json(MANIFESTS_DIR / "ui.json", ui_data if isinstance(ui_data, dict) else {"raw": ui_data})
 
-    # ── Step 7: Generate visual/audio assets (NOT voice/dialogue) ──
+    # ── Step 8: Generate visual/audio assets (NOT voice/dialogue) ──
     print("\n" + "=" * 50)
-    print("  Step 7/9: Generating visual/audio assets")
+    print("  Step 8/10: Generating visual/audio assets")
     print("=" * 50)
     from .generators import (
-        generate_characters, generate_backgrounds,
+        generate_characters, generate_backgrounds, generate_cgs,
         generate_bgm, generate_se, generate_voice_all,
         generate_ui, generate_dialogue, generate_all_tres,
     )
@@ -493,6 +526,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     for name, fn in [
         ("characters", lambda: generate_characters(image, skip_existing=skip)),
         ("backgrounds", lambda: generate_backgrounds(image, skip_existing=skip)),
+        ("cgs", lambda: generate_cgs(image, skip_existing=skip)),
         ("bgm", lambda: generate_bgm(image, skip_existing=skip)),
         ("se", lambda: generate_se(image, skip_existing=skip)),
         ("ui", lambda: generate_ui(image, skip_existing=skip)),
@@ -503,20 +537,23 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         except Exception as e:
             print(f"  [error] {name}: {e}")
 
-    # ── Step 8: Generate .ks scripts (BEFORE voice/dialogue) ──
+    # ── Step 9: Generate .ks scripts (BEFORE voice/dialogue) ──
     print("\n" + "=" * 50)
-    print("  Step 8/9: Generating .ks scripts, voice & dialogue")
+    print("  Step 9/10: Generating .ks scripts, voice & dialogue")
     print("=" * 50)
     chapters = script_data.get("chapters", [])
 
     # Load actual manifest IDs (not script.json IDs which may differ)
     char_manifest = _load_json(MANIFESTS_DIR / "characters.json")
     bg_manifest = _load_json(MANIFESTS_DIR / "backgrounds.json")
+    cgs_manifest_path = MANIFESTS_DIR / "cgs.json"
+    cgs_manifest = _load_json(cgs_manifest_path) if cgs_manifest_path.exists() else {}
     bgm_manifest = _load_json(MANIFESTS_DIR / "bgm.json")
     se_manifest = _load_json(MANIFESTS_DIR / "se.json")
 
     char_ids = list(char_manifest.get("items", {}).keys())
     bg_ids = list(bg_manifest.get("items", {}).keys())
+    cg_ids = list(cgs_manifest.get("items", {}).keys())
     bgm_ids = list(bgm_manifest.get("items", {}).keys())
     se_ids = list(se_manifest.get("items", {}).keys())
 
@@ -533,6 +570,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
 
     print(f"  Characters: {char_ids}")
     print(f"  Backgrounds: {bg_ids}")
+    print(f"  CGs: {cg_ids}")
     print(f"  BGM: {bgm_ids}")
     print(f"  SE: {se_ids}")
 
@@ -544,10 +582,12 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
                 "scene_summary": scene.get("summary", ""),
                 "characters": char_info_str,
                 "backgrounds": _json.dumps(bg_ids, ensure_ascii=False),
+                "cg_list": _json.dumps(cg_ids, ensure_ascii=False) if cg_ids else "（无可用CG）",
                 "bgm_list": _json.dumps(bgm_ids, ensure_ascii=False),
                 "context": chapter.get("summary", ""),
                 "extra_instructions": f"""重要：必须使用以下ID，不要自行发明！
 背景ID: {', '.join(bg_ids)}
+CG ID: {', '.join(cg_ids) if cg_ids else '（无）'}
 BGM ID: {', '.join(bgm_ids)}
 SE ID: {', '.join(se_ids)}
 角色ID: {', '.join(char_ids)}
@@ -573,9 +613,9 @@ SE ID: {', '.join(se_ids)}
     except Exception as e:
         print(f"  [error] dialogue: {e}")
 
-    # ── Step 9: Generate .tres resource files ─────────────────
+    # ── Step 10: Generate .tres resource files ────────────────
     print("\n" + "=" * 50)
-    print("  Step 9/9: Generating Godot .tres resource files")
+    print("  Step 10/10: Generating Godot .tres resource files")
     print("=" * 50)
     try:
         generate_all_tres()
@@ -643,7 +683,7 @@ def main(argv: list[str] | None = None) -> None:
     gen_parser = sub.add_parser("generate", aliases=["g"], help="Generate assets")
     gen_parser.add_argument(
         "type",
-        help="Asset type: characters/backgrounds/bgm/se/voice/ui/dialogue/all",
+        help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all",
     )
     gen_parser.add_argument(
         "--force", "-f", action="store_true",
@@ -662,7 +702,7 @@ def main(argv: list[str] | None = None) -> None:
     clean_parser = sub.add_parser("clean", help="Remove generated files")
     clean_parser.add_argument(
         "type",
-        help="Type to clean: characters/backgrounds/bgm/se/voice/ui/all/manifests/scripts",
+        help="Type to clean: characters/backgrounds/cgs/bgm/se/voice/ui/all/manifests/scripts",
     )
     clean_parser.add_argument(
         "--deep", "-d", action="store_true",

@@ -17,6 +17,7 @@ from ..config import (
     MANIFESTS_DIR,
     CHARACTERS_DIR,
     BACKGROUNDS_DIR,
+    CGS_DIR,
     BGM_DIR,
     SE_DIR,
     VOICE_DIR,
@@ -135,7 +136,11 @@ def generate_characters_tres() -> None:
 
 
 def generate_backgrounds_tres() -> None:
-    """Generate backgrounds.tres from background assets."""
+    """Generate backgrounds.tres from background and CG assets.
+
+    CGs are registered alongside regular backgrounds so they can be used
+    with the ``background`` command in .ks scripts.
+    """
     manifest_path = MANIFESTS_DIR / "backgrounds.json"
     if not manifest_path.exists():
         print("[backgrounds.tres] manifest not found, skipping")
@@ -146,12 +151,22 @@ def generate_backgrounds_tres() -> None:
 
     items = data.get("items", data.get("backgrounds", {}))
 
-    # Only include backgrounds that have generated files
-    backgrounds = []
+    # Collect backgrounds: (id, res_path) pairs
+    backgrounds: list[tuple[str, str]] = []
     for bg_id in items:
         img_path = BACKGROUNDS_DIR / f"{bg_id}.png"
         if img_path.exists():
-            backgrounds.append(bg_id)
+            backgrounds.append((bg_id, f"res://assets/backgrounds/{bg_id}.png"))
+
+    # Also include CGs as backgrounds (they can be used with the background command)
+    cgs_manifest_path = MANIFESTS_DIR / "cgs.json"
+    if cgs_manifest_path.exists():
+        with open(cgs_manifest_path, encoding="utf-8") as f:
+            cgs_data = json.load(f)
+        for cg_id, cg_cfg in cgs_data.get("items", {}).items():
+            img_path = CGS_DIR / f"{cg_id}.png"
+            if img_path.exists():
+                backgrounds.append((cg_id, f"res://assets/cgs/{cg_id}.png"))
 
     if not backgrounds:
         print("[backgrounds.tres] no background assets found, skipping")
@@ -172,17 +187,15 @@ def generate_backgrounds_tres() -> None:
 
     ext_id = 3
     texture_ids = {}
-    for bg_id in backgrounds:
+    for bg_id, res_path in backgrounds:
         texture_ids[bg_id] = ext_id
-        lines.append(_ext_resource_texture(
-            f"res://assets/backgrounds/{bg_id}.png", f"ext_{ext_id}"
-        ))
+        lines.append(_ext_resource_texture(res_path, f"ext_{ext_id}"))
         ext_id += 1
 
     # Sub-resources
     res_id = 1
     bg_ids = {}
-    for bg_id in backgrounds:
+    for bg_id, _ in backgrounds:
         bg_ids[bg_id] = res_id
         lines.append(f'\n[sub_resource type="Resource" id="res_{res_id}"]')
         lines.append(f'script = ExtResource("ext_2")')
@@ -191,7 +204,7 @@ def generate_backgrounds_tres() -> None:
         res_id += 1
 
     # Root resource
-    bg_refs = ", ".join(f'SubResource("res_{bg_ids[b]}")' for b in backgrounds)
+    bg_refs = ", ".join(f'SubResource("res_{bg_ids[b]}")' for b, _ in backgrounds)
     lines.append(f'\n[resource]')
     lines.append(f'script = ExtResource("ext_1")')
     lines.append(f'background_list = Array[ExtResource("ext_2")]([{bg_refs}])')

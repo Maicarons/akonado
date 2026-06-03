@@ -22,6 +22,7 @@ PROJECT_ROOT = _PROJECT_ROOT
 ASSETS_DIR = PROJECT_ROOT / "assets"
 CHARACTERS_DIR = ASSETS_DIR / "characters"
 BACKGROUNDS_DIR = ASSETS_DIR / "backgrounds"
+CGS_DIR = ASSETS_DIR / "cgs"
 AUDIO_DIR = ASSETS_DIR / "audio"
 BGM_DIR = AUDIO_DIR / "bgm"
 SE_DIR = AUDIO_DIR / "se"
@@ -85,7 +86,7 @@ def get_voice_character_names() -> set[str]:
 def ensure_dirs() -> None:
     """Create all required directories if they don't exist."""
     for d in [
-        CHARACTERS_DIR, BACKGROUNDS_DIR, BGM_DIR, SE_DIR,
+        CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR,
         VOICE_DIR, UI_DIR, STORY_DIR, RESOURCES_DIR,
         OUTPUT_DIR, COMFYUI_DIR,
     ]:

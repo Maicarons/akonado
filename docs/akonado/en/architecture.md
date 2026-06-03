@@ -2,7 +2,7 @@
 
 ## Pipeline Flow
 
-Akonado uses a seven-step pipeline to generate complete visual novel assets from a one-sentence premise:
+Akonado uses a ten-step pipeline to generate complete visual novel assets from a one-sentence premise:
 
 ```
 One-sentence premise
@@ -12,31 +12,32 @@ One-sentence premise
 |  Step 1: LLM -> script.json                         |
 |    generate_script skill                            |
 |    Output: chapters, scenes, characters,            |
-|            backgrounds, BGM, SE definitions          |
+|            backgrounds, CGs, BGM, SE definitions    |
 +-----------------------------------------------------+
     |
     v
 +-----------------------------------------------------+
-|  Step 2-5: LLM -> Manifests                         |
+|  Step 2-7: LLM -> Manifests                         |
 |    characters.json / backgrounds.json               |
-|    bgm.json + se.json / voice_config.json           |
+|    cgs.json / bgm.json + se.json                    |
+|    voice_config.json / ui.json                      |
 +-----------------------------------------------------+
     |
     v
 +-----------------------------------------------------+
-|  Step 6: Providers -> Visual/Audio assets            |
+|  Step 8: Providers -> Visual/Audio assets            |
 |    ComfyUI -> character sprites, backgrounds,       |
-|               BGM, SFX, UI                          |
+|               CG illustrations, BGM, SFX, UI        |
 |    Output to assets/ directory                      |
 +-----------------------------------------------------+
     |
     v
 +-----------------------------------------------------+
-|  Step 7a: LLM -> .ks scripts                        |
+|  Step 9a: LLM -> .ks scripts                        |
 |    generate_scene_script skill                      |
 |    Output to story/ directory                       |
 +-----------------------------------------------------+
-|  Step 7b: TTS -> Voice files                        |
+|  Step 9b: TTS -> Voice files                        |
 |    Extract lines from .ks -> synthesize ->          |
 |    inject voice labels                              |
 |    Output to assets/audio/voice/                    |
@@ -50,7 +51,7 @@ One-sentence premise
 
 ### Execution Order
 
-Voice generation (Step 7b) MUST run after .ks script generation (Step 7a), because the voice pipeline extracts dialogue lines from the .ks scripts.
+Voice generation (Step 9b) MUST run after .ks script generation (Step 9a), because the voice pipeline extracts dialogue lines from the .ks scripts.
 
 ## Core Modules
 
@@ -79,6 +80,7 @@ Each generator reads a manifest JSON and calls providers to produce output files
 |-----------|---------------|--------|
 | `characters.py` | characters.json | `assets/characters/<id>/<expr>.png` (transparent background) |
 | `backgrounds.py` | backgrounds.json | `assets/backgrounds/<id>.png` |
+| `cg.py` | cgs.json | `assets/cgs/<id>.png` (CG illustration, 1920x1080) |
 | `bgm.py` | bgm.json | `assets/audio/bgm/<id>.mp3` |
 | `se.py` | se.json | `assets/audio/se/<id>.mp3` |
 | `voice.py` | .ks scripts + voice_config.json | `assets/audio/voice/<hash>.wav` |
@@ -112,6 +114,7 @@ akonado/                        # Project root (Godot project)
 |   |       +-- happy.png
 |   |       +-- ...
 |   +-- backgrounds/            #   Background images (PNG, 1920x1080)
+|   +-- cgs/                    #   CG illustrations (PNG, 1920x1080, characters+background combined)
 |   +-- audio/
 |       +-- bgm/                #   Background music (MP3)
 |       +-- se/                 #   Sound effects (MP3)
@@ -134,6 +137,15 @@ akonado/                        # Project root (Godot project)
 |   |   +-- tts_mimo.py         #       MiMo TTS (cloud)
 |   |   +-- tts_qwen.py         #       Qwen3 TTS (local)
 |   +-- generators/             #     Asset generators
+|   |   +-- characters.py       #       Character sprites
+|   |   +-- backgrounds.py      #       Background images
+|   |   +-- cg.py               #       CG illustrations
+|   |   +-- bgm.py              #       Background music
+|   |   +-- se.py               #       Sound effects
+|   |   +-- voice.py            #       Voice synthesis
+|   |   +-- ui.py               #       UI assets
+|   |   +-- dialogue.py         #       Dialogue extraction
+|   |   +-- godot_resources.py  #       .tres resource files
 |   +-- skills/                 #     LLM prompt templates (JSON)
 |   +-- manifests/              #     Asset manifest definitions (JSON)
 |   +-- comfyui/                #     ComfyUI workflow templates

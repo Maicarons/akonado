@@ -20,7 +20,8 @@ Akonado is an AI-powered visual novel asset generation pipeline. Starting from a
 
 - One sentence → full script + characters + scene settings
 - Character sprite generation (ComfyUI, auto background removal)
-- Background, BGM, SFX, UI asset generation
+- Background, CG illustration, BGM, SFX, UI asset generation
+- CG illustration generation: high-quality scene illustrations combining characters and backgrounds for key story moments
 - Voice synthesis: MiMo TTS (cloud) / Qwen3 TTS (local GPU)
 - JSON-driven asset manifests for easy editing and automation
 - Web GUI for visual editing and generation control
@@ -94,7 +95,7 @@ akonado/                  # Project root (Godot project)
 |---------|-------------|
 | `python -m akonado pipeline "<premise>"` | Generate all assets from one sentence (recommended) |
 | `python -m akonado check` | Check provider availability |
-| `python -m akonado generate <type>` | Generate assets (characters/backgrounds/bgm/se/voice/ui/dialogue/all) |
+| `python -m akonado generate <type>` | Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all) |
 | `python -m akonado list [type]` | View manifest contents |
 | `python -m akonado clean <type>` | Delete generated files (supports all/manifests/scripts/type, `--deep` for full cleanup) |
 | `python -m akonado skill list` | List available skills |
