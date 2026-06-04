@@ -71,14 +71,6 @@ python -m akonado pipeline "一个关于奶茶店的故事" --chapters 5 --scene
 # 使用 Qwen TTS 引擎
 python -m akonado pipeline "科幻冒险故事" --engine qwen
 
-<a href="https://godothub.com">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://legacy.godothub.com/godothub_dark_logo.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://legacy.godothub.com/godothub_light_logo.png">
-  <img src="https://legacy.godothub.com/godothub_light_logo.png" alt="godothub" style="width: 65%;" />
-</picture>
-</a>
-
 # 指定 Godot 引擎目录
 python -m akonado pipeline "故事概要" --godot-dir "C:\path\to\Godot"
 

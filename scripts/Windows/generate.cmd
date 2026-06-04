@@ -1,7 +1,7 @@
 @echo off
 :: Generate assets
 :: Usage:
-::   scripts\Windows\generate.cmd                    - Generate all assets
+::   scripts\Windows\generate.cmd                    - Generate all assets (skip existing)
 ::   scripts\Windows\generate.cmd characters         - Generate characters only
 ::   scripts\Windows\generate.cmd backgrounds        - Generate backgrounds only
 ::   scripts\Windows\generate.cmd bgm                - Generate BGM only
@@ -11,6 +11,7 @@
 ::   scripts\Windows\generate.cmd ui                 - Generate UI assets only
 ::   scripts\Windows\generate.cmd dialogue           - Extract dialogue only
 ::   scripts\Windows\generate.cmd all --force        - Force regenerate all
+::   scripts\Windows\generate.cmd all --check-missing - Detect and regenerate missing assets
 cd /d "%~dp0\..\.."
 if "%~1"=="" (
     python -m akonado generate all

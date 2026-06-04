@@ -388,6 +388,9 @@ python -m akonado pipeline "故事概要" --temperature 0.8
 
 # 强制重新生成（不跳过已有文件）
 python -m akonado pipeline "故事概要" --force
+
+# 只生成剧本和 prompt，不生成素材（两阶段工作流）
+python -m akonado pipeline "故事概要" --prompts-only
 ```
 
 ### 7.3 在 Godot 中运行
@@ -506,6 +509,7 @@ python -m akonado check
 
 ## 下一步
 
+- [工作流程指南](workflow.md) — 两阶段工作流、选择性重新生成、素材补全
 - [架构设计](architecture.md) — 了解管线内部工作原理
 - [技能系统](skills.md) — 自定义 LLM prompt 模板
 - [资产清单](manifests.md) — 了解各 manifest 格式

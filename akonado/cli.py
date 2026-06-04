@@ -91,6 +91,154 @@ def cmd_check(_args: argparse.Namespace) -> None:
         print("\nSome providers are not available. Check your .env configuration.")
 
 
+def _check_and_fill_missing(type_filter: str, generators: dict) -> None:
+    """Check manifests vs actual files, report missing, and regenerate."""
+    from .config import (
+        MANIFESTS_DIR, CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR,
+        BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR, STORY_DIR,
+    )
+
+    missing: dict[str, list[str]] = {}
+
+    def _check_characters():
+        path = MANIFESTS_DIR / "characters.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", data.get("characters", {}))
+        for char_id, cfg in items.items():
+            for expr_name in cfg.get("expressions", {}):
+                if not (CHARACTERS_DIR / char_id / f"{expr_name}.png").exists():
+                    missing.setdefault("characters", []).append(f"{char_id}/{expr_name}.png")
+
+    def _check_backgrounds():
+        path = MANIFESTS_DIR / "backgrounds.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", data.get("backgrounds", {}))
+        for bg_id in items:
+            if not (BACKGROUNDS_DIR / f"{bg_id}.png").exists():
+                missing.setdefault("backgrounds", []).append(f"{bg_id}.png")
+
+    def _check_cgs():
+        path = MANIFESTS_DIR / "cgs.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", {})
+        for cg_id in items:
+            if not (CGS_DIR / f"{cg_id}.png").exists():
+                missing.setdefault("cgs", []).append(f"{cg_id}.png")
+
+    def _check_bgm():
+        path = MANIFESTS_DIR / "bgm.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", {})
+        for item_id in items:
+            if not (BGM_DIR / f"{item_id}.mp3").exists():
+                missing.setdefault("bgm", []).append(f"{item_id}.mp3")
+
+    def _check_se():
+        path = MANIFESTS_DIR / "se.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", {})
+        for item_id in items:
+            if not (SE_DIR / f"{item_id}.mp3").exists():
+                missing.setdefault("se", []).append(f"{item_id}.mp3")
+
+    def _check_ui():
+        path = MANIFESTS_DIR / "ui.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", {})
+        for item_id in items:
+            if not (UI_DIR / f"{item_id}.png").exists():
+                missing.setdefault("ui", []).append(f"{item_id}.png")
+
+    def _check_voice():
+        path = MANIFESTS_DIR / "voice_config.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        lines = data.get("lines", [])
+        for entry in lines:
+            char = entry.get("character", "")
+            idx = entry.get("index", 0)
+            if not (VOICE_DIR / char / f"{idx:04d}.mp3").exists():
+                missing.setdefault("voice", []).append(f"{char}/{idx:04d}.mp3")
+
+    def _check_dialogue():
+        path = MANIFESTS_DIR / "script.json"
+        if not path.exists():
+            return
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        for chapter in data.get("chapters", []):
+            for scene in chapter.get("scenes", []):
+                ks_path = STORY_DIR / chapter["id"] / f"{scene['id']}.ks"
+                if not ks_path.exists():
+                    missing.setdefault("dialogue", []).append(f"{chapter['id']}/{scene['id']}.ks")
+
+    checkers = {
+        "characters": _check_characters,
+        "backgrounds": _check_backgrounds,
+        "cgs": _check_cgs,
+        "bgm": _check_bgm,
+        "se": _check_se,
+        "voice": _check_voice,
+        "ui": _check_ui,
+        "dialogue": _check_dialogue,
+    }
+
+    if type_filter == "all":
+        for checker in checkers.values():
+            checker()
+    elif type_filter in checkers:
+        checkers[type_filter]()
+    else:
+        print(f"unknown type: {type_filter}")
+        sys.exit(1)
+
+    if not missing:
+        print("All assets are present. Nothing to regenerate.")
+        return
+
+    print("Missing assets found:")
+    total = 0
+    for asset_type, files in missing.items():
+        print(f"\n  [{asset_type}] {len(files)} missing:")
+        for f in files[:10]:
+            print(f"    - {f}")
+        if len(files) > 10:
+            print(f"    ... and {len(files) - 10} more")
+        total += len(files)
+    print(f"\nTotal: {total} missing assets")
+
+    # Regenerate missing types
+    print("\nRegenerating missing assets...")
+    for asset_type in missing:
+        if asset_type in generators:
+            print(f"\n{'='*40}")
+            print(f"  regenerating: {asset_type}")
+            print(f"{'='*40}")
+            generators[asset_type]()
+
+    print("\nDone!")
+
+
 def cmd_generate(args: argparse.Namespace) -> None:
     """Generate assets."""
     from .generators import (
@@ -120,6 +268,11 @@ def cmd_generate(args: argparse.Namespace) -> None:
         "ui": lambda: generate_ui(image, skip_existing=skip),
         "dialogue": lambda: generate_dialogue(),
     }
+
+    # --check-missing: scan manifests, report missing, regenerate
+    if getattr(args, "check_missing", False):
+        _check_and_fill_missing(args.type, generators)
+        return
 
     if args.type == "all":
         for name, fn in generators.items():
@@ -514,6 +667,23 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         ui_data = {"raw": ui_result}
     _save_json(MANIFESTS_DIR / "ui.json", ui_data if isinstance(ui_data, dict) else {"raw": ui_data})
 
+    # ── Prompts-only mode: stop here ─────────────────────────
+    if getattr(args, "prompts_only", False):
+        print("\n" + "=" * 50)
+        print("  Prompts-only mode: manifests generated!")
+        print("=" * 50)
+        print("  All manifests saved to:", MANIFESTS_DIR)
+        print()
+        print("  You can now:")
+        print("    1. Edit manifests/*.json to customize prompts")
+        print("    2. Edit manifests/script.json to adjust the story")
+        print("    3. Run 'python -m akonado generate all' when ready")
+        print("    4. Or generate specific types:")
+        print("       python -m akonado generate characters")
+        print("       python -m akonado generate backgrounds")
+        print("       python -m akonado generate bgm")
+        return
+
     # ── Step 8: Generate visual/audio assets (NOT voice/dialogue) ──
     print("\n" + "=" * 50)
     print("  Step 8/10: Generating visual/audio assets")
@@ -700,6 +870,10 @@ def main(argv: list[str] | None = None) -> None:
         "--engine", "-e", choices=["mimo", "qwen"],
         help="TTS engine for voice generation (default: mimo)",
     )
+    gen_parser.add_argument(
+        "--check-missing", "-c", action="store_true",
+        help="Check for missing assets and regenerate them",
+    )
 
     # list
     list_parser = sub.add_parser("list", aliases=["ls"], help="View manifests")
@@ -735,6 +909,10 @@ def main(argv: list[str] | None = None) -> None:
     pipe_parser = sub.add_parser("pipeline", aliases=["p"], help="Full pipeline: premise -> all assets")
     pipe_parser.add_argument("premise", help="One-sentence story premise")
     pipe_parser.add_argument("--force", "-f", action="store_true", help="Force regeneration")
+    pipe_parser.add_argument(
+        "--prompts-only", action="store_true",
+        help="Only generate script and manifest prompts, skip asset generation",
+    )
     pipe_parser.add_argument("--temperature", "-t", type=float, help="LLM temperature (default: 0.7)")
     pipe_parser.add_argument("--chapters", type=int, default=4, help="Number of chapters (default: 4)")
     pipe_parser.add_argument("--scenes-per-chapter", type=int, default=3, help="Scenes per chapter (default: 3)")

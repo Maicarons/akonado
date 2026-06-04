@@ -82,6 +82,50 @@ python -m akonado generate all
 python -m akonado web
 ```
 
+## Workflow
+
+### One-shot Generation
+
+```bash
+python -m akonado pipeline "a story about a milk tea shop"
+```
+
+### Two-Phase Workflow (Recommended)
+
+Generate scripts and prompts first, review/edit them, then generate actual assets:
+
+```bash
+# Phase 1: Generate script and prompts only (no images/audio)
+python -m akonado pipeline "story premise" --prompts-only
+
+# Edit manifests/*.json to customize character appearance, backgrounds, BGM, etc.
+
+# Phase 2: Generate actual assets
+python -m akonado generate all
+```
+
+### Selective Regeneration
+
+```bash
+# Regenerate a specific asset type (existing files are skipped by default)
+python -m akonado generate characters
+python -m akonado generate voice --engine qwen
+
+# Force overwrite existing files
+python -m akonado generate characters --force
+
+# Detect missing assets and auto-fill
+python -m akonado generate all --check-missing
+```
+
+### Cleanup
+
+```bash
+python -m akonado clean characters   # Clean character assets
+python -m akonado clean all          # Clean all assets
+python -m akonado clean all --deep   # Also remove manifests and .ks scripts
+```
+
 ## Project Structure
 
 ```
@@ -105,9 +149,11 @@ akonado/                  # Project root (Godot project)
 
 | Command | Description |
 |---------|-------------|
-| `python -m akonado pipeline "<premise>"` | Generate all assets from one sentence (recommended) |
-| `python -m akonado check` | Check provider availability |
+| `python -m akonado pipeline "<premise>"` | Full pipeline: premise → script → prompts → assets → .ks |
+| `python -m akonado pipeline "<premise>" --prompts-only` | Generate script and prompts only, skip asset generation |
 | `python -m akonado generate <type>` | Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all) |
+| `python -m akonado generate all --check-missing` | Detect missing assets and auto-fill |
+| `python -m akonado check` | Check provider availability |
 | `python -m akonado list [type]` | View manifest contents |
 | `python -m akonado clean <type>` | Delete generated files (supports all/manifests/scripts/type, `--deep` for full cleanup) |
 | `python -m akonado skill list` | List available skills |
@@ -119,6 +165,7 @@ akonado/                  # Project root (Godot project)
 
 | Option | Description | Default |
 |--------|-------------|---------|
+| `--prompts-only` | Only generate script and manifest prompts, skip asset generation | false |
 | `--chapters` | Number of chapters | 4 |
 | `--scenes-per-chapter` | Scenes per chapter | 3 |
 | `--engine` | TTS engine (mimo/qwen) | mimo |
@@ -126,9 +173,18 @@ akonado/                  # Project root (Godot project)
 | `--force` | Force regeneration (don't skip existing files) | false |
 | `--temperature` | LLM temperature parameter | 0.7 |
 
+### Generate Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--force` / `-f` | Force regeneration, overwrite existing files | false |
+| `--check-missing` / `-c` | Scan manifests, detect missing assets, and regenerate them | false |
+| `--engine` / `-e` | TTS engine for voice generation (mimo/qwen) | mimo |
+
 ## Documentation
 
 - [Getting Started](docs/akonado/en/getting-started.md) -- Installation, configuration, first project
+- [Workflow Guide](docs/akonado/workflow.md) -- Two-phase workflow, selective regeneration, missing asset detection
 - [ComfyUI Setup Guide](docs/akonado/en/comfyui-setup.md) -- Image/audio generation backend
 - [TTS Setup Guide](docs/akonado/en/tts-setup.md) -- MiMo TTS / Qwen TTS configuration
 - [Architecture](docs/akonado/en/architecture.md)

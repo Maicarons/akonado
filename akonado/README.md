@@ -38,6 +38,50 @@ python -m akonado generate all
 python -m akonado web
 ```
 
+## 工作流程
+
+### 一键生成
+
+```bash
+python -m akonado pipeline "一个关于奶茶店的故事"
+```
+
+### 两阶段工作流（推荐）
+
+先生成剧本和 prompt，手动调整后再生成素材：
+
+```bash
+# 阶段一：只生成剧本和 prompt（不生成图片/音频）
+python -m akonado pipeline "故事概要" --prompts-only
+
+# 编辑 manifests/*.json 调整角色外观、背景描述、BGM 等...
+
+# 阶段二：生成实际素材
+python -m akonado generate all
+```
+
+### 选择性重新生成
+
+```bash
+# 重新生成某一类素材（已有文件自动跳过）
+python -m akonado generate characters
+python -m akonado generate voice --engine qwen
+
+# 强制覆盖已有文件
+python -m akonado generate characters --force
+
+# 检测缺失素材并自动补全
+python -m akonado generate all --check-missing
+```
+
+### 清理
+
+```bash
+python -m akonado clean characters   # 清理角色素材
+python -m akonado clean all          # 清理全部素材
+python -m akonado clean all --deep   # 连 manifests 和 .ks 脚本一起清理
+```
+
 ## 架构
 
 ```
@@ -78,8 +122,11 @@ akonado/
 
 | 命令 | 说明 |
 |------|------|
-| `python -m akonado check` | 检查 provider 可用性 |
+| `python -m akonado pipeline "概要"` | 一键生成完整管线（剧本→prompt→素材→.ks） |
+| `python -m akonado pipeline "概要" --prompts-only` | 只生成剧本和 prompt，不生成素材 |
 | `python -m akonado generate <type>` | 生成资产（characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all） |
+| `python -m akonado generate all --check-missing` | 检测缺失素材并自动补全 |
+| `python -m akonado check` | 检查 provider 可用性 |
 | `python -m akonado list [type]` | 查看 manifest 内容 |
 | `python -m akonado clean <type>` | 删除生成的文件 |
 | `python -m akonado skill list` | 列出可用 skills |
