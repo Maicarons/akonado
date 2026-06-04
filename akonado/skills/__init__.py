@@ -23,7 +23,7 @@ def list_skills() -> list[dict[str, str]]:
     skills = []
     for path in sorted(SKILLS_DIR.glob("*.json")):
         with open(path, encoding="utf-8") as f:
-            data = json.load(f)
+            data = json.load(f, strict=False)
         skills.append({
             "name": data.get("name", path.stem),
             "description": data.get("description", ""),
@@ -46,11 +46,11 @@ def load_skill(name: str) -> dict:
     path = SKILLS_DIR / f"{name}.json"
     if path.exists():
         with open(path, encoding="utf-8") as f:
-            return json.load(f)
+            return json.load(f, strict=False)
 
     for path in SKILLS_DIR.glob("*.json"):
         with open(path, encoding="utf-8") as f:
-            data = json.load(f)
+            data = json.load(f, strict=False)
         if data.get("name") == name:
             return data
 

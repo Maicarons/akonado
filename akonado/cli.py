@@ -31,7 +31,14 @@ def _strip_markdown_code_blocks(text: str) -> str:
             text = text[first_newline + 1 :]
     if text.endswith("```"):
         text = text[: -3]
-    return text.strip()
+    text = text.strip()
+    # If the result doesn't look like JSON, try to extract JSON block
+    if not text.startswith("{"):
+        import re
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            text = match.group()
+    return text
 
 
 def _get_providers(engine: str = "mimo"):
@@ -343,7 +350,7 @@ def _load_json(path) -> dict:
     import json as _json
 
     with open(path, encoding="utf-8") as f:
-        return _json.load(f)
+        return _json.load(f, strict=False)
 
 
 def cmd_pipeline(args: argparse.Namespace) -> None:
@@ -378,7 +385,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        script_data = _json.loads(script_result)
+        script_data = _json.loads(script_result, strict=False)
     except _json.JSONDecodeError:
         print("Error: Failed to parse script JSON from LLM output")
         print(script_result[:500])
@@ -396,7 +403,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        char_data = _json.loads(char_result)
+        char_data = _json.loads(char_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse character JSON, saving raw output")
         char_data = char_result
@@ -413,7 +420,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        bg_data = _json.loads(bg_result)
+        bg_data = _json.loads(bg_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse background JSON, saving raw output")
         bg_data = bg_result
@@ -436,7 +443,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        cgs_data = _json.loads(cgs_result)
+        cgs_data = _json.loads(cgs_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse CG JSON, saving raw output")
         cgs_data = cgs_result
@@ -457,7 +464,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        audio_data = _json.loads(audio_result)
+        audio_data = _json.loads(audio_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse audio JSON, saving raw output")
         audio_data = {"raw": audio_result}
@@ -480,7 +487,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        voice_data = _json.loads(voice_result)
+        voice_data = _json.loads(voice_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse voice config JSON, saving raw output")
         voice_data = {"raw": voice_result}
@@ -501,7 +508,7 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         temperature,
     )
     try:
-        ui_data = _json.loads(ui_result)
+        ui_data = _json.loads(ui_result, strict=False)
     except _json.JSONDecodeError:
         print("Warning: Failed to parse UI JSON, saving raw output")
         ui_data = {"raw": ui_result}
