@@ -55,10 +55,12 @@ func _on_resized() -> void:
 		tween.set_parallel(true)
 		tween.tween_property(slot, "position:x", -size.x / h_division * (h_division - h_character_position ) + slot.size.x/2, animation_time)
 		await tween.finished
+		_layout_status_node()
 		actor_moved.emit()
 	else:
 		slot.position.x = -size.x / h_division * (h_division - h_character_position ) + slot.size.x/2
 	
+		_layout_status_node()
 		actor_moved.emit()
 
 ## 高亮
@@ -119,16 +121,7 @@ func exit_actor(play_anim: bool = true) -> void:
 func _on_enter_animation_finished() -> void:
 	actor_entered.emit()
 
-func set_character_status(status: KND_CharacterStatus) -> void:
-	if status == null:
-		push_error("正在试图设置一个空角色状态")
-		return
-	if status.status_scene:
-		set_character_scene(status.status_scene)
-	else:
-		set_character_texture(status.status_texture)
-
-func set_character_scene(scene: PackedScene) -> void:
+func set_character_scene(scene: PackedScene, initial_status: String = "") -> void:
 	_clear_status_node()
 	if not slot:
 		return
@@ -141,12 +134,33 @@ func set_character_scene(scene: PackedScene) -> void:
 	var instance := scene.instantiate()
 	_status_node = instance
 	slot.add_child(instance)
-	if instance is Control:
-		instance.set_anchors_preset(Control.PRESET_FULL_RECT)
-		instance.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		instance.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_layout_status_node()
 	if instance is CanvasItem:
 		instance.visible = true
+	if not initial_status.is_empty():
+		apply_character_status(initial_status)
+
+func apply_character_status(status_name: String) -> void:
+	if status_name.is_empty():
+		return
+	if _status_node == null:
+		push_error("角色场景节点未创建，无法切换状态：" + status_name)
+		return
+	if _status_node.has_method("apply_status"):
+		_status_node.call("apply_status", status_name)
+		return
+	if _status_node.has_method("change_status"):
+		_status_node.call("change_status", status_name)
+		return
+	if _status_node.has_method("set_status"):
+		_status_node.call("set_status", status_name)
+		return
+	var animated_sprite := _find_animated_sprite(_status_node)
+	var animation_name := StringName(status_name)
+	if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(animation_name):
+		animated_sprite.play(animation_name)
+		return
+	push_warning("角色场景未实现 apply_status，且未找到同名动画：" + status_name)
 
 func set_character_texture(texture: Texture) -> void:
 	_clear_status_node()
@@ -161,6 +175,18 @@ func _clear_status_node() -> void:
 	if _status_node and is_instance_valid(_status_node):
 		_status_node.queue_free()
 	_status_node = null
+
+func _layout_status_node() -> void:
+	if _status_node == null or not slot:
+		return
+	if _status_node is Control:
+		var control := _status_node as Control
+		control.set_anchors_preset(Control.PRESET_FULL_RECT)
+		control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		control.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	elif _status_node is Node2D:
+		var node_2d := _status_node as Node2D
+		node_2d.position = slot.size * 0.5
 
 func _get_status_visual() -> CanvasItem:
 	if _status_node:
@@ -180,6 +206,15 @@ func _find_canvas_item(node: Node) -> CanvasItem:
 		var nested := _find_canvas_item(child)
 		if nested:
 			return nested
+	return null
+
+func _find_animated_sprite(node: Node) -> AnimatedSprite2D:
+	if node is AnimatedSprite2D:
+		return node as AnimatedSprite2D
+	for child in node.get_children():
+		var sprite := _find_animated_sprite(child)
+		if sprite:
+			return sprite
 	return null
 
 @export var slot: Control

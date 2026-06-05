@@ -237,12 +237,17 @@ func _on_transition_finished(mat: ShaderMaterial, target_tex: Texture) -> void:
 	
 	
 # 新建角色的方法
-func create_new_character(chara_id: String, h_division: int, pos_h: int, state: String, status_data: Variant = null) -> void:
+func create_new_character(chara_id: String, h_division: int, pos_h: int, state: String, character_scene: PackedScene = null) -> void:
 	# 检查创建的是否为场景已有角色
 	for chara_dict in actor_dict.values():
 		if chara_dict["id"] == chara_id:
 			print_rich("[color=red]创建新演员：错误，重复的角色[/color]")
 			delete_character(chara_dict["id"])
+
+	if character_scene == null:
+		push_error("创建角色失败：角色[%s]没有配置角色场景" % chara_id)
+		character_created.emit()
+		return
 			
 	# 角色信息字典结构说明:
 	# {
@@ -269,9 +274,9 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 	temp_node.use_tween = false
 	temp_node.h_division = h_division
 	temp_node.h_character_position = pos_h
-	_apply_character_status(temp_node, status_data)
 	# 添加到角色容器
 	_chara_controler.add_child(temp_node)
+	temp_node.set_character_scene(character_scene, state)
 	# 添加到演员节点字典
 	actor_nodes[chara_id] = temp_node
 	temp_node.use_tween = true
@@ -285,46 +290,17 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 
 
 ## 切换演员的状态
-func change_actor_state(actor_id: String, state_id: String, status_data: Variant = null) -> void:
+func change_actor_state(actor_id: String, state_id: String) -> void:
 	var chara_node: KND_Actor = get_chara_node(actor_id)
 	if chara_node == null:
-		var status_info := _describe_character_status(status_data)
-		push_error("切换角色状态失败：角色ID[%s]，目标状态ID[%s]，状态资源[%s]，未找到角色节点" % [actor_id, state_id, status_info])
+		push_error("切换角色状态失败：角色ID[%s]，目标状态ID[%s]，未找到角色节点" % [actor_id, state_id])
 		character_state_changed.emit()
 	else:
 		# 修改字典中角色的状态
 		actor_dict[actor_id]["state"] = state_id
-		_apply_character_status(chara_node, status_data)
+		chara_node.apply_character_status(state_id)
 		character_state_changed.emit()
 		print("切换"+actor_id+"到"+str(state_id)+"状态")
-
-func _apply_character_status(actor: KND_Actor, status_data: Variant) -> void:
-	if actor == null:
-		return
-	if status_data is KND_CharacterStatus:
-		actor.set_character_status(status_data)
-	elif status_data is PackedScene:
-		actor.set_character_scene(status_data)
-	elif status_data is Texture:
-		actor.set_character_texture(status_data)
-	elif status_data == null:
-		push_error("角色状态资源为空")
-	else:
-		push_error("不支持的角色状态资源类型：" + str(typeof(status_data)))
-
-func _describe_character_status(status_data: Variant) -> String:
-	if status_data == null:
-		return "<null>"
-	if status_data is KND_CharacterStatus:
-		var paths := PackedStringArray()
-		if status_data.status_scene:
-			paths.append(status_data.status_scene.resource_path)
-		if status_data.status_texture:
-			paths.append(status_data.status_texture.resource_path)
-		return "KND_CharacterStatus(%s)" % ",".join(paths)
-	if status_data is Resource:
-		return status_data.resource_path
-	return str(status_data)
 
 
 # 高亮角色

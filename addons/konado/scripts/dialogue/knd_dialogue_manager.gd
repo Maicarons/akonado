@@ -724,14 +724,6 @@ func _display_background(bg_name: String, effect: KND_ActingInterface.Background
 	
 
 ## 演员状态切换的方法
-func _find_character_status(chara: KND_Character, state_id: String) -> KND_CharacterStatus:
-	if chara == null:
-		return null
-	for state in chara.chara_status:
-		if state and state.status_name == state_id:
-			return state
-	return null
-
 func _actor_change_state(chara_id: String, state_id: String):
 	var target_chara: KND_Character
 	for chara in chara_list.characters:
@@ -742,12 +734,7 @@ func _actor_change_state(chara_id: String, state_id: String):
 		push_error("切换角色状态失败：未找到角色[%s]" % chara_id)
 		_acting_interface.character_state_changed.emit()
 		return
-	var target_status := _find_character_status(target_chara, state_id)
-	if target_status == null:
-		push_error("切换角色状态失败：角色[%s]未找到状态[%s]" % [chara_id, state_id])
-		_acting_interface.change_actor_state(target_chara.chara_name, state_id, null)
-		return
-	_acting_interface.change_actor_state(target_chara.chara_name, state_id, target_status)
+	_acting_interface.change_actor_state(target_chara.chara_name, state_id)
 
 ## 从角色列表创建并显示角色
 func _display_character(dialogue: KND_Dialogue) -> void:
@@ -765,15 +752,14 @@ func _display_character(dialogue: KND_Dialogue) -> void:
 		
 	# 读取对话的角色状态ID
 	var target_state_name = dialogue.character_state
-	var target_status := _find_character_status(target_chara, target_state_name)
-	if target_status == null:
-		push_error("显示角色失败：角色[%s]未找到状态[%s]" % [target_chara_name, target_state_name])
+	if target_chara.character_scene == null:
+		push_error("显示角色失败：角色[%s]没有配置角色场景" % target_chara_name)
 		_acting_interface.character_created.emit()
 		return
 	# 角色位置
 	var pos = dialogue.actor_position
 	# 创建角色
-	_acting_interface.create_new_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_status)
+	_acting_interface.create_new_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_chara.character_scene)
 		
 ## 演员退场
 func _exit_actor(actor_name: String) -> void:
