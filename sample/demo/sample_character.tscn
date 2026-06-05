@@ -65,7 +65,7 @@ metadata/_edit_vertical_guides_ = [960.0]
 metadata/_edit_horizontal_guides_ = [640.0]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=92475700]
-position = Vector2(0.15622759, 14.382477)
+position = Vector2(-8, 87.999985)
 scale = Vector2(0.30456302, 0.30456296)
 sprite_frames = SubResource("SpriteFrames_d5n6n")
 animation = &"介绍"
