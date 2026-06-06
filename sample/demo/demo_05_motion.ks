@@ -14,6 +14,11 @@ actor motion Kona jump_twice
 "Kona" "内置动作bounce"
 actor motion Kona bounce
 
+# addons/konado/template/character/actor_motion_layer.tscn
+# 可以自行扩展动作，作用于CharcterMount上即可
+"Kona" "扩展动作【倒下】"
+actor motion Kona 倒下
+
 # 演员退出
 actor exit Kona
 

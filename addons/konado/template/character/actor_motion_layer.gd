@@ -65,7 +65,7 @@ func _play_builtin_motion(motion_name: String, params: Dictionary) -> void:
 		"bounce":
 			_play_bounce(params)
 		_:
-			push_warning("未找到演员动作：" + motion_name)
+			push_warning("未找到演员动作：%s，可用 AnimationPlayer 动画：%s" % [motion_name, _get_animation_names_text()])
 			_finish_motion(motion_name)
 
 func _play_shake(params: Dictionary) -> void:
@@ -132,3 +132,13 @@ func _reset_motion_target() -> void:
 	target.set("position", Vector2.ZERO)
 	target.set("scale", Vector2.ONE)
 	target.set("rotation", 0.0)
+
+func _get_animation_names_text() -> String:
+	if animation_player == null:
+		return "未配置 AnimationPlayer"
+	var names := PackedStringArray()
+	for animation_name in animation_player.get_animation_list():
+		names.append(str(animation_name))
+	if names.is_empty():
+		return "无"
+	return ", ".join(names)

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dcwk5so2ohcc2"]
 
 [ext_resource type="Script" uid="uid://mksyuojdc6ns" path="res://addons/konado/template/character/konado_actor.gd" id="1_gnto7"]
-[ext_resource type="Script" uid="uid://b6h45twralmd1" path="res://addons/konado/template/character/actor_motion_layer.gd" id="2_aw61d"]
+[ext_resource type="PackedScene" uid="uid://vn8ookpi8m80" path="res://addons/konado/template/character/actor_motion_layer.tscn" id="2_lmolw"]
 
 [node name="character" type="Control" unique_id=1241920877 node_paths=PackedStringArray("texture_rect", "motion_layer", "slot")]
 layout_mode = 3
@@ -25,25 +25,13 @@ offset_right = 191.99805
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MotionLayer" type="Control" parent="Slot" unique_id=1709223513 node_paths=PackedStringArray("animation_player", "mount_node")]
+[node name="MotionLayer" parent="Slot" instance=ExtResource("2_lmolw")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_aw61d")
-animation_player = NodePath("AnimationPlayer")
-mount_node = NodePath("CharacterMount")
-
-[node name="CharacterMount" type="Control" parent="Slot/MotionLayer" unique_id=1327654451]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset_ratio = Vector2(0.5, 1)
 
 [node name="TextureRect" type="TextureRect" parent="Slot/MotionLayer/CharacterMount" unique_id=1921303695]
 unique_name_in_owner = true
@@ -56,5 +44,3 @@ grow_vertical = 2
 pivot_offset_ratio = Vector2(0.5, 1)
 expand_mode = 3
 stretch_mode = 5
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Slot/MotionLayer" unique_id=999472103]
