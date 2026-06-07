@@ -14,3 +14,4 @@ docs/**/*.uid
 
 # Jetbrain IDE specific ignores
 .idea/
+.DS_Store

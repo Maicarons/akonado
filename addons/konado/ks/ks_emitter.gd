@@ -23,6 +23,7 @@ const BACKGROUND_EFFECTS_MAP: Dictionary = {
 	"vortex": KND_ActingInterface.BackgroundTransitionEffectsType.VORTEX_SWAP_EFFECT,
 	"windmill": KND_ActingInterface.BackgroundTransitionEffectsType.WINDMILL_EFFECT,
 	"cyberglitch": KND_ActingInterface.BackgroundTransitionEffectsType.CYBER_GLITCH_EFFECT,
+	"blink": KND_ActingInterface.BackgroundTransitionEffectsType.BlinkEffect,
 }
 
 
@@ -132,7 +133,11 @@ func _emit_background(node: KS_AST.BackgroundNode) -> KND_Dialogue:
 	d.background_image_name = node.image_name
 	if not node.effect.is_empty():
 		d.background_toggle_effects = BACKGROUND_EFFECTS_MAP.get(
-			node.effect, KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT)
+			node.effect, KND_ActingInterface.BackgroundTransitionEffectsType.NULL)
+		if d.background_toggle_effects == KND_ActingInterface.BackgroundTransitionEffectsType.NULL:
+			push_warning("警告：%s [行：%d] 目标效果 '%s' 未找到" % [_path, d.source_file_line, node.effect])
+			d.background_toggle_effects = KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
+			
 	return d
 
 

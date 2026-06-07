@@ -1,0 +1,14 @@
+[remap]
+
+importer="konado.scripts"
+type="Resource"
+uid="uid://3l6b6b4lttju"
+path="res://.godot/imported/demo_06_bg_effects.ks-923b88e4bf96b638c7a071cd6e85924e.res"
+
+[deps]
+
+source_file="res://sample/demo/demo_06_bg_effects.ks"
+dest_files=["res://.godot/imported/demo_06_bg_effects.ks-923b88e4bf96b638c7a071cd6e85924e.res"]
+
+[params]
+

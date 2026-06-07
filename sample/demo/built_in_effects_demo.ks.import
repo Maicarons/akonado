@@ -1,0 +1,14 @@
+[remap]
+
+importer="konado.scripts"
+type="Resource"
+uid="uid://b6pafsme7d55n"
+path="res://.godot/imported/built_in_effects_demo.ks-aa3cd145ecc0009481154a0f108f0980.res"
+
+[deps]
+
+source_file="res://sample/demo/built_in_effects_demo.ks"
+dest_files=["res://.godot/imported/built_in_effects_demo.ks-aa3cd145ecc0009481154a0f108f0980.res"]
+
+[params]
+

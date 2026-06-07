@@ -80,7 +80,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "在线文档"
-uri = "https://godothub.com/oss/konado/"
+uri = "https://godothub.com/oss/konado/zh/tutorial/script/konado-script.html"
 
 [node name="VBoxContainer2" type="SplitContainer" parent="dock" unique_id=1355989015]
 layout_mode = 2

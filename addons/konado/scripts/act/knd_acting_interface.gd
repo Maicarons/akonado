@@ -27,7 +27,9 @@ enum BackgroundTransitionEffectsType {
 	ALPHA_FADE_EFFECT, ## ALPHA淡入淡出
 	VORTEX_SWAP_EFFECT, ## 极坐标漩涡效果
 	WINDMILL_EFFECT, ## 风车效果
-	CYBER_GLITCH_EFFECT ## 电子故障效果
+	CYBER_GLITCH_EFFECT, ## 电子故障效果
+	BlinkEffect, ## 眨眼效果
+	NULL = -1
 	}
 	
 ## 当前背景
@@ -42,6 +44,8 @@ var alpha_fade_effect_shader: Shader = preload("res://addons/konado/shader/bg_tr
 var vortex_swap_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/vortex_swap_effect.gdshader")
 var windmill_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/windmill_effect.gdshader")
 var cyber_glitch_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/cyber_glitch_effect.gdshader")
+var blink_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/blink_effect.gdshader")
+
 
 ## 演员模板
 @onready var _konado_actor_template: PackedScene = preload("res://addons/konado/template/character/character_template.tscn")
@@ -138,6 +142,12 @@ func init_transtion_config() -> void:
 		BackgroundTransitionEffectsType.CYBER_GLITCH_EFFECT: {
 			"shader": cyber_glitch_effect_shader,
 			"duration": 1.0,
+			"progress_target": 1.0,
+			"tween_trans": Tween.TRANS_LINEAR
+		},
+		BackgroundTransitionEffectsType.BlinkEffect: {
+			"shader": blink_effect_shader,
+			"duration": 3.0,
 			"progress_target": 1.0,
 			"tween_trans": Tween.TRANS_LINEAR
 		}

@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://djgrve3cuhwbb" path="res://sample/demo/sample_arts/03.png" id="5_vkseo"]
 [ext_resource type="Texture2D" uid="uid://djdy733ored5q" path="res://sample/demo/sample_arts/04.png" id="6_o1kv4"]
 [ext_resource type="Texture2D" uid="uid://c885teqil5cw5" path="res://sample/demo/sample_arts/geometry-frame_07.png" id="8_7sk0e"]
+[ext_resource type="Texture2D" uid="uid://wbfhu2nd82rr" path="res://sample/demo/sample_arts/过渡效果演示.png" id="9_vkseo"]
 
 [sub_resource type="Resource" id="Resource_84d5u"]
 script = ExtResource("1_84d5u")
@@ -52,7 +53,13 @@ background_name = "00"
 background_image = ExtResource("8_7sk0e")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
+[sub_resource type="Resource" id="Resource_o1kv4"]
+script = ExtResource("1_84d5u")
+background_name = "bg_effect"
+background_image = ExtResource("9_vkseo")
+metadata/_custom_type_script = "uid://di66ghc1qq8e5"
+
 [resource]
 script = ExtResource("2_71yj3")
-background_list = Array[ExtResource("1_84d5u")]([SubResource("Resource_84d5u"), SubResource("Resource_55st1"), SubResource("Resource_7oel1"), SubResource("Resource_dq7nf"), SubResource("Resource_pq6qq"), SubResource("Resource_jcqqy"), SubResource("Resource_vkseo")])
+background_list = Array[ExtResource("1_84d5u")]([SubResource("Resource_84d5u"), SubResource("Resource_55st1"), SubResource("Resource_7oel1"), SubResource("Resource_dq7nf"), SubResource("Resource_pq6qq"), SubResource("Resource_jcqqy"), SubResource("Resource_vkseo"), SubResource("Resource_o1kv4")])
 metadata/_custom_type_script = "uid://5aqgmxi8gxcw"
