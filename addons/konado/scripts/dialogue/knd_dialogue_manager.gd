@@ -407,7 +407,9 @@ func _process(delta) -> void:
 				# 如果是切换背景
 				elif cur_dialogue_type == KND_Dialogue.Type.SWITCH_BACKGROUND:
 					# 显示背景
-					var bg_name = dialog.background_image_name
+					var bg_name = dialog.background_name
+					if bg_name.is_empty():
+						bg_name = dialog.background_image_name
 					var bg_effect = dialog.background_toggle_effects
 					var s = _acting_interface.background_change_finished
 					# 检查信号是否已经连接
@@ -727,18 +729,29 @@ func start_autoplay(value: bool):
 	
 ## 显示背景的方法
 func _display_background(bg_name: String, effect: KND_ActingInterface.BackgroundTransitionEffectsType) -> void:
-	if bg_name == null:
+	if bg_name == null or bg_name.is_empty():
+		push_error("背景名称为空，请检查 KS/Shot 是否已经重新导入")
+		_acting_interface.background_change_finished.emit()
+		return
+	if background_list == null:
+		push_error("背景列表未配置")
+		_acting_interface.background_change_finished.emit()
 		return
 	var bg_list = background_list.background_list
-	var bg_tex: Texture
+	var target_background: KND_Background
 	for bg in bg_list:
 		if bg.background_name == bg_name:
-			bg_tex = bg.background_image
-			
-	if bg_tex == null:
-		printerr("背景图片没有找到")
+			target_background = bg
+			break
+	if target_background == null:
+		push_error("背景没有找到：" + bg_name)
+		_acting_interface.background_change_finished.emit()
 		return
-	_acting_interface.change_background_image(bg_tex, bg_name, effect)
+	if target_background.background_scene == null:
+		push_error("背景[%s]没有配置背景场景" % bg_name)
+		_acting_interface.background_change_finished.emit()
+		return
+	_acting_interface.change_background_scene(target_background.background_scene, bg_name, effect)
 	
 
 ## 演员状态切换的方法

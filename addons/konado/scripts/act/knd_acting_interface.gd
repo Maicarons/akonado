@@ -32,21 +32,6 @@ enum BackgroundTransitionEffectsType {
 	NULL = -1
 	}
 	
-## 当前背景
-var current_texture: Texture = Texture.new()
-
-## 特效Shader路径
-var none_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/none_effect.gdshader")
-var erase_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/erase_effect.gdshader")
-var blinds_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/blinds_effect.gdshader")
-var wave_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/wave_effect.gdshader")
-var alpha_fade_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/alpha_fade_effect.gdshader")
-var vortex_swap_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/vortex_swap_effect.gdshader")
-var windmill_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/windmill_effect.gdshader")
-var cyber_glitch_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/cyber_glitch_effect.gdshader")
-var blink_effect_shader: Shader = preload("res://addons/konado/shader/bg_trans_effects/blink_effect.gdshader")
-
-
 ## 演员模板
 @onready var _konado_actor_template: PackedScene = preload("res://addons/konado/template/character/character_template.tscn")
 
@@ -56,29 +41,96 @@ var actor_dict = {}
 var actor_nodes = {}
 ## 角色列表
 var chara_list: KND_CharacterList
-## 背景图片
-@onready var _background: ColorRect = $BackgroundLayer
+## 背景底色层
+@onready var _background: ColorRect = get_node_or_null("BackgroundLayer") as ColorRect
+## 背景场景容器
+@onready var _background_container: Control = get_node_or_null("BackgroundLayer/BackgroundContainer") as Control
 ## 角色容器
-@onready var _chara_controler: Control = $BackgroundLayer/CharaControl
+@onready var _chara_controler: Control = get_node_or_null("CharaControl") as Control
 ## 效果层
-@onready var _effect_layer: ColorRect = $EffectLayer
+@onready var _effect_layer: ColorRect = get_node_or_null("EffectLayer") as ColorRect
 
-# Tween效果动画节点
-var effect_tween: Tween
-#存档用背景id
-var background_id : String
+## 存档用背景 id
+var background_id: String = ""
 
-var TRANSITION_CONFIGS: Dictionary = {}
+var _current_background_scene: KND_BackgroundSceneBase
+var _transition_old_background: KND_BackgroundSceneBase
+var _background_transition_wait_count: int = 0
+
+const BACKGROUND_EFFECT_NAMES := {
+	BackgroundTransitionEffectsType.NONE_EFFECT: "none",
+	BackgroundTransitionEffectsType.EraseEffect: "erase",
+	BackgroundTransitionEffectsType.BlindsEffect: "blinds",
+	BackgroundTransitionEffectsType.WaveEffect: "wave",
+	BackgroundTransitionEffectsType.ALPHA_FADE_EFFECT: "fade",
+	BackgroundTransitionEffectsType.VORTEX_SWAP_EFFECT: "vortex",
+	BackgroundTransitionEffectsType.WINDMILL_EFFECT: "windmill",
+	BackgroundTransitionEffectsType.CYBER_GLITCH_EFFECT: "cyberglitch",
+	BackgroundTransitionEffectsType.BlinkEffect: "blink",
+}
 
 
 func _ready() -> void:
-	# 初始化 ShaderMaterial
-	_background.material = ShaderMaterial.new()
-	# 初始化配置
-	init_transtion_config()
-	
+	_ensure_stage_nodes()
 	for child in _chara_controler.get_children():
 		child.queue_free()
+
+## 确保表演舞台的层级存在。
+## 背景已经全面转成场景，这里只兜住“场景挂载层”本身，避免旧模板实例没有 BackgroundContainer 时背景无法显示。
+func _ensure_stage_nodes() -> void:
+	if _background == null:
+		_background = ColorRect.new()
+		_background.name = "BackgroundLayer"
+		_background.color = Color.BLACK
+		add_child(_background)
+	if _background_container == null:
+		_background_container = Control.new()
+		_background_container.name = "BackgroundContainer"
+		_background.add_child(_background_container)
+	elif _background_container.get_parent() != _background:
+		var container_parent := _background_container.get_parent()
+		if container_parent:
+			container_parent.remove_child(_background_container)
+		_background.add_child(_background_container)
+
+	if _chara_controler == null:
+		_chara_controler = get_node_or_null("BackgroundLayer/CharaControl") as Control
+	if _chara_controler == null:
+		_chara_controler = Control.new()
+		_chara_controler.name = "CharaControl"
+		add_child(_chara_controler)
+	elif _chara_controler.get_parent() != self:
+		var chara_parent := _chara_controler.get_parent()
+		if chara_parent:
+			chara_parent.remove_child(_chara_controler)
+		add_child(_chara_controler)
+
+	if _effect_layer == null:
+		_effect_layer = ColorRect.new()
+		_effect_layer.name = "EffectLayer"
+		_effect_layer.color = Color(0, 0, 0, 0)
+		add_child(_effect_layer)
+
+	_set_full_rect(_background)
+	_set_full_rect(_background_container)
+	_set_full_rect(_chara_controler)
+	_set_full_rect(_effect_layer)
+
+	## 层级顺序固定为：背景场景 -> 角色 -> 全屏效果。
+	if _background.get_parent() == self:
+		move_child(_background, 0)
+	if _chara_controler.get_parent() == self:
+		move_child(_chara_controler, min(1, get_child_count() - 1))
+	if _effect_layer.get_parent() == self:
+		move_child(_effect_layer, get_child_count() - 1)
+
+func _set_full_rect(control: Control) -> void:
+	if control == null:
+		return
+	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	control.set_anchors_preset(Control.PRESET_FULL_RECT)
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	control.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	
 ## 获取角色节点的方法
 func get_chara_node(actor_id: String) -> Node:
@@ -94,162 +146,86 @@ func get_chara_node(actor_id: String) -> Node:
 		return chara_node
 	return null
 			
-## 初始化背景切换配置
-func init_transtion_config() -> void:
-	TRANSITION_CONFIGS = {
-		BackgroundTransitionEffectsType.NONE_EFFECT: {
-			"shader": none_effect_shader,
-			"duration": 0.0,
-			"progress_target": 0.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.EraseEffect: {
-			"shader": erase_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.BlindsEffect: {
-			"shader": blinds_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.WaveEffect: {
-			"shader": wave_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.8,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.ALPHA_FADE_EFFECT: {
-			"shader": alpha_fade_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.VORTEX_SWAP_EFFECT: {
-			"shader": vortex_swap_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.WINDMILL_EFFECT: {
-			"shader": windmill_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.CYBER_GLITCH_EFFECT: {
-			"shader": cyber_glitch_effect_shader,
-			"duration": 1.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		},
-		BackgroundTransitionEffectsType.BlinkEffect: {
-			"shader": blink_effect_shader,
-			"duration": 3.0,
-			"progress_target": 1.0,
-			"tween_trans": Tween.TRANS_LINEAR
-		}
-	}
-
 ## 清空背景
 func clean_background(effects_type: BackgroundTransitionEffectsType) -> void:
-	var image = Image.create(256, 256, false, Image.FORMAT_RGBA8)
-	image.fill(Color.BLACK)
-	var tex = ImageTexture.create_from_image(image)
-	if effects_type == BackgroundTransitionEffectsType.NONE_EFFECT:
-		_background.material.set_shader(none_effect_shader)
-		_background.material.set_shader_parameter("target_texture", tex)
-		current_texture = tex
+	background_id = ""
+	if _current_background_scene == null:
 		background_change_finished.emit()
 		return
-	
-	var config = TRANSITION_CONFIGS.get(effects_type, TRANSITION_CONFIGS[BackgroundTransitionEffectsType.NONE_EFFECT])
-
-	_background.material.set("shader", config.shader)
-	print(_background.material.get_shader())
-	_background.material.set_shader_parameter("progress", 0.0)
-	_background.material.set_shader_parameter("current_texture", current_texture)
-	_background.material.set_shader_parameter("target_texture", tex)
-
-	# 创建并配置过渡动画
-	effect_tween = get_tree().create_tween()
-	effect_tween.tween_property(
-		_background.material, 
-		"shader_parameter/progress", 
-		config.progress_target, 
-		config.duration
+	_transition_old_background = _current_background_scene
+	_current_background_scene = null
+	_background_transition_wait_count = 1
+	_transition_old_background.background_exit_finished.connect(
+		_on_background_transition_part_finished.bind(_transition_old_background),
+		ConnectFlags.CONNECT_ONE_SHOT
 	)
-	effect_tween.set_ease(config.tween_trans)
-	
-	# 动画完成回调
-	effect_tween.finished.connect(_on_transition_finished.bind(_background.material, tex))
-	effect_tween.play()
-	
+	_transition_old_background.play_exit(_background_effect_name(effects_type))
 
-## 显示背景图片的方法
-func change_background_image(tex: Texture, name: String, effects_type: BackgroundTransitionEffectsType) -> void:
-	if not tex:
-		print_rich("[color=red]切换背景失败，空Texture，请检查资源图片[/color]")
+## 显示背景场景的方法
+func change_background_scene(scene: PackedScene, name: String, effects_type: BackgroundTransitionEffectsType) -> void:
+	_ensure_stage_nodes()
+	if scene == null:
+		print_rich("[color=red]切换背景失败，空背景场景，请检查背景资源[/color]")
+		background_change_finished.emit()
+		return
+	_clear_pending_background_transition()
+	var instance := scene.instantiate()
+	if not (instance is KND_BackgroundSceneBase):
+		push_error("背景场景必须继承 KND_BackgroundSceneBase：" + name)
+		instance.queue_free()
 		background_change_finished.emit()
 		return
 
-	# 基础状态更新
+	var next_background := instance as KND_BackgroundSceneBase
 	background_id = name
-	print_rich("[color=cyan]切换背景为: [/color]"+str(name) +" " + "过渡效果: " + str(effects_type))
-	
-	# 获取当前效果配置
-	var config = TRANSITION_CONFIGS.get(effects_type, TRANSITION_CONFIGS[BackgroundTransitionEffectsType.NONE_EFFECT])
-	
-	# 停止之前的过渡动画
-	if effect_tween and not effect_tween.is_valid():
-		effect_tween.kill()
-		effect_tween = null
+	next_background.name = name
+	_prepare_background_scene(next_background)
+	_background_container.add_child(next_background)
+	next_background.setup_background(name)
 
-	# 无效果处理
-	if effects_type == BackgroundTransitionEffectsType.NONE_EFFECT:
-		_background.material.set_shader(none_effect_shader)
-		_background.material.set_shader_parameter("target_texture", tex)
-		current_texture = tex
-		background_change_finished.emit()
-		return
-
-	_background.material.set("shader", config.shader)
-	print(_background.material.get_shader())
-	_background.material.set_shader_parameter("progress", 0.0)
-	_background.material.set_shader_parameter("current_texture", current_texture)
-	_background.material.set_shader_parameter("target_texture", tex)
-
-	# 创建并配置过渡动画
-	effect_tween = get_tree().create_tween()
-	effect_tween.tween_property(
-		_background.material, 
-		"shader_parameter/progress", 
-		config.progress_target, 
-		config.duration
+	var old_background := _current_background_scene
+	_current_background_scene = next_background
+	_transition_old_background = old_background
+	_background_transition_wait_count = 1
+	var effect_name := _background_effect_name(effects_type)
+	next_background.background_enter_finished.connect(
+		_on_background_transition_part_finished.bind(next_background),
+		ConnectFlags.CONNECT_ONE_SHOT
 	)
-	effect_tween.set_ease(config.tween_trans)
-	
-	# 动画完成回调
-	effect_tween.finished.connect(_on_transition_finished.bind(_background.material, tex))
-	effect_tween.play()
+	if old_background and is_instance_valid(old_background):
+		_background_transition_wait_count += 1
+		old_background.background_exit_finished.connect(
+			_on_background_transition_part_finished.bind(old_background),
+			ConnectFlags.CONNECT_ONE_SHOT
+		)
+		old_background.play_exit(effect_name)
+	next_background.play_enter(effect_name)
+	print_rich("[color=cyan]切换背景为: [/color]"+str(name) +" " + "过渡效果: " + str(effects_type))
 
+func _prepare_background_scene(background: KND_BackgroundSceneBase) -> void:
+	_set_full_rect(background)
 
-## 过渡动画完成统一处理函数
-func _on_transition_finished(mat: ShaderMaterial, target_tex: Texture) -> void:
-	print("背景过渡动画完成")
-	current_texture = target_tex
-	mat.set_shader_parameter("current_texture", current_texture)
-	
-	# 清理tween（避免内存泄漏）
-	if effect_tween and effect_tween.is_valid():
-		effect_tween.kill()
-	effect_tween = null
-	
+func _background_effect_name(effects_type: BackgroundTransitionEffectsType) -> String:
+	return BACKGROUND_EFFECT_NAMES.get(effects_type, "none")
+
+func _clear_pending_background_transition() -> void:
+	if _transition_old_background and is_instance_valid(_transition_old_background):
+		_transition_old_background.stop_background_transition()
+		if _transition_old_background != _current_background_scene:
+			_transition_old_background.queue_free()
+	_transition_old_background = null
+	_background_transition_wait_count = 0
+
+func _on_background_transition_part_finished(background: KND_BackgroundSceneBase) -> void:
+	_background_transition_wait_count -= 1
+	if _background_transition_wait_count > 0:
+		return
+	if _transition_old_background and is_instance_valid(_transition_old_background):
+		_transition_old_background.queue_free()
+	_transition_old_background = null
+	print("背景场景切换完成")
 	background_change_finished.emit()
-	
-	
+
 # 新建角色的方法
 func create_new_character(chara_id: String, h_division: int, pos_h: int, state: String, character_scene: PackedScene = null, motion_layer_scene: PackedScene = null) -> void:
 	# 检查创建的是否为场景已有角色

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bcl2e6o0kb5dm"]
 
 [ext_resource type="Script" uid="uid://ct7rfs05wpar0" path="res://sample/demo/demo.gd" id="1_sgljs"]
-[ext_resource type="Resource" uid="uid://xgl88461tnam" path="res://sample/demo/demo_05_motion.ks" id="3_3bwhi"]
+[ext_resource type="Resource" uid="uid://do4iuryp83ets" path="res://sample/demo/demo_01.ks" id="3_3bwhi"]
 [ext_resource type="Resource" uid="uid://gi0knny11y78" path="res://sample/demo/character_list.tres" id="3_c17kf"]
 [ext_resource type="Resource" uid="uid://bf0o7uo4h3ta1" path="res://sample/demo/bg_list.tres" id="4_qcbmp"]
 [ext_resource type="Resource" uid="uid://v3bsw26q8dli" path="res://sample/demo/bgm_list.tres" id="5_qcbmp"]

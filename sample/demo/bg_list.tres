@@ -2,61 +2,61 @@
 
 [ext_resource type="Script" uid="uid://di66ghc1qq8e5" path="res://addons/konado/scripts/background/knd_background.gd" id="1_84d5u"]
 [ext_resource type="Script" uid="uid://5aqgmxi8gxcw" path="res://addons/konado/scripts/background/knd_background_list.gd" id="2_71yj3"]
-[ext_resource type="Texture2D" uid="uid://bb7nhjioefh8a" path="res://sample/demo/sample_arts/示例-咖啡馆-背景.png" id="2_mfnc7"]
-[ext_resource type="Texture2D" uid="uid://bo8u6nb7xuyl" path="res://sample/demo/sample_arts/01.png" id="3_4xo75"]
-[ext_resource type="Texture2D" uid="uid://ckrkayafsqgic" path="res://sample/demo/sample_arts/02.png" id="4_7sk0e"]
-[ext_resource type="Texture2D" uid="uid://cyhlk1hod47gb" path="res://sample/demo/sample_arts/结束.png" id="4_55st1"]
-[ext_resource type="Texture2D" uid="uid://djgrve3cuhwbb" path="res://sample/demo/sample_arts/03.png" id="5_vkseo"]
-[ext_resource type="Texture2D" uid="uid://djdy733ored5q" path="res://sample/demo/sample_arts/04.png" id="6_o1kv4"]
-[ext_resource type="Texture2D" uid="uid://c885teqil5cw5" path="res://sample/demo/sample_arts/geometry-frame_07.png" id="8_7sk0e"]
-[ext_resource type="Texture2D" uid="uid://wbfhu2nd82rr" path="res://sample/demo/sample_arts/过渡效果演示.png" id="9_vkseo"]
+[ext_resource type="PackedScene" uid="uid://cx40k6u1duv2j" path="res://sample/demo/backgrounds/bg1.tscn" id="3_bg1"]
+[ext_resource type="PackedScene" uid="uid://ddl7i4fowixsf" path="res://sample/demo/backgrounds/bg_01.tscn" id="4_bg01"]
+[ext_resource type="PackedScene" uid="uid://brwafxupl5d67" path="res://sample/demo/backgrounds/bg_02.tscn" id="5_bg02"]
+[ext_resource type="PackedScene" uid="uid://lniw6qy0g6jg" path="res://sample/demo/backgrounds/bg_03.tscn" id="6_bg03"]
+[ext_resource type="PackedScene" uid="uid://cwj5xkyg4dtlr" path="res://sample/demo/backgrounds/bg_04.tscn" id="7_bg04"]
+[ext_resource type="PackedScene" uid="uid://bxvg7w8s4kpbf" path="res://sample/demo/backgrounds/bg_end.tscn" id="8_bgend"]
+[ext_resource type="PackedScene" uid="uid://dtmwn4h8mgvop" path="res://sample/demo/backgrounds/bg_00.tscn" id="9_bg00"]
+[ext_resource type="PackedScene" uid="uid://b6f70bkx7xmdt" path="res://sample/demo/backgrounds/bg_effect.tscn" id="10_bgeffect"]
 
 [sub_resource type="Resource" id="Resource_84d5u"]
 script = ExtResource("1_84d5u")
 background_name = "bg1"
-background_image = ExtResource("2_mfnc7")
+background_scene = ExtResource("3_bg1")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_55st1"]
 script = ExtResource("1_84d5u")
 background_name = "01"
-background_image = ExtResource("3_4xo75")
+background_scene = ExtResource("4_bg01")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_7oel1"]
 script = ExtResource("1_84d5u")
 background_name = "02"
-background_image = ExtResource("4_7sk0e")
+background_scene = ExtResource("5_bg02")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_dq7nf"]
 script = ExtResource("1_84d5u")
 background_name = "03"
-background_image = ExtResource("5_vkseo")
+background_scene = ExtResource("6_bg03")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_pq6qq"]
 script = ExtResource("1_84d5u")
 background_name = "04"
-background_image = ExtResource("6_o1kv4")
+background_scene = ExtResource("7_bg04")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_jcqqy"]
 script = ExtResource("1_84d5u")
 background_name = "bg_end"
-background_image = ExtResource("4_55st1")
+background_scene = ExtResource("8_bgend")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_vkseo"]
 script = ExtResource("1_84d5u")
 background_name = "00"
-background_image = ExtResource("8_7sk0e")
+background_scene = ExtResource("9_bg00")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [sub_resource type="Resource" id="Resource_o1kv4"]
 script = ExtResource("1_84d5u")
 background_name = "bg_effect"
-background_image = ExtResource("9_vkseo")
+background_scene = ExtResource("10_bgeffect")
 metadata/_custom_type_script = "uid://di66ghc1qq8e5"
 
 [resource]

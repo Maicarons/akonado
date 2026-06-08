@@ -130,7 +130,8 @@ func _emit_background(node: KS_AST.BackgroundNode) -> KND_Dialogue:
 	var d := KND_Dialogue.new()
 	d.source_file_line = node.line
 	d.dialog_type = KND_Dialogue.Type.SWITCH_BACKGROUND
-	d.background_image_name = node.image_name
+	d.background_name = node.background_name
+	d.background_image_name = node.background_name
 	if not node.effect.is_empty():
 		d.background_toggle_effects = BACKGROUND_EFFECTS_MAP.get(
 			node.effect, KND_ActingInterface.BackgroundTransitionEffectsType.NULL)

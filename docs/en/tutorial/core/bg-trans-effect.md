@@ -7,7 +7,7 @@ order: 3
 
 ## Preface
 
-Background transition effects refer to the effect where the current background image exits while the new scene's background image enters during a scene switch. This can increase visual impact and improve user experience. This chapter helps you implement custom background transition effects.
+Background transition effects refer to the effect where the current background scene exits while the new background scene enters during a scene switch. This can increase visual impact and improve user experience. This chapter helps you implement custom background transition effects.
 
 ## Background Switching Shader Specification
 

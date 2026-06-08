@@ -160,7 +160,7 @@ Wrapper クラスは Konado GDScript リソースの軽量 C# ラッパーです
 | `JumpBranchTarget` | `string` | 現在ショット内の分岐ラベル。 |
 | `BgmName` | `string` | 再生する BGM 名。 |
 | `SoundeffectName` | `string` | 再生する効果音名。 |
-| `BackgroundImageName` | `string` | 切り替える背景画像名。 |
+| `BackgroundName` | `string` | 切り替える背景名。 |
 | `BackgroundToggleEffects` | `BackgroundTransitionEffectsType` | 背景切り替え効果。 |
 | `CustomSignalName` | `string` | `CustomSignal` イベントで送られる内容。 |
 | `AchievementId` | `string` | 実績 ID。 |

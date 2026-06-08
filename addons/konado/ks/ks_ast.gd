@@ -24,7 +24,7 @@ class DialogueNode extends ASTNode:
 
 ## 背景切换节点
 class BackgroundNode extends ASTNode:
-	var image_name: String = ""
+	var background_name: String = ""
 	var effect: String = ""
 
 

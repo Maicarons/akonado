@@ -147,7 +147,7 @@ func _parse_dialogue() -> KS_AST.DialogueNode:
 	return node
 
 
-## 背景切换解析：  background <image_name> [effect]
+## 背景切换解析：  background <background_name> [effect]
 func _parse_background() -> KS_AST.BackgroundNode:
 	var node := KS_AST.BackgroundNode.new()
 	node.line = _peek().line
@@ -155,9 +155,9 @@ func _parse_background() -> KS_AST.BackgroundNode:
 
 	var name_tok := _expect_any_value()
 	if name_tok == null:
-		_error("background 缺少图片资源名")
+		_error("background 缺少背景资源名")
 		return null
-	node.image_name = str(name_tok.value)
+	node.background_name = str(name_tok.value)
 
 	# 可选的效果类型
 	if not _at_line_end():

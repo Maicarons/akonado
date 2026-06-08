@@ -1,6 +1,6 @@
 "标签","按钮名称","按钮图标","插入语句","按钮备注"
 "Dialogue","Dialogue","","""Character Name"" ""Dialogue Content"" [Voice ID]","Character dialogue content"
-"Background","Background Switch","","background <Background Image Name> [Effect Type]","Switch background image, optional effect"
+"Background","Background Switch","","background <Background Name> [Effect Type]","Switch background scene, optional effect"
 "Character","Actor Show","","actor show <Character Name> <Character State> at <Target Position>","Display character on screen"
 "Character","Actor Exit","","actor exit <Character Name>","Remove character from screen"
 "Character","State Change","","actor change <Character Name> <New State>","Change character state"

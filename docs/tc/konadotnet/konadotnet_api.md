@@ -160,7 +160,7 @@ Wrapper 類別是 Konado GDScript 資源的輕量 C# 封裝。包裝已有資源
 | `JumpBranchTarget` | `string` | 目前鏡頭內的分支標籤目標。 |
 | `BgmName` | `string` | 要播放的 BGM 名稱。 |
 | `SoundeffectName` | `string` | 要播放的音效名稱。 |
-| `BackgroundImageName` | `string` | 要切換的背景圖片名稱。 |
+| `BackgroundName` | `string` | 要切換的背景名稱。 |
 | `BackgroundToggleEffects` | `BackgroundTransitionEffectsType` | 背景切換效果。 |
 | `CustomSignalName` | `string` | 透過 `CustomSignal` 事件送出的內容。 |
 | `AchievementId` | `string` | 成就 ID。 |

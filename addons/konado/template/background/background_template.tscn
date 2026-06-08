@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dihd4sjsfufp6"]
+
+[ext_resource type="Script" uid="uid://ca0g17r6mh3hi" path="res://addons/konado/scripts/background/knd_background_scene_base.gd" id="1_bgtemplate"]
+
+[node name="Background" type="Control" unique_id=2112032307 node_paths=PackedStringArray("animation_player")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_bgtemplate")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Content" type="Control" parent="." unique_id=674105596]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1163341113]

@@ -97,6 +97,7 @@ public partial class Dialogue : Resource
         public new static readonly StringName BgmName = "bgm_name";
         public new static readonly StringName VoiceId = "voice_id";
         public new static readonly StringName SoundeffectName = "soundeffect_name";
+        public new static readonly StringName BackgroundName = "background_name";
         public new static readonly StringName BackgroundImageName = "background_image_name";
         public new static readonly StringName BackgroundToggleEffects = "background_toggle_effects";
         public new static readonly StringName CustomSignalName = "custom_signal_name";
@@ -268,6 +269,12 @@ public partial class Dialogue : Resource
     {
         get => _source.Get(GDScriptPropertyName.SoundeffectName).As<string>();
         set => _source.Set(GDScriptPropertyName.SoundeffectName, value);
+    }
+
+    public new string BackgroundName
+    {
+        get => _source.Get(GDScriptPropertyName.BackgroundName).As<string>();
+        set => _source.Set(GDScriptPropertyName.BackgroundName, value);
     }
 
     public new string BackgroundImageName

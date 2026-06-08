@@ -481,11 +481,6 @@ func _capture_background_state() -> Dictionary:
 		print("捕获背景状态")
 		state["background_id"] = acting_interface.background_id
 		print("背景ID：" + acting_interface.background_id)
-		if acting_interface.current_texture:
-			state["background_texture_path"] = acting_interface.current_texture.resource_path
-			print("背景纹理路径：" + acting_interface.current_texture.resource_path)
-		else:
-			print("当前背景纹理为空")
 	else:
 		print("对话管理器或表演接口不存在")
 	
@@ -500,19 +495,22 @@ func _restore_background_state(state: Dictionary) -> void:
 	var acting_interface = dialogue_manager._acting_interface
 	
 	# 恢复背景状态
-	if state.has("background_id") and state.has("background_texture_path"):
+	if state.has("background_id"):
 		var bg_id = state["background_id"]
-		var bg_tex_path = state["background_texture_path"]
-		
-		# 确保bg_tex_path不为空
-		if bg_tex_path and bg_tex_path != "":
-			var bg_tex = load(bg_tex_path)
-			
-			if bg_tex:
-				acting_interface.change_background_image(
-					bg_tex,
-					bg_id,
-					KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
-				)
-			else:
-				print("无法加载背景纹理: " + bg_tex_path)
+		if bg_id == "":
+			acting_interface.clean_background(KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT)
+			return
+		var target_background: KND_Background
+		if dialogue_manager.background_list:
+			for bg in dialogue_manager.background_list.background_list:
+				if bg.background_name == bg_id:
+					target_background = bg
+					break
+		if target_background and target_background.background_scene:
+			acting_interface.change_background_scene(
+				target_background.background_scene,
+				bg_id,
+				KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
+			)
+		else:
+			print("无法恢复背景场景: " + bg_id)

@@ -425,7 +425,7 @@ res://addons/konado/scripts/dialogue/knd_dialogue.gd
 | --- | --- | --- |
 | `BgmName` | `string` | 要播放的 BGM 名称。 |
 | `SoundeffectName` | `string` | 要播放的音效名称。 |
-| `BackgroundImageName` | `string` | 要切换到的背景图片名称。 |
+| `BackgroundName` | `string` | 要切换到的背景名称。 |
 | `BackgroundToggleEffects` | `BackgroundTransitionEffectsType` | 背景切换效果。 |
 
 ### 自定义信号、成就和变量属性

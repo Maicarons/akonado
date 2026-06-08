@@ -6,17 +6,17 @@ order: 1
 # Background Switch
 
 ## Description
-Switch the background image of the game scene, with support for transition effects.
+Switch the background scene of the game scene, with support for transition effects.
 
 ## Syntax
 ```text
-background [image resource name] <effect type>
+background [background resource name] <effect type>
 ```
 
 ## Parameters
 | Parameter | Required | Example | Description |
 |------|------|--------|------|
-| Image resource name | Yes | `morning_forest` | Texture file name without extension |
+| Background resource name | Yes | `morning_forest` | Background name configured in the background list |
 | Effect type | No | `fade` | Transition effect (default: instant switch) |
 
 ### Supported Effect Types

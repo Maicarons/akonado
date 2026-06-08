@@ -94,7 +94,8 @@ static func read_fields(node: GraphNode) -> KND_Dialogue:
 		KND_Dialogue.Type.EXIT_ACTOR:
 			d.exit_actor = _val(f, "exit_actor")
 		KND_Dialogue.Type.SWITCH_BACKGROUND:
-			d.background_image_name = _val(f, "bg_name")
+			d.background_name = _val(f, "bg_name")
+			d.background_image_name = d.background_name
 			d.background_toggle_effects = _ival(f, "bg_effect") as KND_ActingInterface.BackgroundTransitionEffectsType
 		KND_Dialogue.Type.PLAY_BGM:
 			d.bgm_name = _val(f, "bgm_name")
@@ -210,7 +211,10 @@ static func _actor_exit(d: KND_Dialogue) -> GraphNode:
 static func _background(d: KND_Dialogue) -> GraphNode:
 	var n := _base("Background", TYPE_COLORS[KND_Dialogue.Type.SWITCH_BACKGROUND])
 	n.set_meta("dialogue_type", KND_Dialogue.Type.SWITCH_BACKGROUND)
-	var f1 := _add_field(n, "Name", d.background_image_name if d else "")
+	var bg_name := d.background_name if d else ""
+	if d and bg_name.is_empty():
+		bg_name = d.background_image_name
+	var f1 := _add_field(n, "Name", bg_name)
 	var opt := OptionButton.new()
 	opt.add_item("none", 0)
 	opt.add_item("erase", 1)

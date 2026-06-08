@@ -239,7 +239,7 @@ res://addons/konado/scripts/dialogue/knd_dialogue.gd
 | `JumpBranchTarget` | `string` | Branch label target in the current shot. |
 | `BgmName` | `string` | BGM name to play. |
 | `SoundeffectName` | `string` | Sound effect name to play. |
-| `BackgroundImageName` | `string` | Background image name to switch to. |
+| `BackgroundName` | `string` | Background name to switch to. |
 | `BackgroundToggleEffects` | `BackgroundTransitionEffectsType` | Background transition effect. |
 | `CustomSignalName` | `string` | Payload emitted through `CustomSignal`. |
 | `AchievementId` | `string` | Achievement ID. |

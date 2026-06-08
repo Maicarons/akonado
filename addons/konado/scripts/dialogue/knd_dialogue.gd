@@ -83,7 +83,9 @@ enum Type {
 @export var voice_id: String
 ## 音效名称
 @export var soundeffect_name: String
-## 对话背景图片
+## 对话背景名称
+@export var background_name: String
+## 旧版序列化字段，仅用于读取已导入的 KS/Shot 资源；背景本身仍然只使用场景。
 @export var background_image_name: String
 ## 背景切换特效
 @export var background_toggle_effects: KND_ActingInterface.BackgroundTransitionEffectsType
