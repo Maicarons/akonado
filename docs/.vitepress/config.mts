@@ -4,13 +4,68 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { genZhSidebar, genEnSidebar, genTcSidebar, genJaSidebar, genKoSidebar } from './genSidebar'
 import { bbcodeLanguage } from './bbcodeLanguage'
+import { DEFAULT_DOC_VERSION, DOC_VERSIONS } from './versions'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const docsRoot = resolve(__dirname, '..')
+const docsBase = '/oss/konado/'
+const sidebars = {
+  zh: Object.fromEntries(DOC_VERSIONS.map(({ value }) => [`/zh/${value}/`, genZhSidebar(docsRoot, value)])),
+  tc: Object.fromEntries(DOC_VERSIONS.map(({ value }) => [`/tc/${value}/`, genTcSidebar(docsRoot, value)])),
+  en: Object.fromEntries(DOC_VERSIONS.map(({ value }) => [`/en/${value}/`, genEnSidebar(docsRoot, value)])),
+  ja: Object.fromEntries(DOC_VERSIONS.map(({ value }) => [`/ja/${value}/`, genJaSidebar(docsRoot, value)])),
+  ko: Object.fromEntries(DOC_VERSIONS.map(({ value }) => [`/ko/${value}/`, genKoSidebar(docsRoot, value)])),
+}
+
+function redirectBaseWithoutSlash() {
+  const baseWithoutSlash = docsBase.slice(0, -1)
+  const supported = ['zh', 'tc', 'en', 'ja', 'ko']
+  const matchLanguage = (acceptLanguage = '') => {
+    const languages = acceptLanguage.split(',').map(value => value.split(';')[0].trim().toLowerCase())
+    return languages.map(lang => {
+      if (lang.startsWith('ja')) return 'ja'
+      if (lang.startsWith('ko')) return 'ko'
+      if (lang.startsWith('zh-tw') || lang.startsWith('zh-hk') || lang.startsWith('zh-mo') || lang.startsWith('zh-hant')) return 'tc'
+      if (lang.startsWith('zh')) return 'zh'
+      if (lang.startsWith('en')) return 'en'
+      return ''
+    }).find(lang => supported.includes(lang)) || 'en'
+  }
+  const redirect = (req, res, next) => {
+    if (!req.url) {
+      next()
+      return
+    }
+
+    const url = new URL(req.url, 'http://localhost')
+    if (url.pathname !== baseWithoutSlash && url.pathname !== docsBase) {
+      next()
+      return
+    }
+
+    const locale = matchLanguage(req.headers['accept-language'])
+    res.statusCode = 308
+    res.setHeader('Location', `${docsBase}${locale}/${DEFAULT_DOC_VERSION}/${url.search}`)
+    res.end()
+  }
+
+  return {
+    name: 'konado-base-without-slash-redirect',
+    configureServer(server) {
+      server.middlewares.use(redirect)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(redirect)
+    },
+  }
+}
 
 export default defineConfig({
 
   lastUpdated: true,
+  appearance: {
+    initialValue: 'dark'
+  },
 
   markdown: {
     languages: [bbcodeLanguage],
@@ -19,7 +74,7 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [MermaidPlugin()],
+    plugins: [redirectBaseWithoutSlash(), MermaidPlugin()],
     build: {
       chunkSizeWarningLimit: 1000,
     },
@@ -32,7 +87,7 @@ export default defineConfig({
   },
 
   title: "Konado",
-  base: "/oss/konado/",
+  base: docsBase,
   description: "Konado: Visual Novel Framework",
   head: [
     [
@@ -44,15 +99,19 @@ export default defineConfig({
       {},
       `(() => {
         const supported = ['zh', 'tc', 'en', 'ja', 'ko'];
+        const defaultVersion = ${JSON.stringify(DEFAULT_DOC_VERSION)};
         const path = window.location.pathname.replace(/\\/index\\.html$/, '/');
-        const base = '/oss/konado/';
+        const base = ${JSON.stringify(docsBase)};
         const isRoot = path === '/' || path === base || path === base.slice(0, -1);
-        const storageKey = 'konado-lang-redirected';
-        const hasRedirected = (() => {
-          try { return sessionStorage.getItem(storageKey) === '1'; }
-          catch { return false; }
-        })();
-        if (!isRoot || hasRedirected) return;
+        const deployedLocaleRoot = path.match(/^\\/oss\\/konado\\/(zh|tc|en|ja|ko)\\/?$/);
+        const localLocaleRoot = path.match(/^\\/(zh|tc|en|ja|ko)\\/?$/);
+        const localeRoot = deployedLocaleRoot || localLocaleRoot;
+        if (localeRoot) {
+          const targetBase = deployedLocaleRoot ? base : '/';
+          window.location.replace(targetBase + localeRoot[1] + '/' + defaultVersion + '/');
+          return;
+        }
+        if (!isRoot) return;
         const languages = navigator.languages?.length ? navigator.languages : [navigator.language || ''];
         const matched = languages.map(lang => lang.toLowerCase()).map(lang => {
           if (lang.startsWith('ja')) return 'ja';
@@ -62,9 +121,8 @@ export default defineConfig({
           if (lang.startsWith('en')) return 'en';
           return '';
         }).find(lang => supported.includes(lang)) || 'en';
-        try { sessionStorage.setItem(storageKey, '1'); } catch {}
         const targetBase = path === '/' ? '/' : base;
-        window.location.replace(targetBase + matched + '/');
+        window.location.replace(targetBase + matched + '/' + defaultVersion + '/');
       })();`
     ]
   ],
@@ -100,6 +158,7 @@ export default defineConfig({
 
     zh: {
       label: '简体中文',
+      link: `/zh/${DEFAULT_DOC_VERSION}/`,
       lang: 'zh-CN',
       description: 'Konado: 视觉小说框架',
       themeConfig: {
@@ -136,16 +195,17 @@ export default defineConfig({
         },
         nav: [
           { text: 'Godot Hub', link: 'https://godothub.com' },
-          { text: '查看文档', link: '/zh/tutorial/install' },
+          { text: '查看文档', link: `/zh/${DEFAULT_DOC_VERSION}/tutorial/install` },
           { text: '下载插件', link: 'https://github.com/godothub/konado/releases/latest' },
           { text: '赞助我们', link: 'https://ifdian.net/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: genZhSidebar(docsRoot)
+        sidebar: sidebars.zh
       }
     },
 
     tc: {
       label: '繁體中文',
+      link: `/tc/${DEFAULT_DOC_VERSION}/`,
       lang: 'zh-Hant',
       description: 'Konado: 視覺小說框架',
       themeConfig: {
@@ -182,16 +242,17 @@ export default defineConfig({
         },
         nav: [
           { text: 'Godot Hub', link: 'https://godothub.com' },
-          { text: '查看文檔', link: '/tc/tutorial/install' },
+          { text: '查看文檔', link: `/tc/${DEFAULT_DOC_VERSION}/tutorial/install` },
           { text: '下載插件', link: 'https://github.com/godothub/konado/releases/latest' },
           { text: '贊助我們', link: 'https://ifdian.net/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: genTcSidebar(docsRoot)
+        sidebar: sidebars.tc
       }
     },
 
     en: {
       label: 'English',
+      link: `/en/${DEFAULT_DOC_VERSION}/`,
       lang: 'en',
       description: 'Konado: Visual Novel Framework',
       themeConfig: {
@@ -202,16 +263,17 @@ export default defineConfig({
         },
         nav: [
           { text: 'Godot Hub', link: 'https://godothub.com' },
-          { text: 'Documentation', link: '/en/tutorial/install' },
+          { text: 'Documentation', link: `/en/${DEFAULT_DOC_VERSION}/tutorial/install` },
           { text: 'Download Plugin', link: 'https://github.com/godothub/konado/releases/latest' },
           { text: 'Sponsor Us', link: 'https://ifdian.net/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: genEnSidebar(docsRoot)
+        sidebar: sidebars.en
       }
     },
 
     ja: {
       label: '日本語',
+      link: `/ja/${DEFAULT_DOC_VERSION}/`,
       lang: 'ja',
       description: 'Konado: ビジュアルノベルフレームワーク',
       themeConfig: {
@@ -248,16 +310,17 @@ export default defineConfig({
         },
         nav: [
           { text: 'Godot Hub', link: 'https://godothub.com' },
-          { text: 'ドキュメント', link: '/ja/tutorial/install' },
+          { text: 'ドキュメント', link: `/ja/${DEFAULT_DOC_VERSION}/tutorial/install` },
           { text: 'プラグインをダウンロード', link: 'https://github.com/godothub/konado/releases/latest' },
           { text: 'スポンサー', link: 'https://ifdian.net/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: genJaSidebar(docsRoot)
+        sidebar: sidebars.ja
       }
     },
 
     ko: {
       label: '한국어',
+      link: `/ko/${DEFAULT_DOC_VERSION}/`,
       lang: 'ko',
       description: 'Konado: 비주얼 노벨 프레임워크',
       themeConfig: {
@@ -294,11 +357,11 @@ export default defineConfig({
         },
         nav: [
           { text: 'Godot Hub', link: 'https://godothub.com' },
-          { text: '문서', link: '/ko/tutorial/install' },
+          { text: '문서', link: `/ko/${DEFAULT_DOC_VERSION}/tutorial/install` },
           { text: '플러그인 다운로드', link: 'https://github.com/godothub/konado/releases/latest' },
           { text: '후원하기', link: 'https://ifdian.net/item/52230b2860a011f083ef52540025c377' }
         ],
-        sidebar: genKoSidebar(docsRoot)
+        sidebar: sidebars.ko
       }
     }
   }

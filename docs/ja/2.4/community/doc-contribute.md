@@ -38,7 +38,7 @@ Konado ドキュメントは [VitePress](https://vitepress.dev/) で構築され
 
 VitePress は Node.js 環境で動作するため、対応する Node.js を先にインストールする必要があります。
 
-1. **バージョン要件**：Node.js 18.x 以上を推奨します。互換性の面では LTS 版が最適です。
+1. **バージョン要件**：Node.js 18.x 以上を推奨します。互換性の面では LTS版が最適です。
 2. **ダウンロードとインストール**：
    - Node.js 公式ダウンロードページにアクセスします：[https://nodejs.org/](https://nodejs.org/)
    - 使用している OS（Windows/macOS/Linux）に合うインストーラーを選び、ウィザードに従ってインストールします（Windows では「Add to PATH」の選択を推奨します）。
