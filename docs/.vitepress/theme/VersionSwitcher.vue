@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
 import { DEFAULT_DOC_VERSION, DOC_VERSIONS, VERSION_SWITCHER_LABELS } from '../versions'
 
@@ -32,6 +32,11 @@ const currentLocale = computed<Locale>(() => {
 })
 
 const switcherLabel = computed(() => VERSION_SWITCHER_LABELS[currentLocale.value])
+const selectedVersion = ref(DEFAULT_DOC_VERSION)
+
+watch(currentVersion, (version) => {
+  selectedVersion.value = version
+}, { immediate: true })
 
 function versionLabel(version: (typeof versions)[number]): string {
   return version.labels[currentLocale.value] ?? version.labels.en
@@ -50,7 +55,8 @@ function targetPath(version: string): string {
 function switchVersion(event: Event) {
   const nextVersion = (event.target as HTMLSelectElement).value
   if (nextVersion === currentVersion.value) return
-  window.location.href = withBase(targetPath(nextVersion))
+  selectedVersion.value = nextVersion
+  window.location.assign(withBase(targetPath(nextVersion)))
 }
 </script>
 
@@ -58,7 +64,7 @@ function switchVersion(event: Event) {
   <div class="KonadoVersionSwitcher">
     <select
       :aria-label="switcherLabel"
-      :value="currentVersion"
+      v-model="selectedVersion"
       @change="switchVersion"
     >
       <option v-for="version in versions" :key="version.value" :value="version.value">
