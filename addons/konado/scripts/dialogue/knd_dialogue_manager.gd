@@ -420,7 +420,7 @@ func _process(delta) -> void:
 				# 如果是显示演员
 				elif cur_dialogue_type == KND_Dialogue.Type.DISPLAY_ACTOR:
 					# 显示演员
-					var s = _acting_interface.character_created
+					var s = _acting_interface.character_shown
 					# 检查信号是否已经连接
 					if not s.is_connected(_auto_process_next.bind(s)):
 						s.connect(_auto_process_next.bind(s))
@@ -672,9 +672,10 @@ func _process_next() -> void:
 	
 ## 自动下一个，添加信号解绑功能保证只被触发一次
 func _auto_process_next(s: Signal) -> void:
+	var auto_next := _auto_process_next.bind(s)
 	_dialogue_goto_state(DialogState.PAUSED)
-	if not s.is_null() and s.is_connected(_auto_process_next):
-		s.disconnect(_auto_process_next)
+	if not s.is_null() and s.is_connected(auto_next):
+		s.disconnect(auto_next)
 		print("触发自动下一个信号")
 	_process_next()
 
@@ -778,6 +779,7 @@ func _display_character(dialogue: KND_Dialogue) -> void:
 	
 	if target_chara == null:
 		push_error("显示角色失败：未找到角色[%s]" % target_chara_name)
+		_acting_interface.character_shown.emit()
 		_acting_interface.character_created.emit()
 		return
 		
@@ -785,12 +787,13 @@ func _display_character(dialogue: KND_Dialogue) -> void:
 	var target_state_name = dialogue.character_state
 	if target_chara.character_scene == null:
 		push_error("显示角色失败：角色[%s]没有配置角色场景" % target_chara_name)
+		_acting_interface.character_shown.emit()
 		_acting_interface.character_created.emit()
 		return
 	# 角色位置
 	var pos = dialogue.actor_position
 	# 创建角色
-	_acting_interface.create_new_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_chara.character_scene, target_chara.actor_motion_layer)
+	_acting_interface.show_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_chara.character_scene, target_chara.actor_motion_layer)
 		
 ## 演员退场
 func _exit_actor(actor_name: String) -> void:
