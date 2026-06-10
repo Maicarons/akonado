@@ -27,20 +27,24 @@ signal actor_motion_finished(motion_name: String)
 @export var texture_rect: TextureRect
 @export var motion_layer: KND_ActorMotionLayer
 var _status_node: Node = null
+var _move_tween: Tween
+var _suspend_layout_update := false
 
 ## 屏幕横向分块数，不得小于2，将屏幕宽度分为从左到右递增的块，每个块大小相同
 @export var h_division: int = 5:
 	set(value):
 		if h_division != value:
 			h_division = clamp(value, 2, 5)
-			_on_resized()
+			if not _suspend_layout_update:
+				_on_resized()
 
 ## 当前角色横向位置所在区块分割线索引，从0开始，从左到右递增
 @export var h_character_position: int = 3:
 	set(value):
 		if h_character_position != value:
 			h_character_position = clamp(value, 0, h_division)
-			_on_resized()
+			if not _suspend_layout_update:
+				_on_resized()
 
 func _ready() -> void:
 	# 初始化透明度为1（确保初始状态正常）
@@ -54,13 +58,22 @@ func _ready() -> void:
 func _on_resized() -> void:
 	if not slot:
 		print("警告：slot未赋值")
+		actor_moved.emit()
 		return
+
+	if _move_tween:
+		_move_tween.kill()
+		_move_tween = null
 	
-	if use_tween:
+	if use_tween and animation_time > 0.0:
 		var tween: Tween = slot.create_tween()
+		_move_tween = tween
 		tween.set_parallel(true)
 		tween.tween_property(slot, "position:x", -size.x / h_division * (h_division - h_character_position ) + slot.size.x/2, animation_time)
 		await tween.finished
+		if _move_tween != tween:
+			return
+		_move_tween = null
 		_layout_status_node()
 		actor_moved.emit()
 	else:
@@ -68,6 +81,18 @@ func _on_resized() -> void:
 	
 		_layout_status_node()
 		actor_moved.emit()
+
+func set_stage_position(target_h_division: int, target_h_character_position: int) -> bool:
+	var next_h_division: int = clamp(target_h_division, 2, 5)
+	var next_position: int = clamp(target_h_character_position, 0, next_h_division)
+	if h_division == next_h_division and h_character_position == next_position:
+		return false
+	_suspend_layout_update = true
+	h_division = next_h_division
+	h_character_position = next_position
+	_suspend_layout_update = false
+	_on_resized()
+	return true
 
 ## 高亮
 func set_highlight(highlight: bool) -> void:
