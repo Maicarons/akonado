@@ -30,11 +30,11 @@ Konado is a dialogue creation toolkit for the Godot Engine, with templates and a
 
 ## Quick Start
 
-Get up and running with Konado in minutes by following our [Quick Start Guide](https://godothub.com/oss/konado/en/tutorial/install.html).
+Get up and running with Konado in minutes by following our [Quick Start Guide](https://godothub.com/oss/konado/en/2.4/tutorial/install.html).
 
 ## Documentation
 
-For comprehensive guides, API references, and advanced tutorials, visit our official project website: https://godothub.com/oss/konado/en/.
+For comprehensive guides, API references, and advanced tutorials, visit our official project website: https://godothub.com/oss/konado/en/2.4/.
 
 ## Community
 
