@@ -415,12 +415,8 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 		_resolve_jump_branch_targets(blocks.get("if", []), tag_to_first_node_id)
 		_resolve_jump_branch_targets(blocks.get("else", []), tag_to_first_node_id)
 
-	# 6. 连接 if/else 块（主线 + 分支内）
-	_link_ifelse_blocks(main_dialogues, ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
-	for tag_name in _branch_dialogues:
-		_link_ifelse_blocks(_branch_dialogues[tag_name], ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
-
-	# 7. 连接分支内对话的 next_id
+	# 6. 连接分支内对话的 next_id。
+	# if/else 块需要依赖 IFELSE_BRANCH.next_id 作为汇合点，因此分支顺序必须先确定。
 	for tag_name in _branch_dialogues:
 		var branch_dialogs: Array = _branch_dialogues[tag_name]
 		for idx in range(branch_dialogs.size() - 1):
@@ -429,7 +425,8 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 			if cur.next_id.is_empty():
 				cur.next_id = nxt.node_id
 
-	# 8. 连接 if/else 块内对话的 next_id
+	# 7. 连接 if/else 块内对话的 next_id。
+	# 块内最后一个节点稍后由 _link_ifelse_blocks 接回 endif 后面的节点。
 	for key in _ifelse_blocks:
 		var blocks: Dictionary = _ifelse_blocks[key]
 		var if_dialogs: Array = blocks.get("if", [])
@@ -440,6 +437,11 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 		for idx in range(else_dialogs.size() - 1):
 			if else_dialogs[idx].next_id.is_empty():
 				else_dialogs[idx].next_id = else_dialogs[idx + 1].node_id
+
+	# 8. 连接 if/else 块（主线 + 分支内）
+	_link_ifelse_blocks(main_dialogues, ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
+	for tag_name in _branch_dialogues:
+		_link_ifelse_blocks(_branch_dialogues[tag_name], ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
 
 	# 9. 扁平化：将所有对话放入 shot.dialogues
 	shot.dialogues.clear()
