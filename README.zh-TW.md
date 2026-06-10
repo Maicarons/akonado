@@ -74,9 +74,26 @@ Konado 是 Godot 引擎的對話創建工具包，提供模板和對話管理器
 本專案遵循 [Code of Conduct](./CODE_OF_CONDUCT.md) 行為準則。
 
 
+## Konado 專案團隊
+
+- [DSOE1024](https://github.com/DSOE1024)
+- [putyk](https://github.com/putyk)
+- [moluopro](https://github.com/moluopro)
+- [ioniccrystal](https://github.com/ioniccrystal)
+- [fangchu](https://github.com/fangchudark)
+
+
 ## 專案貢獻者
 
-貢獻者名單請見 [AUTHORS.md](./AUTHORS.md)。
+以下成員為本專案做出了貢獻：
+
+<a href="https://github.com/godothub/konado/graphs/contributors" target="_blank">
+  <picture>
+	<source media="(prefers-color-scheme: dark)" srcset="https://contrib.rocks/image?repo=godothub/konado&theme=dark" />
+	<source media="(prefers-color-scheme: light)" srcset="https://contrib.rocks/image?repo=godothub/konado" />
+	<img alt="Contributors" src="https://contrib.rocks/image?repo=godothub/konado" />
+  </picture>
+</a>
 
 
 ## 開放原始碼授權條款

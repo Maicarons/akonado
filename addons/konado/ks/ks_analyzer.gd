@@ -99,9 +99,7 @@ func _validate_actor(node: KS_AST.ActorNode, context: String) -> void:
 		"show":
 			if not _dep_characters.has(node.actor_name):
 				_dep_characters.append(node.actor_name)
-			if _active_actors.has(node.actor_name):
-				_warning(node.line, "角色 '%s' 已存在，将复用已有角色并更新状态或位置" % node.actor_name)
-			else:
+			if not _active_actors.has(node.actor_name):
 				_active_actors.append(node.actor_name)
 		"exit":
 			if _active_actors.has(node.actor_name):

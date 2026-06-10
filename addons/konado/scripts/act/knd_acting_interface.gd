@@ -5,7 +5,9 @@ class_name KND_ActingInterface
 
 ## 完成背景切换的信号
 signal background_change_finished
-## 完成角色创建的信号
+## 完成角色显示的信号
+signal character_shown
+## 完成角色创建的信号，保留给旧调用方兼容
 signal character_created
 ## 完成角色删除的信号
 signal character_deleted
@@ -287,8 +289,8 @@ func _on_shader_background_transition_finished(old_background: KND_BackgroundSce
 	print("背景 shader 转场完成")
 	background_change_finished.emit()
 
-# 新建角色的方法
-func create_new_character(chara_id: String, h_division: int, pos_h: int, state: String, character_scene: PackedScene = null, motion_layer_scene: PackedScene = null) -> void:
+## 显示角色。角色不存在时创建，已存在时复用节点并更新状态或位置。
+func show_character(chara_id: String, h_division: int, pos_h: int, state: String, character_scene: PackedScene = null, motion_layer_scene: PackedScene = null) -> void:
 	var existing_actor := get_chara_node(chara_id) as KND_Actor
 	if existing_actor != null:
 		_update_existing_character(existing_actor, chara_id, h_division, pos_h, state)
@@ -299,8 +301,8 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 		actor_dict.erase(chara_id)
 
 	if character_scene == null:
-		push_error("创建角色失败：角色[%s]没有配置角色场景" % chara_id)
-		character_created.emit()
+		push_error("显示角色失败：角色[%s]没有配置角色场景" % chara_id)
+		_emit_character_shown()
 		return
 			
 	# 角色信息字典结构说明:
@@ -313,12 +315,14 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 	#     "mirror": bool    # 是否镜像翻转
 	# }
 
+	var initial_h_division: int = clamp(h_division, 2, 5)
+	var initial_pos_h: int = clamp(pos_h, 0, initial_h_division)
 	var chara_dict: Dictionary = {
 		"id": chara_id,
-		"h_division": h_division,
-		"pos": pos_h,
+		"h_division": initial_h_division,
+		"pos": initial_pos_h,
 		"state": state
-		}
+	}
 		
 	# 添加到角色字典
 	actor_dict[chara_dict["id"]] = chara_dict
@@ -326,8 +330,7 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 	var temp_node : KND_Actor = _konado_actor_template.instantiate() as KND_Actor
 	temp_node.name = node_name
 	temp_node.use_tween = false
-	temp_node.h_division = h_division
-	temp_node.h_character_position = pos_h
+	temp_node.set_stage_position(h_division, pos_h)
 	# 添加到角色容器
 	_chara_controler.add_child(temp_node)
 	temp_node.actor_motion_started.connect(_on_character_motion_started.bind(chara_id))
@@ -336,38 +339,50 @@ func create_new_character(chara_id: String, h_division: int, pos_h: int, state: 
 	temp_node.set_character_scene(character_scene, state)
 	# 添加到演员节点字典
 	actor_nodes[chara_id] = temp_node
-	temp_node.use_tween = true
-	temp_node.enter_actor(true)
-	temp_node.actor_entered.connect(
-		func():
-			character_created.emit()
-			print("新建了演员："+str(chara_id)+" 演员状态："+str(state)))
 	# 移动信号
 	temp_node.actor_moved.connect(_on_character_moved)
+	temp_node.actor_entered.connect(_on_character_entered.bind(chara_id, state), ConnectFlags.CONNECT_ONE_SHOT)
+	temp_node.use_tween = true
+	temp_node.enter_actor(true)
+
+## 旧接口名保留兼容。新代码应使用 show_character，表达 show 的 upsert 语义。
+func create_new_character(chara_id: String, h_division: int, pos_h: int, state: String, character_scene: PackedScene = null, motion_layer_scene: PackedScene = null) -> void:
+	show_character(chara_id, h_division, pos_h, state, character_scene, motion_layer_scene)
 
 func _update_existing_character(chara_node: KND_Actor, chara_id: String, h_division: int, pos_h: int, state: String) -> void:
 	var previous_state := ""
 	if actor_dict.has(chara_id):
 		previous_state = str(actor_dict[chara_id].get("state", ""))
 
-	var position_changed := chara_node.h_division != h_division or chara_node.h_character_position != pos_h
-	var state_changed := previous_state != state
+	var next_h_division: int = clamp(h_division, 2, 5)
+	var next_pos_h: int = clamp(pos_h, 0, next_h_division)
+	var position_changed: bool = chara_node.h_division != next_h_division or chara_node.h_character_position != next_pos_h
+	var state_changed: bool = previous_state != state
 
 	actor_dict[chara_id] = {
 		"id": chara_id,
-		"h_division": h_division,
-		"pos": pos_h,
+		"h_division": next_h_division,
+		"pos": next_pos_h,
 		"state": state
 	}
 	actor_nodes[chara_id] = chara_node
 
 	if position_changed:
-		chara_node.h_division = h_division
-		chara_node.h_character_position = pos_h
+		chara_node.set_stage_position(next_h_division, next_pos_h)
 	if state_changed:
 		chara_node.apply_character_status(state)
+	if position_changed and chara_node.slot != null and chara_node.use_tween and chara_node.animation_time > 0.0:
+		await chara_node.actor_moved
 
 	print("复用已有演员：" + str(chara_id) + " 演员状态：" + str(state))
+	_emit_character_shown()
+
+func _on_character_entered(chara_id: String, state: String) -> void:
+	_emit_character_shown()
+	print("新建了演员："+str(chara_id)+" 演员状态："+str(state))
+
+func _emit_character_shown() -> void:
+	character_shown.emit()
 	character_created.emit()
 
 ## 切换演员的状态
@@ -454,7 +469,12 @@ func move_actor(chara_id: String, target_h_division: int):
 	print("移动演员")
 	print(target_h_division)
 	var chara_node: KND_Actor = get_chara_node(chara_id) as KND_Actor
-	chara_node.h_character_position = target_h_division
+	if chara_node == null:
+		push_error("移动角色失败：角色ID[%s]，未找到角色节点" % chara_id)
+		character_moved.emit()
+		return
+	if not chara_node.set_stage_position(chara_node.h_division, target_h_division):
+		character_moved.emit()
 
 	
 func _on_character_moved() -> void:

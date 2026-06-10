@@ -69,9 +69,25 @@ Interested in contributing to Konado? Check out our [CONTRIBUTING.md](./CONTRIBU
 
 This project adheres to our [Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
+## Konado Project Team
+
+- [DSOE1024](https://github.com/DSOE1024)
+- [putyk](https://github.com/putyk)
+- [moluopro](https://github.com/moluopro)
+- [ioniccrystal](https://github.com/ioniccrystal)
+- [fangchu](https://github.com/fangchudark)
+
 ## Contributors
 
-A complete list of contributors can be found in [AUTHORS.md](./AUTHORS.md).
+The following people contributed to this project:
+
+<a href="https://github.com/godothub/konado/graphs/contributors" target="_blank">
+  <picture>
+	<source media="(prefers-color-scheme: dark)" srcset="https://contrib.rocks/image?repo=godothub/konado&theme=dark" />
+	<source media="(prefers-color-scheme: light)" srcset="https://contrib.rocks/image?repo=godothub/konado" />
+	<img alt="Contributors" src="https://contrib.rocks/image?repo=godothub/konado" />
+  </picture>
+</a>
 
 ## Open Source License
 

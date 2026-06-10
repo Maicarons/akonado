@@ -458,7 +458,7 @@ func _restore_actor_state(state: Dictionary) -> void:
 				if target_chara:
 					var state_name = actor_state.get("state", "")
 					if target_chara.character_scene:
-						acting_interface.create_new_character(
+						acting_interface.show_character(
 							actor_id,
 							actor_state.get("h_division", 6),
 							actor_state.get("pos_h", 0),
