@@ -5,7 +5,7 @@
 bin/
 PROJECT_OVERVIEW.md
 
-# VS Code specific ignores
+# VS Code specific ignores  
 .vscode/
 .VSCodeCounter
 *.tmp
@@ -15,3 +15,9 @@ docs/**/*.uid
 # Jetbrain IDE specific ignores
 .idea/
 .DS_Store
+.atomcode/
+
+
+skills/konado-script/language-configuration.json
+skills/konado-script/package.json
+skills/konado-script/syntaxes/
