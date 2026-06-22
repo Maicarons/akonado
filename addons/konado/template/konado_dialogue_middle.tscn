@@ -145,6 +145,18 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 alignment = 2
 
+[node name="QuickSave" type="Button" parent="KonadoUI/ColorRect/HBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "快速保存"
+flat = true
+
+[node name="QuickLoad" type="Button" parent="KonadoUI/ColorRect/HBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "快速读取"
+flat = true
+
 [node name="Save" type="Button" parent="KonadoUI/ColorRect/HBoxContainer" unique_id=1837329553]
 layout_mode = 2
 theme_type_variation = &"FlatButton"
@@ -282,13 +294,14 @@ text = "Skip this error..."
 
 [node name="KND_SaveSystem" type="Node" parent="." unique_id=8383492]
 script = ExtResource("7_0mmft")
-enable_auto_save = false
 metadata/_custom_type_script = "uid://dusoj8pkl7ecg"
 
 [node name="KND_SettingsBridge" type="Node" parent="." unique_id=865758855]
 script = ExtResource("9_yt2oi")
 metadata/_custom_type_script = "uid://b3xcpatqnlrg"
 
+[connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/QuickSave" to="." method="_on_quick_save_pressed"]
+[connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/QuickLoad" to="." method="_on_quick_load_pressed"]
 [connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/Save" to="KonadoUI/SaveSystemUI" method="open_save_ui"]
 [connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/Achievement" to="." method="_on_achievement_pressed"]
 [connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/MainMenu" to="." method="_on_main_menu_pressed"]

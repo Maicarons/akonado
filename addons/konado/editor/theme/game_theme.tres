@@ -5,5 +5,5 @@
 [resource]
 Button/colors/font_color = Color(0, 0, 0, 1)
 RichTextLabel/colors/default_color = Color(0.174028, 0.174028, 0.174028, 1)
-autosave/base_type = &"Label"
-autosave/styles/normal = SubResource("StyleBoxFlat_nhitb")
+quicksave/base_type = &"Label"
+quicksave/styles/normal = SubResource("StyleBoxFlat_nhitb")
