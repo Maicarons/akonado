@@ -7,6 +7,18 @@ order: 2
 
 ## 使用方法
 
+### 快速保存
+
+```gdscript
+# 快速保存到槽位0
+save_system.save_game(0)
+```
+### 快速读取
+```gdscript
+# 从槽位0快速加载
+save_system.load_game(0)
+```
+
 ### 保存游戏
 
 ```gdscript
