@@ -33,9 +33,12 @@ func _create_save_slot() -> void:
 			var format_save_id: String = str("%02d" % (i + 1))
 			
 			# 设置存档名称
-			save_slot.save_name = "存档" + format_save_id
+			if i == 0:
+				save_slot.save_name = "快速保存"
+				save_slot.quicksave_sign.visible = true
+			else:
+				save_slot.save_name = "存档" + format_save_id
 			save_slot.save_time = "未知时间"
-			save_slot.auto_save = false
 			
 			save_slot.init_empty_save_slot()
 			

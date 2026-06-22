@@ -21,12 +21,6 @@ const SAVE_EXT = ".kns"
 ## 最大存档数量
 @export var max_save_slots: int = 20
 
-## 自动存档间隔（秒）
-@export var auto_save_interval: float = 5.0
-
-## 是否启用自动存档
-@export var enable_auto_save: bool = true
-
 ## 存档策略配置
 @export var save_strategy: Dictionary = {
 	"include_dialogue_state": true,
@@ -39,20 +33,9 @@ const SAVE_EXT = ".kns"
 ## 对话管理器引用
 var dialogue_manager: KND_DialogueManager
 
-## 自动存档计时器
-var auto_save_timer: Timer
-
 func _ready() -> void:
 	# 确保存档目录存在
 	_dir_check()
-	
-	# 初始化自动存档计时器
-	if enable_auto_save:
-		auto_save_timer = Timer.new()
-		auto_save_timer.wait_time = auto_save_interval
-		auto_save_timer.autostart = true
-		auto_save_timer.timeout.connect(_auto_save)
-		add_child(auto_save_timer)
 
 ## 检查并创建存档目录
 func _dir_check() -> void:
@@ -223,10 +206,6 @@ func get_all_save_info() -> Array[Dictionary]:
 	for i in range(max_save_slots):
 		save_infos.append(get_save_info(i))
 	return save_infos
-
-## 自动存档
-func _auto_save() -> void:
-	save_game(0)  # 自动存档到0号槽位
 
 ## 捕获对话状态
 func _capture_dialogue_state() -> Dictionary:
