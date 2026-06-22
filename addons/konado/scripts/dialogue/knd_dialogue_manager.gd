@@ -1018,3 +1018,80 @@ func _on_achievement_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().change_scene_to_file("res://sample/demo/main.tscn")
+
+## 快速保存
+func _on_quick_save_pressed() -> void:
+	if not save_system:
+		printerr("存档系统未设置")
+		return
+	var success = save_system.save_game(0)
+	if success:
+		print("快速保存完成")
+		_show_toast("快速保存成功")
+	else:
+		printerr("快速保存失败")
+		_show_toast("快速保存失败")
+
+## 快速读取
+func _on_quick_load_pressed() -> void:
+	if not save_system:
+		printerr("存档系统未设置")
+		return
+	var save_info = save_system.get_save_info(0)
+	if not save_info.get("exists", false):
+		printerr("无快速存档可读取")
+		_show_toast("无快速存档可读取")
+		return
+	# 弹出确认框
+	_show_load_confirm_dialog()
+
+## 显示读取确认对话框
+func _show_load_confirm_dialog() -> void:
+	var dialog = ConfirmationDialog.new()
+	dialog.title = ""
+	dialog.dialog_text = "读取会失去未保存的进度。\n\n你确定要这么做吗？"
+	dialog.confirmed.connect(_on_load_confirmed.bind(dialog))
+	dialog.canceled.connect(func(): dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered()
+
+## 确认读取后执行加载
+func _on_load_confirmed(dialog: ConfirmationDialog) -> void:
+	dialog.queue_free()
+	var success = save_system.load_game(0)
+	if success:
+		print("快速读取完成")
+	else:
+		printerr("快速读取失败")
+		_show_toast("快速读取失败")
+
+## 显示轻量提示信息
+func _show_toast(message: String, duration: float = 2.0) -> void:
+	var toast = Label.new()
+	toast.text = message
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.add_theme_font_size_override("font_size", 28)
+	
+	# 背景样式
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.7)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_left = 8
+	style.corner_radius_bottom_right = 8
+	style.content_margin_left = 24
+	style.content_margin_right = 24
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	toast.add_theme_stylebox_override("normal", style)
+	
+	# 定位到屏幕顶部居中
+	add_child(toast)
+	toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP, Control.PRESET_MODE_KEEP_SIZE)
+	toast.position.y = 40
+	
+	# 延时后淡出并移除
+	var tween = create_tween()
+	tween.tween_interval(duration)
+	tween.tween_property(toast, "modulate:a", 0.0, 0.3)
+	tween.tween_callback(toast.queue_free)
