@@ -1,0 +1,56 @@
+{
+  "name": "konado-script-syntax",
+  "displayName": "Konado Script Syntax",
+  "description": "Syntax highlighting for Konado Script (.ks) files — visual novel DSL for the Konado engine.",
+  "version": "1.0.0",
+  "publisher": "shanewu",
+  "author": {
+    "name": "Shane Wu",
+    "email": "792821@qq.com"
+  },
+  "license": "MIT",
+  "icon": "./icon.png", 
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shanewu921/konado-script-syntax.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shanewu921/konado-script-syntax/issues"
+  },
+  "keywords": [
+    "konado",
+    "ks",
+    "visual novel",
+    "novel script",
+    "syntax highlight",
+    "dsl"
+  ],
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "konado-script",
+        "aliases": [
+          "Konado Script",
+          "ks"
+        ],
+        "extensions": [
+          ".ks"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "konado-script",
+        "scopeName": "source.ks",
+        "path": "./syntaxes/ks.tmLanguage.json"
+      }
+    ]
+  }
+}
