@@ -1,0 +1,1 @@
+Syntax highlighting for Konado Script (.ks) files — visual novel DSL for the Konado engine.
