@@ -2,7 +2,7 @@
   "name": "konado-script-syntax",
   "displayName": "Konado Script Syntax",
   "description": "Syntax highlighting for Konado Script (.ks) files — visual novel DSL for the Konado engine.",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "publisher": "shanewu",
   "author": {
     "name": "Shane Wu",
@@ -20,6 +20,7 @@
   "keywords": [
     "konado",
     "ks",
+    "godot",
     "visual novel",
     "novel script",
     "syntax highlight",
@@ -29,7 +30,8 @@
     "vscode": "^1.60.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Snippets"
   ],
   "contributes": {
     "languages": [
