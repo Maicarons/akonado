@@ -6,7 +6,7 @@ bin/
 PROJECT_OVERVIEW.md
 
 # VS Code specific ignores  
-.vscode/
+.vscode/settings.json
 .VSCodeCounter
 *.tmp
 docs/**/*.import
