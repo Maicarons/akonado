@@ -1,7 +1,7 @@
 # Akonado Test Report
 
 **Date**: 2026-06-01
-**Test Environment**: Windows 11 Pro, Python 3.10+, Godot 4.6+
+**Test Environment**: Windows 11 Pro, Python 3.10+, Godot 4.7+
 
 ## Summary
 

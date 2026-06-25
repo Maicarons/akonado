@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4.6 + Konado. From a one-sentence premise, it generates complete scripts, character sprites, backgrounds, BGM, sound effects, voice acting, and UI assets. The generated output runs directly in Godot using the Konado dialogue framework.
+Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4.7 + Konado 2.5. From a one-sentence premise, it generates complete scripts, character sprites, backgrounds, BGM, sound effects, voice acting, and UI assets. The generated output runs directly in Godot using the Konado dialogue framework.
 
 The project has two layers:
 - **Python package** (`akonado/`) — CLI + Web GUI for AI asset generation (the main codebase you'll work on)
@@ -73,7 +73,7 @@ Ruff config is in `pyproject.toml`: line-length 100, target Python 3.10, rules E
 
 ## Godot Project (root)
 
-Open `project.godot` in Godot 4.6+ to run the visual novel. The `addons/konado/` folder is the upstream Konado framework (not akonado code) — do not modify it directly.
+Open `project.godot` in Godot 4.7+ to run the visual novel. The `addons/konado/` folder is the upstream Konado framework (not akonado code) — do not modify it directly.
 
 Key Konado concepts:
 - `.ks` scripts (in `story/`) use a line-oriented DSL: `"character" "text"` for dialogue, `actor show`, `background switch`, `play bgm` for game commands

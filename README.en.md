@@ -5,7 +5,8 @@
 Full-pipeline AI visual novel asset generator built on Godot + Konado.
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Godot-4.6+-blue.svg?style=flat-square&logo=godotengine&logoSize=14" alt="Godot" height="20">
+  <img src="https://img.shields.io/badge/Konado-2.5-blueviolet.svg?style=flat-square&logoSize=14" alt="Konado" height="20">
+  <img src="https://img.shields.io/badge/Godot-4.7+-blue.svg?style=flat-square&logo=godotengine&logoSize=14" alt="Godot" height="20">
   <img src="https://img.shields.io/badge/Python-3.10+-green.svg?style=flat-square&logo=python&logoSize=14" alt="Python" height="20">
   <img src="https://img.shields.io/badge/License-AGPL_3.0-purple.svg?style=flat-square&logoSize=14" alt="License" height="20">
 </div>
@@ -45,7 +46,7 @@ All demo assets (scripts, sprites, backgrounds, CGs, music, voice acting) were f
 ### Run the Visual Novel (Godot)
 
 1. Clone this repository
-2. Open the project in Godot 4.6+
+2. Open the project in Godot 4.7+
 3. Generate assets with Akonado, then run
 
 ### Generate Assets (Python)
@@ -195,9 +196,23 @@ akonado/                  # Project root (Godot project)
 - [Chinese Documentation](docs/akonado/)
 - [Konado Framework Docs](docs/konado/)
 
+## Upstream Project
+
+This project is built on [Konado](https://github.com/godothub/konado) dialogue framework (v2.5).
+
+### Konado 2.5 Highlights
+
+- **Quick Save/Load** — Built-in quick save/load system with dialogue template support
+- **Main Menu Screen** — Game startup main menu
+- **Background Transitions** — "Blink" and other visual transition effects; backgrounds are now scenes
+- **Character Motion Layer** — `motion` command for stage actions and custom animations
+- **Character Scene-based** — Character sprites are now scene nodes for flexible extension
+- **VSCode Syntax Highlight** — Konado script syntax highlighting extension (`konado-script-syntax/`)
+- **Achievement Fix** — Fixed achievement closing bug
+
 ## Dependencies
 
-- [Konado](https://github.com/DSOE1024/Konado) — Godot visual novel dialogue framework (BSD-3-Clause)
+- [Konado](https://github.com/godothub/konado) — Godot visual novel dialogue framework (BSD-3-Clause)
 
 ## AI Usage Disclaimer
 

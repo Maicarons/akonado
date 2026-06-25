@@ -1,6 +1,6 @@
 # Akonado 文档
 
-Akonado 是基于 Godot 4.6 + Konado 的全流程 AI 视觉小说生成管线。从一句话概要出发，自动生成剧本、角色立绘、背景图、BGM、音效、配音和 UI 资产，直接在 Godot 中运行。
+Akonado 是基于 Godot 4.7 + Konado 2.5 的全流程 AI 视觉小说生成管线。从一句话概要出发，自动生成剧本、角色立绘、背景图、BGM、音效、配音和 UI 资产，直接在 Godot 中运行。
 
 ## 入门
 

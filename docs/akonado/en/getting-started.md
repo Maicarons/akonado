@@ -12,7 +12,7 @@ Akonado consists of the following components. You need all of them to run the fu
 | LLM API | Script, character, and scene generation | Yes |
 | ComfyUI | Character sprites, backgrounds, BGM, SFX | Yes |
 | TTS engine | Character voice synthesis | Yes (MiMo or Qwen, pick one) |
-| Godot 4.6+ | Run the generated visual novel | Runtime only |
+| Godot 4.7+ | Run the generated visual novel | Runtime only |
 
 ### Hardware Requirements
 
@@ -304,7 +304,7 @@ Godot is the visual novel runtime engine. Akonado's generated `.ks` scripts and 
 
 ### 5.1 Download Godot
 
-Download **Godot 4.6+** standard version from the [Godot website](https://godotengine.org/download) or [Steam](https://store.steampowered.com/app/404790/Godot_Engine/).
+Download **Godot 4.7+** standard version from the [Godot website](https://godotengine.org/download) or [Steam](https://store.steampowered.com/app/404790/Godot_Engine/).
 
 ### 5.2 Configure Godot Path (Optional)
 
@@ -490,7 +490,7 @@ See [ComfyUI Setup Guide](comfyui-setup.md).
 
 ### Godot runtime errors
 
-- Ensure you're using Godot 4.6+
+- Ensure you're using Godot 4.7+
 - Ensure `addons/konado/` directory is complete
 - See [Known Pitfalls](../../CLAUDE.md#known-pitfalls-踩坑记录)
 
