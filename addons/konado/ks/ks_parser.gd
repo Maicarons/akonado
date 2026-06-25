@@ -147,7 +147,7 @@ func _parse_dialogue() -> KS_AST.DialogueNode:
 	return node
 
 
-## 背景切换解析：  background <image_name> [effect]
+## 背景切换解析：  background <background_name> [effect]
 func _parse_background() -> KS_AST.BackgroundNode:
 	var node := KS_AST.BackgroundNode.new()
 	node.line = _peek().line
@@ -155,9 +155,9 @@ func _parse_background() -> KS_AST.BackgroundNode:
 
 	var name_tok := _expect_any_value()
 	if name_tok == null:
-		_error("background 缺少图片资源名")
+		_error("background 缺少背景资源名")
 		return null
-	node.image_name = str(name_tok.value)
+	node.background_name = str(name_tok.value)
 
 	# 可选的效果类型
 	if not _at_line_end():
@@ -169,7 +169,7 @@ func _parse_background() -> KS_AST.BackgroundNode:
 	return node
 
 
-## 演员解析：  actor show/exit/change/move ...
+## 演员解析：  actor show/exit/change/move/motion ...
 func _parse_actor() -> KS_AST.ActorNode:
 	var node := KS_AST.ActorNode.new()
 	node.line = _peek().line
@@ -244,11 +244,26 @@ func _parse_actor() -> KS_AST.ActorNode:
 			node.position = float(str(pos_tok.value))
 			node.has_position = true
 
+		KS_Token.Type.KW_MOTION:
+			node.action = "motion"
+			_advance()
+			var name_tok := _expect_any_value()
+			if name_tok == null:
+				_error("actor motion 缺少角色名")
+				return null
+			node.actor_name = str(name_tok.value)
+
+			var motion_tok := _expect_any_value()
+			if motion_tok == null:
+				_error("actor motion 缺少动作名")
+				return null
+			node.motion_name = str(motion_tok.value)
+
 		_:
 			_error("未知的 actor 操作: %s" % str(action_tok.value))
 			return null
 
-	# 跳过行末剩余 token（如 scale 等额外参数）
+	# 跳过行末剩余 token（如 scale、motion 参数等额外参数）
 	_skip_to_next_line()
 	return node
 

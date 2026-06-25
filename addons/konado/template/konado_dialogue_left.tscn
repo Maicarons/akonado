@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://b3xcpatqnlrg" path="res://addons/konado/scripts/knd_settings_bridge.gd" id="2_m70cm"]
 [ext_resource type="Script" uid="uid://dpo124xwpder5" path="res://addons/konado/scripts/dialogue/knd_dialogue_manager.gd" id="2_tn0i2"]
 [ext_resource type="Script" uid="uid://cyoedi0x84dxy" path="res://addons/konado/scripts/act/knd_acting_interface.gd" id="3_j3lp8"]
+[ext_resource type="Script" uid="uid://cglr3pnhbntvk" path="res://addons/konado/scripts/background/knd_background_transition_layer.gd" id="4_transition"]
 [ext_resource type="PackedScene" uid="uid://b3wibk1ya0b6j" path="res://addons/konado/template/knd_dialogue_box_left.tscn" id="4_m70cm"]
 [ext_resource type="Script" uid="uid://b0kbsxqyedoml" path="res://addons/konado/scripts/dialogue/knd_choice_interface.gd" id="5_k5ucr"]
 [ext_resource type="Script" uid="uid://gh6w15d30qe7" path="res://addons/konado/scripts/save_system/save_load_ui.gd" id="6_5t7mf"]
@@ -63,8 +64,26 @@ script = ExtResource("3_j3lp8")
 layout_mode = 2
 color = Color(0, 0, 0, 1)
 
-[node name="CharaControl" type="Control" parent="KonadoUI/ActingInterface/BackgroundLayer" unique_id=245679010]
+[node name="BackgroundContainer" type="Control" parent="KonadoUI/ActingInterface/BackgroundLayer"]
 layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundTransitionLayer" type="Control" parent="KonadoUI/ActingInterface"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_transition")
+
+[node name="CharaControl" type="Control" parent="KonadoUI/ActingInterface" unique_id=245679010]
+layout_mode = 2
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -125,6 +144,18 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 alignment = 2
 
+[node name="QuickSave" type="Button" parent="KonadoUI/ColorRect/HBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "快速保存"
+flat = true
+
+[node name="QuickLoad" type="Button" parent="KonadoUI/ColorRect/HBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "快速读取"
+flat = true
+
 [node name="Save" type="Button" parent="KonadoUI/ColorRect/HBoxContainer" unique_id=1837329553]
 layout_mode = 2
 theme_type_variation = &"FlatButton"
@@ -148,6 +179,12 @@ flat = true
 layout_mode = 2
 theme_type_variation = &"FlatButton"
 text = "设置"
+flat = true
+
+[node name="MainMenu" type="Button" parent="KonadoUI/ColorRect/HBoxContainer" unique_id=283867521]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "主菜单"
 flat = true
 
 [node name="SaveSystemUI" type="Control" parent="KonadoUI" unique_id=14919090 node_paths=PackedStringArray("root_container", "save_system")]
@@ -257,13 +294,15 @@ text = "Skip this error..."
 
 [node name="KND_SaveSystem" type="Node" parent="." unique_id=8383492]
 script = ExtResource("8_iq8kq")
-enable_auto_save = false
 metadata/_custom_type_script = "uid://dusoj8pkl7ecg"
 
 [node name="KND_SettingsBridge" type="Node" parent="." unique_id=601812021]
 script = ExtResource("2_m70cm")
 metadata/_custom_type_script = "uid://b3xcpatqnlrg"
 
+[connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/QuickSave" to="." method="_on_quick_save_pressed"]
+[connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/QuickLoad" to="." method="_on_quick_load_pressed"]
 [connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/Save" to="KonadoUI/SaveSystemUI" method="open_save_ui"]
 [connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/Achievement" to="." method="_on_achievement_pressed"]
+[connection signal="pressed" from="KonadoUI/ColorRect/HBoxContainer/MainMenu" to="." method="_on_main_menu_pressed"]
 [connection signal="pressed" from="KonadoUI/SaveSystemUI/Button" to="KonadoUI/SaveSystemUI" method="close_save_ui"]

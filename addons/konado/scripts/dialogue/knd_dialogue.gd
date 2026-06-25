@@ -23,7 +23,8 @@ enum Type {
 	ACHIEVEMENT_PROGRESS,
 	ACHIEVEMENT_FLAG,
 	SET_VARIABLE,
-	THE_END
+	THE_END,
+	ACTOR_MOTION
 }
 
 @export var dialog_type: Type:
@@ -70,6 +71,10 @@ enum Type {
 @export var target_move_chara: String
 ## 角色要移动的位置
 @export var target_move_pos: Vector2
+## 要播放舞台层动作的角色
+@export var motion_actor: String
+## 要播放的舞台层动作名称
+@export var motion_name: String
 ## 选项
 @export var choices: Array[KND_DialogueChoice] = []
 ## BGM
@@ -78,7 +83,9 @@ enum Type {
 @export var voice_id: String
 ## 音效名称
 @export var soundeffect_name: String
-## 对话背景图片
+## 对话背景名称
+@export var background_name: String
+## 旧版序列化字段，仅用于读取已导入的 KS/Shot 资源；背景本身仍然只使用场景。
 @export var background_image_name: String
 ## 背景切换特效
 @export var background_toggle_effects: KND_ActingInterface.BackgroundTransitionEffectsType

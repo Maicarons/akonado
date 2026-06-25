@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://vn8ookpi8m80"]
+
+[ext_resource type="Script" uid="uid://b6h45twralmd1" path="res://addons/konado/template/character/actor_motion_layer.gd" id="1_x4bn7"]
+
+[sub_resource type="Animation" id="Animation_e3j0a"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterMount:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CharacterMount:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CharacterMount:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_bounce"]
+resource_name = "bounce"
+length = 0.28
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterMount:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.14, 0.28),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.08, 1.08), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_jump"]
+resource_name = "jump"
+length = 0.28
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterMount:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.14, 0.28),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -32), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_jump_twice"]
+resource_name = "jump_twice"
+length = 0.56
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterMount:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.14, 0.28, 0.42, 0.56),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -32), Vector2(0, 0), Vector2(0, -32), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_shake"]
+resource_name = "shake"
+length = 0.28
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterMount:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(12, 0), Vector2(-12, 0), Vector2(10, 0), Vector2(-10, 0), Vector2(6, 0), Vector2(-6, 0), Vector2(3, 0), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_q81ja"]
+_data = {
+&"RESET": SubResource("Animation_e3j0a"),
+&"bounce": SubResource("Animation_bounce"),
+&"jump": SubResource("Animation_jump"),
+&"jump_twice": SubResource("Animation_jump_twice"),
+&"shake": SubResource("Animation_shake")
+}
+
+[node name="MotionLayer" type="Control" unique_id=423597021 node_paths=PackedStringArray("animation_player", "mount_node")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_x4bn7")
+animation_player = NodePath("AnimationPlayer")
+mount_node = NodePath("CharacterMount")
+metadata/_edit_horizontal_guides_ = [520.0]
+
+[node name="CharacterMount" type="Control" parent="." unique_id=297960300]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -0.0007324219
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset_ratio = Vector2(0.5, 0.5)
+
+[node name="ColorRect" type="ColorRect" parent="CharacterMount" unique_id=2101308053]
+visible = false
+layout_mode = 0
+offset_left = 765.0
+offset_top = 99.0
+offset_right = 1225.0
+offset_bottom = 889.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1869036536]
+libraries/ = SubResource("AnimationLibrary_q81ja")

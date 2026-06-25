@@ -1,0 +1,184 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Konado Script",
+  "scopeName": "source.ks",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#dialogue" },
+    { "include": "#command-actor" },
+    { "include": "#command-background" },
+    { "include": "#command-play-stop" },
+    { "include": "#command-choice" },
+    { "include": "#command-branch" },
+    { "include": "#command-if" },
+    { "include": "#command-else" },
+    { "include": "#command-endif" },
+    { "include": "#command-jump" },
+    { "include": "#command-signal" },
+    { "include": "#command-achievement" },
+    { "include": "#command-variable" },
+    { "include": "#command-end" },
+    { "include": "#resource-path" },
+    { "include": "#variable" },
+    { "include": "#operator" },
+    { "include": "#number" },
+    { "include": "#boolean" },
+    { "include": "#string" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "#.*$",
+      "name": "comment.line.number-sign.ks"
+    },
+    "string": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.ks",
+      "patterns": [
+        {
+          "match": "(%[a-zA-Z_][a-zA-Z0-9_]*)",
+          "name": "variable.other.persistent.ks"
+        },
+        {
+          "match": "(\\$[a-zA-Z_][a-zA-Z0-9_]*)",
+          "name": "variable.other.temporary.ks"
+        }
+      ]
+    },
+    "dialogue": {
+      "comment": "\"角色ID\" \"对话文本\" 格式的对话行",
+      "match": "^\\s*(\")([^\"]*)(\")\\s+(\")([^\"]*)(\")(?:\\s+(\\S+))?",
+      "captures": {
+        "1": { "name": "punctuation.definition.string.begin.ks" },
+        "2": { "name": "entity.name.character.ks" },
+        "3": { "name": "punctuation.definition.string.end.ks" },
+        "4": { "name": "punctuation.definition.string.begin.ks" },
+        "5": { "name": "string.quoted.double.dialogue.ks" },
+        "6": { "name": "punctuation.definition.string.end.ks" },
+        "7": { "name": "variable.other.voice-tag.ks" }
+      }
+    },
+    "command-actor": {
+      "match": "^\\s*(actor)\\s+(show|exit|change|move)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.actor.ks" },
+        "2": { "name": "keyword.other.subcommand.ks" }
+      }
+    },
+    "command-background": {
+      "match": "^\\s*(background)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.background.ks" }
+      }
+    },
+    "command-play-stop": {
+      "match": "^\\s*(play|stop)\\s+(bgm|sfx)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.media.ks" },
+        "2": { "name": "keyword.other.media-type.ks" }
+      }
+    },
+    "command-choice": {
+      "match": "^\\s*(choice)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.choice.ks" }
+      }
+    },
+    "command-branch": {
+      "match": "^\\s*(branch)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.branch.ks" },
+        "2": { "name": "entity.name.label.ks" }
+      }
+    },
+    "command-if": {
+      "match": "^\\s*(if)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.conditional.ks" }
+      }
+    },
+    "command-else": {
+      "match": "^\\s*(else)\\s*:",
+      "captures": {
+        "1": { "name": "keyword.control.conditional.ks" }
+      }
+    },
+    "command-endif": {
+      "match": "^\\s*(endif)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.conditional.ks" }
+      }
+    },
+    "command-jump": {
+      "match": "^\\s*(jump_branch|jump)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.jump.ks" }
+      }
+    },
+    "command-signal": {
+      "match": "^\\s*(signal)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.signal.ks" }
+      }
+    },
+    "command-achievement": {
+      "match": "^\\s*(achievement)\\s+(unlock|increment|set_flag)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.achievement.ks" },
+        "2": { "name": "keyword.other.subcommand.ks" }
+      }
+    },
+    "command-variable": {
+      "match": "^\\s*(set|add|sub|mul|div)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.variable.ks" }
+      }
+    },
+    "command-end": {
+      "match": "^\\s*(end)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.end.ks" }
+      }
+    },
+    "variable": {
+      "patterns": [
+        {
+          "match": "%[a-zA-Z_][a-zA-Z0-9_]*",
+          "name": "variable.other.persistent.ks"
+        },
+        {
+          "match": "\\$[a-zA-Z_][a-zA-Z0-9_]*",
+          "name": "variable.other.temporary.ks"
+        }
+      ]
+    },
+    "resource-path": {
+      "match": "res://\\S+",
+      "name": "string.other.resource-path.ks"
+    },
+    "operator": {
+      "patterns": [
+        {
+          "match": "->",
+          "name": "keyword.operator.arrow.ks"
+        },
+        {
+          "match": "==|!=|>=|<=|>|<",
+          "name": "keyword.operator.comparison.ks"
+        },
+        {
+          "match": "=",
+          "name": "keyword.operator.assignment.ks"
+        }
+      ]
+    },
+    "number": {
+      "match": "\\b[0-9]+(\\.[0-9]+)?\\b",
+      "name": "constant.numeric.ks"
+    },
+    "boolean": {
+      "match": "\\b(true|false)\\b",
+      "name": "constant.language.boolean.ks"
+    }
+  }
+}
