@@ -137,3 +137,33 @@
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+.KonadoVersionSwitcher {
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+}
+
+.KonadoVersionSwitcher select {
+  height: 32px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 0 28px 0 10px;
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.KonadoVersionSwitcher select:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+@media (max-width: 767px) {
+  .KonadoVersionSwitcher {
+    padding: 12px 24px;
+  }
+
+  .KonadoVersionSwitcher select {
+    width: 100%;
+  }
+}

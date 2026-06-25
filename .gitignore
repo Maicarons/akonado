@@ -2,9 +2,11 @@
 .godot/
 /android/
 /exports/
+bin/
+PROJECT_OVERVIEW.md
 
-# VS Code specific ignores
-.vscode/
+# VS Code specific ignores  
+.vscode/settings.json
 .VSCodeCounter
 *.tmp
 docs/**/*.import
@@ -52,3 +54,9 @@ story/
 # Test/temp
 *.bak
 *.orig
+.DS_Store
+.atomcode/
+
+skills/konado-script/language-configuration.json
+skills/konado-script/package.json
+skills/konado-script/syntaxes/

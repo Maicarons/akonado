@@ -30,12 +30,12 @@ Konado는 Godot Engine용 대화 생성 도구킷으로, 템플릿과 대화 관
 
 ## 빠른 시작
 
-[빠른 시작 가이드](https://godothub.com/oss/konado/ko/tutorial/install.html)를 따라 몇 분 만에 Konado를 설정하고 사용하기 시작하세요.
+[빠른 시작 가이드](https://godothub.com/oss/konado/ko/2.4/tutorial/install.html)를 따라 몇 분 만에 Konado를 설정하고 사용하기 시작하세요.
 
 
 ## 문서
 
-종합 가이드, API 참조 및 고급 튜토리얼을 보려면 공식 프로젝트 웹사이트를 방문하세요: https://godothub.com/oss/konado/ko/
+종합 가이드, API 참조 및 고급 튜토리얼을 보려면 공식 프로젝트 웹사이트를 방문하세요: https://godothub.com/oss/konado/ko/2.4/
 
 ## 커뮤니티
 
@@ -74,9 +74,26 @@ Konado에 기여하고 싶으신가요? 참여 방법에 대한 자세한 가이
 이 프로젝트는 [행동 강령](./CODE_OF_CONDUCT.md)을 준수합니다. 참여함으로써 이 규정을 준수할 것으로 기대됩니다.
 
 
+## Konado 프로젝트 팀
+
+- [DSOE1024](https://github.com/DSOE1024)
+- [putyk](https://github.com/putyk)
+- [moluopro](https://github.com/moluopro)
+- [ioniccrystal](https://github.com/ioniccrystal)
+- [fangchu](https://github.com/fangchudark)
+
+
 ## 기여자
 
-기여자 전체 목록은 [AUTHORS.md](./AUTHORS.md)에서 확인할 수 있습니다.
+다음 분들이 이 프로젝트에 기여했습니다:
+
+<a href="https://github.com/godothub/konado/graphs/contributors" target="_blank">
+  <picture>
+	<source media="(prefers-color-scheme: dark)" srcset="https://contrib.rocks/image?repo=godothub/konado&theme=dark" />
+	<source media="(prefers-color-scheme: light)" srcset="https://contrib.rocks/image?repo=godothub/konado" />
+	<img alt="Contributors" src="https://contrib.rocks/image?repo=godothub/konado" />
+  </picture>
+</a>
 
 
 ## 오픈 소스 라이선스

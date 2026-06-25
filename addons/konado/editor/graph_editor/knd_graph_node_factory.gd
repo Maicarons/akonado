@@ -13,6 +13,7 @@ const TYPE_TITLES := {
 	KND_Dialogue.Type.DISPLAY_ACTOR: "Actor Show",
 	KND_Dialogue.Type.ACTOR_CHANGE_STATE: "Actor Change",
 	KND_Dialogue.Type.MOVE_ACTOR: "Actor Move",
+	KND_Dialogue.Type.ACTOR_MOTION: "Actor Motion",
 	KND_Dialogue.Type.EXIT_ACTOR: "Actor Exit",
 	KND_Dialogue.Type.SWITCH_BACKGROUND: "Background",
 	KND_Dialogue.Type.PLAY_BGM: "Play BGM",
@@ -31,6 +32,7 @@ const TYPE_COLORS := {
 	KND_Dialogue.Type.DISPLAY_ACTOR: Color("2d8a4e"),
 	KND_Dialogue.Type.ACTOR_CHANGE_STATE: Color("2d8a4e"),
 	KND_Dialogue.Type.MOVE_ACTOR: Color("2d8a4e"),
+	KND_Dialogue.Type.ACTOR_MOTION: Color("2d8a4e"),
 	KND_Dialogue.Type.EXIT_ACTOR: Color("8a2d2d"),
 	KND_Dialogue.Type.SWITCH_BACKGROUND: Color("7a3dba"),
 	KND_Dialogue.Type.PLAY_BGM: Color("ba7a3d"),
@@ -51,6 +53,7 @@ static func create(type: KND_Dialogue.Type, d: KND_Dialogue = null) -> GraphNode
 		KND_Dialogue.Type.DISPLAY_ACTOR: return _actor_show(d)
 		KND_Dialogue.Type.ACTOR_CHANGE_STATE: return _actor_change(d)
 		KND_Dialogue.Type.MOVE_ACTOR: return _actor_move(d)
+		KND_Dialogue.Type.ACTOR_MOTION: return _actor_motion(d)
 		KND_Dialogue.Type.EXIT_ACTOR: return _actor_exit(d)
 		KND_Dialogue.Type.SWITCH_BACKGROUND: return _background(d)
 		KND_Dialogue.Type.PLAY_BGM: return _play_bgm(d)
@@ -85,10 +88,14 @@ static func read_fields(node: GraphNode) -> KND_Dialogue:
 		KND_Dialogue.Type.MOVE_ACTOR:
 			d.target_move_chara = _val(f, "target_move_chara")
 			d.target_move_pos = Vector2(_fval(f, "pos_x"), _fval(f, "pos_y"))
+		KND_Dialogue.Type.ACTOR_MOTION:
+			d.motion_actor = _val(f, "motion_actor")
+			d.motion_name = _val(f, "motion_name")
 		KND_Dialogue.Type.EXIT_ACTOR:
 			d.exit_actor = _val(f, "exit_actor")
 		KND_Dialogue.Type.SWITCH_BACKGROUND:
-			d.background_image_name = _val(f, "bg_name")
+			d.background_name = _val(f, "bg_name")
+			d.background_image_name = d.background_name
 			d.background_toggle_effects = _ival(f, "bg_effect") as KND_ActingInterface.BackgroundTransitionEffectsType
 		KND_Dialogue.Type.PLAY_BGM:
 			d.bgm_name = _val(f, "bgm_name")
@@ -182,6 +189,16 @@ static func _actor_move(d: KND_Dialogue) -> GraphNode:
 	return n
 
 
+static func _actor_motion(d: KND_Dialogue) -> GraphNode:
+	var n := _base("Actor Motion", TYPE_COLORS[KND_Dialogue.Type.ACTOR_MOTION])
+	n.set_meta("dialogue_type", KND_Dialogue.Type.ACTOR_MOTION)
+	var f1 := _add_field(n, "Actor", d.motion_actor if d else "")
+	var f2 := _add_field(n, "Motion", d.motion_name if d else "shake")
+	n.set_meta("fields", {"motion_actor": f1, "motion_name": f2})
+	n.set_slot(0, true, FLOW_PORT, FLOW_COLOR, true, FLOW_PORT, FLOW_COLOR)
+	return n
+
+
 static func _actor_exit(d: KND_Dialogue) -> GraphNode:
 	var n := _base("Actor Exit", TYPE_COLORS[KND_Dialogue.Type.EXIT_ACTOR])
 	n.set_meta("dialogue_type", KND_Dialogue.Type.EXIT_ACTOR)
@@ -194,7 +211,10 @@ static func _actor_exit(d: KND_Dialogue) -> GraphNode:
 static func _background(d: KND_Dialogue) -> GraphNode:
 	var n := _base("Background", TYPE_COLORS[KND_Dialogue.Type.SWITCH_BACKGROUND])
 	n.set_meta("dialogue_type", KND_Dialogue.Type.SWITCH_BACKGROUND)
-	var f1 := _add_field(n, "Name", d.background_image_name if d else "")
+	var bg_name := d.background_name if d else ""
+	if d and bg_name.is_empty():
+		bg_name = d.background_image_name
+	var f1 := _add_field(n, "Name", bg_name)
 	var opt := OptionButton.new()
 	opt.add_item("none", 0)
 	opt.add_item("erase", 1)

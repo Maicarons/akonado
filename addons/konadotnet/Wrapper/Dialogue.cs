@@ -66,7 +66,8 @@ public partial class Dialogue : Resource
         AchievementProgress,
         AchievementFlag,
         SetVariable,
-        TheEnd
+        TheEnd,
+        ActorMotion
     }
 
     public new static class GDScriptPropertyName
@@ -90,10 +91,13 @@ public partial class Dialogue : Resource
         public new static readonly StringName ChangeState = "change_state";
         public new static readonly StringName TargetMoveChara = "target_move_chara";
         public new static readonly StringName TargetMovePos = "target_move_pos";
+        public new static readonly StringName MotionActor = "motion_actor";
+        public new static readonly StringName MotionName = "motion_name";
         public new static readonly StringName Choices = "choices";
         public new static readonly StringName BgmName = "bgm_name";
         public new static readonly StringName VoiceId = "voice_id";
         public new static readonly StringName SoundeffectName = "soundeffect_name";
+        public new static readonly StringName BackgroundName = "background_name";
         public new static readonly StringName BackgroundImageName = "background_image_name";
         public new static readonly StringName BackgroundToggleEffects = "background_toggle_effects";
         public new static readonly StringName CustomSignalName = "custom_signal_name";
@@ -223,6 +227,18 @@ public partial class Dialogue : Resource
         set => _source.Set(GDScriptPropertyName.TargetMovePos, value);
     }
 
+    public string MotionActor
+    {
+        get => _source.Get(GDScriptPropertyName.MotionActor).As<string>();
+        set => _source.Set(GDScriptPropertyName.MotionActor, value);
+    }
+
+    public string MotionName
+    {
+        get => _source.Get(GDScriptPropertyName.MotionName).As<string>();
+        set => _source.Set(GDScriptPropertyName.MotionName, value);
+    }
+
     public Godot.Collections.Array<DialogueChoice> Choices
     {
         get => new(_source.Get(GDScriptPropertyName.Choices).As<Godot.Collections.Array<Resource>>().Select(r => new DialogueChoice(r)));
@@ -253,6 +269,12 @@ public partial class Dialogue : Resource
     {
         get => _source.Get(GDScriptPropertyName.SoundeffectName).As<string>();
         set => _source.Set(GDScriptPropertyName.SoundeffectName, value);
+    }
+
+    public new string BackgroundName
+    {
+        get => _source.Get(GDScriptPropertyName.BackgroundName).As<string>();
+        set => _source.Set(GDScriptPropertyName.BackgroundName, value);
     }
 
     public new string BackgroundImageName

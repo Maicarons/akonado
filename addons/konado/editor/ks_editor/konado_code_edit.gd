@@ -125,7 +125,9 @@ func _get_completion_candidates(line: int, line_text: String, current_word: Stri
 					"fade", 
 					"vortex",
 					"windmill", 
-					"cyberglitch"]
+					"cyberglitch",
+					"blink"
+					]
 				for effect in effects:
 					candidates.append({
 						"kind": CodeCompletionKind.KIND_CONSTANT,

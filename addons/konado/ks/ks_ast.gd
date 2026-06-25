@@ -24,15 +24,16 @@ class DialogueNode extends ASTNode:
 
 ## 背景切换节点
 class BackgroundNode extends ASTNode:
-	var image_name: String = ""
+	var background_name: String = ""
 	var effect: String = ""
 
 
 ## 演员操作节点
 class ActorNode extends ASTNode:
-	var action: String = ""         ## "show", "exit", "change", "move"
+	var action: String = ""         ## "show", "exit", "change", "move", "motion"
 	var actor_name: String = ""
 	var state: String = ""
+	var motion_name: String = ""
 	var position: float = 0.0
 	var has_position: bool = false
 

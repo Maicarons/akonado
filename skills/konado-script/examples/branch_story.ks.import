@@ -1,0 +1,14 @@
+[remap]
+
+importer="konado.scripts"
+type="Resource"
+uid="uid://cealxjcvn00sx"
+path="res://.godot/imported/branch_story.ks-f8df2f4f5822bb676ee977e6d6620228.res"
+
+[deps]
+
+source_file="res://skills/konado-script/examples/branch_story.ks"
+dest_files=["res://.godot/imported/branch_story.ks-f8df2f4f5822bb676ee977e6d6620228.res"]
+
+[params]
+

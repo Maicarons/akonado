@@ -18,6 +18,7 @@ const ADD_ITEMS := [
 	["Actor Show", KND_Dialogue.Type.DISPLAY_ACTOR],
 	["Actor Change", KND_Dialogue.Type.ACTOR_CHANGE_STATE],
 	["Actor Move", KND_Dialogue.Type.MOVE_ACTOR],
+	["Actor Motion", KND_Dialogue.Type.ACTOR_MOTION],
 	["Actor Exit", KND_Dialogue.Type.EXIT_ACTOR],
 	["Background", KND_Dialogue.Type.SWITCH_BACKGROUND],
 	["Play BGM", KND_Dialogue.Type.PLAY_BGM],

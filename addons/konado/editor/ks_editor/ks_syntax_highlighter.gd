@@ -22,7 +22,7 @@ class_name KND_KsHighlighter
 	},
 	# 背景特效
 	{
-		"regex": "\\bbackground\\s+\\w+\\s+(none|erase|blinds|wave|fade|vortex|windmill|cyberglitch)\\b",
+		"regex": "\\bbackground\\s+\\w+\\s+(none|erase|blinds|wave|fade|vortex|windmill|cyberglitch|blink)\\b",
 		"color": Color(0.7, 0.95, 0.8)  # 薄荷绿
 	},
 	# 字符串

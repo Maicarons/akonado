@@ -407,7 +407,9 @@ func _process(delta) -> void:
 				# 如果是切换背景
 				elif cur_dialogue_type == KND_Dialogue.Type.SWITCH_BACKGROUND:
 					# 显示背景
-					var bg_name = dialog.background_image_name
+					var bg_name = dialog.background_name
+					if bg_name.is_empty():
+						bg_name = dialog.background_image_name
 					var bg_effect = dialog.background_toggle_effects
 					var s = _acting_interface.background_change_finished
 					# 检查信号是否已经连接
@@ -418,7 +420,7 @@ func _process(delta) -> void:
 				# 如果是显示演员
 				elif cur_dialogue_type == KND_Dialogue.Type.DISPLAY_ACTOR:
 					# 显示演员
-					var s = _acting_interface.character_created
+					var s = _acting_interface.character_shown
 					# 检查信号是否已经连接
 					if not s.is_connected(_auto_process_next.bind(s)):
 						s.connect(_auto_process_next.bind(s))
@@ -442,6 +444,16 @@ func _process(delta) -> void:
 					if not s.is_connected(_auto_process_next.bind(s)):
 						s.connect(_auto_process_next.bind(s))
 					_acting_interface.move_actor(actor, pos.x)
+				# 如果是播放演员舞台动作
+				elif cur_dialogue_type == KND_Dialogue.Type.ACTOR_MOTION:
+					var actor = dialog.motion_actor
+					var motion_name = dialog.motion_name
+					var s = _acting_interface.character_motion_finished
+					var auto_next := _auto_process_next_from_motion.bind(s)
+					# 检查信号是否已经连接
+					if not s.is_connected(auto_next):
+						s.connect(auto_next)
+					_acting_interface.play_actor_motion(actor, motion_name)
 				# 如果是删除演员
 				elif cur_dialogue_type == KND_Dialogue.Type.EXIT_ACTOR:
 					# 删除演员
@@ -660,10 +672,19 @@ func _process_next() -> void:
 	
 ## 自动下一个，添加信号解绑功能保证只被触发一次
 func _auto_process_next(s: Signal) -> void:
+	var auto_next := _auto_process_next.bind(s)
 	_dialogue_goto_state(DialogState.PAUSED)
-	if not s.is_null() and s.is_connected(_auto_process_next):
-		s.disconnect(_auto_process_next)
+	if not s.is_null() and s.is_connected(auto_next):
+		s.disconnect(auto_next)
 		print("触发自动下一个信号")
+	_process_next()
+
+func _auto_process_next_from_motion(_actor_id: String, _motion_name: String, s: Signal) -> void:
+	var auto_next := _auto_process_next_from_motion.bind(s)
+	_dialogue_goto_state(DialogState.PAUSED)
+	if not s.is_null() and s.is_connected(auto_next):
+		s.disconnect(auto_next)
+		print("触发演员动作自动下一个信号")
 	_process_next()
 	
 ## 关闭对话的方法
@@ -709,31 +730,43 @@ func start_autoplay(value: bool):
 	
 ## 显示背景的方法
 func _display_background(bg_name: String, effect: KND_ActingInterface.BackgroundTransitionEffectsType) -> void:
-	if bg_name == null:
+	if bg_name == null or bg_name.is_empty():
+		push_error("背景名称为空，请检查 KS/Shot 是否已经重新导入")
+		_acting_interface.background_change_finished.emit()
+		return
+	if background_list == null:
+		push_error("背景列表未配置")
+		_acting_interface.background_change_finished.emit()
 		return
 	var bg_list = background_list.background_list
-	var bg_tex: Texture
+	var target_background: KND_Background
 	for bg in bg_list:
 		if bg.background_name == bg_name:
-			bg_tex = bg.background_image
-			
-	if bg_tex == null:
-		printerr("背景图片没有找到")
+			target_background = bg
+			break
+	if target_background == null:
+		push_error("背景没有找到：" + bg_name)
+		_acting_interface.background_change_finished.emit()
 		return
-	_acting_interface.change_background_image(bg_tex, bg_name, effect)
+	if target_background.background_scene == null:
+		push_error("背景[%s]没有配置背景场景" % bg_name)
+		_acting_interface.background_change_finished.emit()
+		return
+	_acting_interface.change_background_scene(target_background.background_scene, bg_name, effect)
 	
 
 ## 演员状态切换的方法
 func _actor_change_state(chara_id: String, state_id: String):
 	var target_chara: KND_Character
-	var state_tex: Texture
 	for chara in chara_list.characters:
 		if chara.chara_name == chara_id:
 			target_chara = chara
-			for state in chara.chara_status:
-				if state.status_name == state_id:
-					state_tex = state.status_texture
-	_acting_interface.change_actor_state(target_chara.chara_name, state_id, state_tex)
+			break
+	if target_chara == null:
+		push_error("切换角色状态失败：未找到角色[%s]" % chara_id)
+		_acting_interface.character_state_changed.emit()
+		return
+	_acting_interface.change_actor_state(target_chara.chara_name, state_id)
 
 ## 从角色列表创建并显示角色
 func _display_character(dialogue: KND_Dialogue) -> void:
@@ -745,21 +778,22 @@ func _display_character(dialogue: KND_Dialogue) -> void:
 			break
 	
 	if target_chara == null:
-		print("目标角色为空")
+		push_error("显示角色失败：未找到角色[%s]" % target_chara_name)
+		_acting_interface.character_shown.emit()
+		_acting_interface.character_created.emit()
 		return
 		
-	# 读取对话的角色状态图片ID
-	var target_states = target_chara.chara_status
+	# 读取对话的角色状态ID
 	var target_state_name = dialogue.character_state
-	var target_state_tex
-	for state in target_states:
-		if state.status_name == target_state_name:
-			target_state_tex = state.status_texture
-			break
+	if target_chara.character_scene == null:
+		push_error("显示角色失败：角色[%s]没有配置角色场景" % target_chara_name)
+		_acting_interface.character_shown.emit()
+		_acting_interface.character_created.emit()
+		return
 	# 角色位置
 	var pos = dialogue.actor_position
 	# 创建角色
-	_acting_interface.create_new_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_state_tex)
+	_acting_interface.show_character(target_chara_name, horizontal_division, pos.x, target_state_name, target_chara.character_scene, target_chara.actor_motion_layer)
 		
 ## 演员退场
 func _exit_actor(actor_name: String) -> void:
@@ -981,3 +1015,83 @@ func _on_achievement_pressed() -> void:
 	else:
 		printerr("无KND_AchievementManager")
 	pass
+
+func _on_main_menu_pressed() -> void:
+	get_tree().change_scene_to_file("res://sample/demo/main.tscn")
+
+## 快速保存
+func _on_quick_save_pressed() -> void:
+	if not save_system:
+		printerr("存档系统未设置")
+		return
+	var success = save_system.save_game(0)
+	if success:
+		print("快速保存完成")
+		_show_toast("快速保存成功")
+	else:
+		printerr("快速保存失败")
+		_show_toast("快速保存失败")
+
+## 快速读取
+func _on_quick_load_pressed() -> void:
+	if not save_system:
+		printerr("存档系统未设置")
+		return
+	var save_info = save_system.get_save_info(0)
+	if not save_info.get("exists", false):
+		printerr("无快速存档可读取")
+		_show_toast("无快速存档可读取")
+		return
+	# 弹出确认框
+	_show_load_confirm_dialog()
+
+## 显示读取确认对话框
+func _show_load_confirm_dialog() -> void:
+	var dialog = ConfirmationDialog.new()
+	dialog.title = ""
+	dialog.dialog_text = "读取会失去未保存的进度。\n\n你确定要这么做吗？"
+	dialog.confirmed.connect(_on_load_confirmed.bind(dialog))
+	dialog.canceled.connect(func(): dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered()
+
+## 确认读取后执行加载
+func _on_load_confirmed(dialog: ConfirmationDialog) -> void:
+	dialog.queue_free()
+	var success = save_system.load_game(0)
+	if success:
+		print("快速读取完成")
+	else:
+		printerr("快速读取失败")
+		_show_toast("快速读取失败")
+
+## 显示轻量提示信息
+func _show_toast(message: String, duration: float = 2.0) -> void:
+	var toast = Label.new()
+	toast.text = message
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.add_theme_font_size_override("font_size", 28)
+	
+	# 背景样式
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.7)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_left = 8
+	style.corner_radius_bottom_right = 8
+	style.content_margin_left = 24
+	style.content_margin_right = 24
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	toast.add_theme_stylebox_override("normal", style)
+	
+	# 定位到屏幕顶部居中
+	add_child(toast)
+	toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP, Control.PRESET_MODE_KEEP_SIZE)
+	toast.position.y = 40
+	
+	# 延时后淡出并移除
+	var tween = create_tween()
+	tween.tween_interval(duration)
+	tween.tween_property(toast, "modulate:a", 0.0, 0.3)
+	tween.tween_callback(toast.queue_free)

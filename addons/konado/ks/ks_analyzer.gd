@@ -99,9 +99,7 @@ func _validate_actor(node: KS_AST.ActorNode, context: String) -> void:
 		"show":
 			if not _dep_characters.has(node.actor_name):
 				_dep_characters.append(node.actor_name)
-			if _active_actors.has(node.actor_name):
-				_error(node.line, "角色 '%s' 已存在，请检查角色名称是否重复创建" % node.actor_name)
-			else:
+			if not _active_actors.has(node.actor_name):
 				_active_actors.append(node.actor_name)
 		"exit":
 			if _active_actors.has(node.actor_name):
@@ -114,6 +112,9 @@ func _validate_actor(node: KS_AST.ActorNode, context: String) -> void:
 		"move":
 			if not _active_actors.has(node.actor_name):
 				_warning(node.line, "无法移动不存在的角色 '%s'" % node.actor_name)
+		"motion":
+			if not _active_actors.has(node.actor_name):
+				_warning(node.line, "无法播放不存在角色 '%s' 的舞台动作" % node.actor_name)
 
 
 ## 验证选项跳转目标

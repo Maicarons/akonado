@@ -28,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="autosave_sign" type="Label" parent="." unique_id=1652400674]
+[node name="quicksave_sign" type="Label" parent="." unique_id=1652400674]
 visible = false
 layout_mode = 1
 anchors_preset = 3
@@ -41,7 +41,7 @@ offset_top = -38.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_kt3kp")
-text = "自动保存"
+text = "快速保存"
 horizontal_alignment = 1
 vertical_alignment = 1
 

@@ -23,6 +23,7 @@ const BACKGROUND_EFFECTS_MAP: Dictionary = {
 	"vortex": KND_ActingInterface.BackgroundTransitionEffectsType.VORTEX_SWAP_EFFECT,
 	"windmill": KND_ActingInterface.BackgroundTransitionEffectsType.WINDMILL_EFFECT,
 	"cyberglitch": KND_ActingInterface.BackgroundTransitionEffectsType.CYBER_GLITCH_EFFECT,
+	"blink": KND_ActingInterface.BackgroundTransitionEffectsType.BlinkEffect,
 }
 
 
@@ -129,10 +130,15 @@ func _emit_background(node: KS_AST.BackgroundNode) -> KND_Dialogue:
 	var d := KND_Dialogue.new()
 	d.source_file_line = node.line
 	d.dialog_type = KND_Dialogue.Type.SWITCH_BACKGROUND
-	d.background_image_name = node.image_name
+	d.background_name = node.background_name
+	d.background_image_name = node.background_name
 	if not node.effect.is_empty():
 		d.background_toggle_effects = BACKGROUND_EFFECTS_MAP.get(
-			node.effect, KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT)
+			node.effect, KND_ActingInterface.BackgroundTransitionEffectsType.NULL)
+		if d.background_toggle_effects == KND_ActingInterface.BackgroundTransitionEffectsType.NULL:
+			push_warning("警告：%s [行：%d] 目标效果 '%s' 未找到" % [_path, d.source_file_line, node.effect])
+			d.background_toggle_effects = KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
+			
 	return d
 
 
@@ -158,6 +164,10 @@ func _emit_actor(node: KS_AST.ActorNode) -> KND_Dialogue:
 			d.dialog_type = KND_Dialogue.Type.MOVE_ACTOR
 			d.target_move_chara = node.actor_name
 			d.target_move_pos = Vector2(node.position, 0.0)
+		"motion":
+			d.dialog_type = KND_Dialogue.Type.ACTOR_MOTION
+			d.motion_actor = node.actor_name
+			d.motion_name = node.motion_name
 
 	return d
 
@@ -405,12 +415,8 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 		_resolve_jump_branch_targets(blocks.get("if", []), tag_to_first_node_id)
 		_resolve_jump_branch_targets(blocks.get("else", []), tag_to_first_node_id)
 
-	# 6. 连接 if/else 块（主线 + 分支内）
-	_link_ifelse_blocks(main_dialogues, ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
-	for tag_name in _branch_dialogues:
-		_link_ifelse_blocks(_branch_dialogues[tag_name], ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
-
-	# 7. 连接分支内对话的 next_id
+	# 6. 连接分支内对话的 next_id。
+	# if/else 块需要依赖 IFELSE_BRANCH.next_id 作为汇合点，因此分支顺序必须先确定。
 	for tag_name in _branch_dialogues:
 		var branch_dialogs: Array = _branch_dialogues[tag_name]
 		for idx in range(branch_dialogs.size() - 1):
@@ -419,7 +425,8 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 			if cur.next_id.is_empty():
 				cur.next_id = nxt.node_id
 
-	# 8. 连接 if/else 块内对话的 next_id
+	# 7. 连接 if/else 块内对话的 next_id。
+	# 块内最后一个节点稍后由 _link_ifelse_blocks 接回 endif 后面的节点。
 	for key in _ifelse_blocks:
 		var blocks: Dictionary = _ifelse_blocks[key]
 		var if_dialogs: Array = blocks.get("if", [])
@@ -430,6 +437,11 @@ func _post_process(shot: KND_Shot, main_dialogues: Array[KND_Dialogue]) -> void:
 		for idx in range(else_dialogs.size() - 1):
 			if else_dialogs[idx].next_id.is_empty():
 				else_dialogs[idx].next_id = else_dialogs[idx + 1].node_id
+
+	# 8. 连接 if/else 块（主线 + 分支内）
+	_link_ifelse_blocks(main_dialogues, ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
+	for tag_name in _branch_dialogues:
+		_link_ifelse_blocks(_branch_dialogues[tag_name], ifelse_if_first, ifelse_else_first, ifelse_if_last, ifelse_else_last)
 
 	# 9. 扁平化：将所有对话放入 shot.dialogues
 	shot.dialogues.clear()

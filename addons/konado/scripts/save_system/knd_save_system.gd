@@ -21,12 +21,6 @@ const SAVE_EXT = ".kns"
 ## 最大存档数量
 @export var max_save_slots: int = 20
 
-## 自动存档间隔（秒）
-@export var auto_save_interval: float = 5.0
-
-## 是否启用自动存档
-@export var enable_auto_save: bool = true
-
 ## 存档策略配置
 @export var save_strategy: Dictionary = {
 	"include_dialogue_state": true,
@@ -39,20 +33,9 @@ const SAVE_EXT = ".kns"
 ## 对话管理器引用
 var dialogue_manager: KND_DialogueManager
 
-## 自动存档计时器
-var auto_save_timer: Timer
-
 func _ready() -> void:
 	# 确保存档目录存在
 	_dir_check()
-	
-	# 初始化自动存档计时器
-	if enable_auto_save:
-		auto_save_timer = Timer.new()
-		auto_save_timer.wait_time = auto_save_interval
-		auto_save_timer.autostart = true
-		auto_save_timer.timeout.connect(_auto_save)
-		add_child(auto_save_timer)
 
 ## 检查并创建存档目录
 func _dir_check() -> void:
@@ -223,10 +206,6 @@ func get_all_save_info() -> Array[Dictionary]:
 	for i in range(max_save_slots):
 		save_infos.append(get_save_info(i))
 	return save_infos
-
-## 自动存档
-func _auto_save() -> void:
-	save_game(0)  # 自动存档到0号槽位
 
 ## 捕获对话状态
 func _capture_dialogue_state() -> Dictionary:
@@ -456,26 +435,21 @@ func _restore_actor_state(state: Dictionary) -> void:
 							break
 				
 				if target_chara:
-					# 查找对应的状态纹理
 					var state_name = actor_state.get("state", "")
-					var state_tex = null
-					for chara_state in target_chara.chara_status:
-						if chara_state.status_name == state_name:
-							state_tex = chara_state.status_texture
-							break
-					
-					if state_tex:
-						# 创建演员
-						acting_interface.create_new_character(
+					if target_chara.character_scene:
+						acting_interface.show_character(
 							actor_id,
 							actor_state.get("h_division", 6),
 							actor_state.get("pos_h", 0),
 							state_name,
-							state_tex
+							target_chara.character_scene,
+							target_chara.actor_motion_layer
 						)
 						
 						# 等待一帧，确保演员节点能够正确创建
 						await get_tree().process_frame
+					else:
+						push_warning("恢复演员失败：角色[%s]没有配置角色场景" % actor_id)
 
 ## 捕获背景状态
 func _capture_background_state() -> Dictionary:
@@ -486,11 +460,6 @@ func _capture_background_state() -> Dictionary:
 		print("捕获背景状态")
 		state["background_id"] = acting_interface.background_id
 		print("背景ID：" + acting_interface.background_id)
-		if acting_interface.current_texture:
-			state["background_texture_path"] = acting_interface.current_texture.resource_path
-			print("背景纹理路径：" + acting_interface.current_texture.resource_path)
-		else:
-			print("当前背景纹理为空")
 	else:
 		print("对话管理器或表演接口不存在")
 	
@@ -505,19 +474,22 @@ func _restore_background_state(state: Dictionary) -> void:
 	var acting_interface = dialogue_manager._acting_interface
 	
 	# 恢复背景状态
-	if state.has("background_id") and state.has("background_texture_path"):
+	if state.has("background_id"):
 		var bg_id = state["background_id"]
-		var bg_tex_path = state["background_texture_path"]
-		
-		# 确保bg_tex_path不为空
-		if bg_tex_path and bg_tex_path != "":
-			var bg_tex = load(bg_tex_path)
-			
-			if bg_tex:
-				acting_interface.change_background_image(
-					bg_tex,
-					bg_id,
-					KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
-				)
-			else:
-				print("无法加载背景纹理: " + bg_tex_path)
+		if bg_id == "":
+			acting_interface.clean_background(KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT)
+			return
+		var target_background: KND_Background
+		if dialogue_manager.background_list:
+			for bg in dialogue_manager.background_list.background_list:
+				if bg.background_name == bg_id:
+					target_background = bg
+					break
+		if target_background and target_background.background_scene:
+			acting_interface.change_background_scene(
+				target_background.background_scene,
+				bg_id,
+				KND_ActingInterface.BackgroundTransitionEffectsType.NONE_EFFECT
+			)
+		else:
+			print("无法恢复背景场景: " + bg_id)

@@ -10,13 +10,13 @@ hero:
   actions:
     - theme: brand
       text: 快速开始
-      link: /zh/tutorial/install
+      link: /zh/2.4/tutorial/install
     - theme: alt
       text: 赞助我们❤
       link: "https://ifdian.net/item/52230b2860a011f083ef52540025c377"
     - theme: alt
       text: 参与贡献
-      link: "/zh/community/code-contribute"
+      link: "/zh/2.4/community/code-contribute"
 
 features:
   - title: 自由分发
