@@ -21,6 +21,12 @@ docs/**/*.uid
 __pycache__/
 *.py[cod]
 
+# AI IDE / AI Code Tool configuration directories
+.codex/
+.claude/
+.cursor/
+.codebuddy/
+
 
 skills/konado-script/language-configuration.json
 skills/konado-script/package.json
