@@ -504,6 +504,24 @@ func _finish_shot() -> void:
 	_shot_active = false
 	dialogue_state = DialogState.OFF
 	_cancel_pending_callbacks()
+	# 清理场景：隐藏对话框、清除文字、消除角色和背景
+	_reset_transient_interfaces(false)
+	if stage_controller != null:
+		stage_controller.remove_all_actors()
+		stage_controller.clean_background(
+			KonadoStageController.BackgroundTransitionEffect.ALPHA_FADE
+		)
+	if dialogue_box != null:
+		dialogue_box.dismiss_dialogue_box()
+	if screen_text != null:
+		screen_text.reset_screen_text()
+	if audio_controller != null:
+		audio_controller.stop_background_music()
+		audio_controller.stop_voice()
+	if camera_controller != null:
+		camera_controller.restore_state(
+			{"position": Vector2.ZERO, "zoom": Vector2.ONE, "offset": Vector2.ZERO}
+		)
 	shot_end.emit()
 
 
