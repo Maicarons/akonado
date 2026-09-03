@@ -3,7 +3,6 @@
 ### New Features
 
 - Added named parameters for per-line typewriter speed and actor, background, and camera transition durations
-- Added actor framing presets and transitions for composing one or multiple actors without moving the background or stage camera
 - Unified dialogue syntax for static actors, actor variables, and interpolated text labels
 - Added stable instruction IDs, execution history, checkpoints, and rollback APIs
 

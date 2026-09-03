@@ -27,7 +27,7 @@ if (dialogue is not null && shot is not null)
 
 ## DialogueManagerApi
 
-재생 제어에는 `SetShot`, `InitDialogue()`, `InitDialogue(Callable callback)`, `StartDialogue`, `StopDialogue`, `StartAutoplay`, `EmitWaitSignal`이 있습니다. `GetDialogueVariable`은 대화 변수를 읽고 `ReloadLocalizedScript`는 현재 스토리를 지정한 언어로 다시 불러옵니다. `SetActorFraming`은 한 액터의 로컬 프레이밍을 바꾸고, `SetActorFramings`는 모든 대상을 검증한 뒤 여러 액터의 전환을 동시에 시작합니다. 리소스 속성은 `CharacterList`, `BackgroundList`, `BgmList`, `VoiceList`, `SoundEffectList`, `VariableStore`입니다.
+재생 제어에는 `SetShot`, `InitDialogue()`, `InitDialogue(Callable callback)`, `StartDialogue`, `StopDialogue`, `StartAutoplay`, `EmitWaitSignal`이 있습니다. `GetDialogueVariable`은 대화 변수를 읽고 `ReloadLocalizedScript`는 현재 스토리를 지정한 언어로 다시 불러옵니다. 리소스 속성은 `CharacterList`, `BackgroundList`, `BgmList`, `VoiceList`, `SoundEffectList`, `VariableStore`입니다.
 
 `ShotStart`, `ShotEnd`, `DialogueLineStart`, `DialogueLineEnd`, `CustomSignal`, `RuntimeFailed`, `RuntimeFailureReported`는 표준 C# 이벤트입니다. `RuntimeFailureReported`는 안정적인 오류 코드, 작업, 리소스, 소스 경로와 줄, 명령 ID, 프로그램 위치를 제공합니다. 저장은 `SaveGame`, `LoadGame`, `DeleteSave`, `GetSaveInfo`, `GetAllSaveInfo`를 사용하고, 이력과 체크포인트는 `CanRollback`, `Rollback`, `GetExecutionHistory`, `ClearExecutionHistory`, `CreateCheckpoint`, `RestoreCheckpoint`를 사용합니다.
 

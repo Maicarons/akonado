@@ -134,7 +134,7 @@ actor motion kona shake
 actor motion kona jump_twice
 ```
 
-制作动作层时，动画只能作用于 `MotionTransform`。`FramingLayer` 由演员景别系统管理，角色场景挂载在 `CharacterMount`；不要直接修改后两者或角色槽位，否则会覆盖持久景别或破坏站位计算。
+制作动作层时，建议让动画作用在 `CharacterMount` 上，不要直接改角色槽位本身。这样不会破坏角色的站位计算。
 
 ## 背景场景
 

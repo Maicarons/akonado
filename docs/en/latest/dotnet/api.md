@@ -41,8 +41,6 @@ if (dialogue is not null && shot is not null)
 | `EmitWaitSignal(string signalName)` | Resumes an instruction waiting for that signal. |
 | `GetDialogueVariable(string key)` | Reads the current value and scope information for a dialogue variable. |
 | `ReloadLocalizedScript(string locale)` | Reloads the current story for the supplied locale. |
-| `SetActorFraming(string actorId, string presetId, double duration = -1, string transition = "")` | Changes one actor's local framing without moving the stage camera. |
-| `SetActorFramings(IReadOnlyDictionary<string, string> framings, double duration = -1, string transition = "")` | Validates and starts a multi-actor framing batch in the same frame. |
 
 Resource properties are `CharacterList`, `BackgroundList`, `BgmList`, `VoiceList`, `SoundEffectList`, and `VariableStore`.
 

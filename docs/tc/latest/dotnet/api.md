@@ -27,7 +27,7 @@ if (dialogue is not null && shot is not null)
 
 ## DialogueManagerApi
 
-播放控制包括 `SetShot`、`InitDialogue()`、`InitDialogue(Callable callback)`、`StartDialogue`、`StopDialogue`、`StartAutoplay` 與 `EmitWaitSignal`。`GetDialogueVariable` 可讀取對話變數，`ReloadLocalizedScript` 可依指定語言重新載入目前劇情。`SetActorFraming` 可調整單個演員的局部景別，`SetActorFramings` 則會完整驗證並同時啟動多演員景別過渡。資源屬性包括 `CharacterList`、`BackgroundList`、`BgmList`、`VoiceList`、`SoundEffectList` 與 `VariableStore`。
+播放控制包括 `SetShot`、`InitDialogue()`、`InitDialogue(Callable callback)`、`StartDialogue`、`StopDialogue`、`StartAutoplay` 與 `EmitWaitSignal`。`GetDialogueVariable` 可讀取對話變數，`ReloadLocalizedScript` 可依指定語言重新載入目前劇情。資源屬性包括 `CharacterList`、`BackgroundList`、`BgmList`、`VoiceList`、`SoundEffectList` 與 `VariableStore`。
 
 `ShotStart`、`ShotEnd`、`DialogueLineStart`、`DialogueLineEnd`、`CustomSignal`、`RuntimeFailed` 與 `RuntimeFailureReported` 是標準 C# 事件。`RuntimeFailureReported` 提供穩定錯誤碼、具體操作、資源、原始碼路徑與行號、指令 ID 及程式位置。存檔使用 `SaveGame`、`LoadGame`、`DeleteSave`、`GetSaveInfo` 與 `GetAllSaveInfo`；回滾與檢查點使用 `CanRollback`、`Rollback`、`GetExecutionHistory`、`ClearExecutionHistory`、`CreateCheckpoint` 與 `RestoreCheckpoint`。
 

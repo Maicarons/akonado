@@ -27,7 +27,7 @@ if (dialogue is not null && shot is not null)
 
 ## DialogueManagerApi
 
-再生制御は `SetShot`、`InitDialogue()`、`InitDialogue(Callable callback)`、`StartDialogue`、`StopDialogue`、`StartAutoplay`、`EmitWaitSignal` です。`GetDialogueVariable` は会話変数を取得し、`ReloadLocalizedScript` は現在のストーリーを指定言語で再読み込みします。`SetActorFraming` は 1 人のアクターの局所画角を変更し、`SetActorFramings` は全対象を検証して複数アクターの遷移を同時に開始します。リソースプロパティは `CharacterList`、`BackgroundList`、`BgmList`、`VoiceList`、`SoundEffectList`、`VariableStore` です。
+再生制御は `SetShot`、`InitDialogue()`、`InitDialogue(Callable callback)`、`StartDialogue`、`StopDialogue`、`StartAutoplay`、`EmitWaitSignal` です。`GetDialogueVariable` は会話変数を取得し、`ReloadLocalizedScript` は現在のストーリーを指定言語で再読み込みします。リソースプロパティは `CharacterList`、`BackgroundList`、`BgmList`、`VoiceList`、`SoundEffectList`、`VariableStore` です。
 
 `ShotStart`、`ShotEnd`、`DialogueLineStart`、`DialogueLineEnd`、`CustomSignal`、`RuntimeFailed`、`RuntimeFailureReported` は標準 C# イベントです。`RuntimeFailureReported` は安定したエラーコード、操作、リソース、ソースパスと行、命令 ID、プログラム位置を提供します。セーブには `SaveGame`、`LoadGame`、`DeleteSave`、`GetSaveInfo`、`GetAllSaveInfo` を、履歴とチェックポイントには `CanRollback`、`Rollback`、`GetExecutionHistory`、`ClearExecutionHistory`、`CreateCheckpoint`、`RestoreCheckpoint` を使用します。
 

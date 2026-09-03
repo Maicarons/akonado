@@ -7,7 +7,7 @@ order: 8
 
 캐릭터와 배경 항목은 `PackedScene`을 참조합니다. 씬에는 이미지, 비디오, Spine, Live2D, 셰이더 또는 사용자 노드를 넣을 수 있습니다.
 
-캐릭터 씬은 `KonadoCharacterSceneBase`를 상속하고 `_apply_status(resolved_status_name, original_status_name)`를 재정의합니다. 상태 이름을 검증할 수 있다면 `_has_status`도 구현합니다. 지연 전환은 요청 수락 시점과 최종 적용 시점에 이를 확인할 수 있으므로 `_has_status`는 부작용이 없고 멱등이어야 합니다. 순수 텍스처를 안전하게 제공할 수 있는 씬은 `_get_current_status_transition_frame`과 `_get_status_transition_frame`을 모두 구현하여 `KonadoCharacterTransitionFrame` 기반 프리멀티플라이드 알파 블렌딩을 사용할 수 있습니다. 부작용 없는 프레임을 제공할 수 없는 Live2D, Spine, 비디오 및 사용자 씬은 안전한 페이드아웃, 상태 적용, 페이드인 경로로 자동 대체됩니다. 두 경로 모두 캐릭터 씬을 복제하지 않습니다. 설정은 [액터 상태 전환](../script/actor/actor-change-state.md)을 참고하세요. 무대 동작은 `KonadoActorMotionLayer` 씬에 둡니다. 모션 애니메이션은 `MotionTransform`만 수정해야 하며, `FramingLayer`는 프레이밍 시스템이 관리하고 캐릭터 씬은 `CharacterMount` 아래에 배치됩니다.
+캐릭터 씬은 `KonadoCharacterSceneBase`를 상속하고 `_apply_status(resolved_status_name, original_status_name)`를 재정의합니다. 상태 이름을 검증할 수 있다면 `_has_status`도 구현합니다. 지연 전환은 요청 수락 시점과 최종 적용 시점에 이를 확인할 수 있으므로 `_has_status`는 부작용이 없고 멱등이어야 합니다. 순수 텍스처를 안전하게 제공할 수 있는 씬은 `_get_current_status_transition_frame`과 `_get_status_transition_frame`을 모두 구현하여 `KonadoCharacterTransitionFrame` 기반 프리멀티플라이드 알파 블렌딩을 사용할 수 있습니다. 부작용 없는 프레임을 제공할 수 없는 Live2D, Spine, 비디오 및 사용자 씬은 안전한 페이드아웃, 상태 적용, 페이드인 경로로 자동 대체됩니다. 두 경로 모두 캐릭터 씬을 복제하지 않습니다. 설정은 [액터 상태 전환](../script/actor/actor-change-state.md)을 참고하세요. 무대 동작은 `KonadoActorMotionLayer` 씬에 둡니다.
 
 상태 프레임을 요청할 때마다 새 독립 프레임을 반환해야 하며, 두 전환 끝점에 같은 가변 프레임을 재사용하면 안 됩니다.
 

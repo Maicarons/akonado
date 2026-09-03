@@ -41,8 +41,6 @@ if (dialogue is not null && shot is not null)
 | `EmitWaitSignal(string signalName)` | 继续等待指定信号的指令。 |
 | `GetDialogueVariable(string key)` | 读取一个对话变量的当前值与作用域信息。 |
 | `ReloadLocalizedScript(string locale)` | 按指定语言重新加载当前剧情。 |
-| `SetActorFraming(string actorId, string presetId, double duration = -1, string transition = "")` | 调整单个演员的局部景别，不移动舞台摄像机。 |
-| `SetActorFramings(IReadOnlyDictionary<string, string> framings, double duration = -1, string transition = "")` | 完整校验后同一帧启动多个演员的景别过渡。 |
 
 资源属性包括 `CharacterList`、`BackgroundList`、`BgmList`、`VoiceList`、`SoundEffectList` 和 `VariableStore`。
 
