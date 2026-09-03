@@ -24,7 +24,6 @@ const DOC_PATHS: Readonly<Record<string, string>> = {
 	"actor change": "actor/actor-change-state",
 	"actor move": "actor/actor-move",
 	"actor motion": "actor/actor-change-state",
-	"actor framing": "actor/actor-framing",
 	play: "audio/index",
 	"play bgm": "audio/play-bgm",
 	"play sfx": "audio/play-sound-effect",

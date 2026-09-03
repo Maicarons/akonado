@@ -100,7 +100,7 @@
 		"commands": {
 			"patterns": [
 				{
-					"match": "^\\s*(actor)\\s+(show|exit|change|move|motion|framing)\\b",
+					"match": "^\\s*(actor)\\s+(show|exit|change|move|motion)\\b",
 					"captures": {
 						"1": {
 							"name": "keyword.control.konado"
@@ -196,7 +196,7 @@
 					}
 				},
 				{
-					"match": "\\b(at|none|linear|ease_in|ease_out|ease_in_out|true|false)\\b",
+					"match": "\\b(at|none|linear|ease_in_out|true|false)\\b",
 					"name": "constant.language.konado"
 				}
 			]

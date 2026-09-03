@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import {
 	ACTOR_POSITIONS,
-	ACTOR_FRAMINGS,
 	BACKGROUND_EFFECTS,
 	CAMERA_TRANSITIONS,
 	COMMANDS,
@@ -14,7 +13,6 @@ import {
 import type { DiagnosticManager } from "./diagnostics";
 import { formatSource } from "./formatter";
 import {
-	definitionHasScope,
 	extractReferences,
 	kindLabel,
 	referencesForLine,
@@ -129,18 +127,6 @@ class CompletionProvider implements vscode.CompletionItemProvider {
 		const partial = trailingSpace ? "" : (tokens.at(-1)?.text ?? "");
 		const root = tokens[0]?.text.replace(/:$/u, "") ?? "";
 		const items: vscode.CompletionItem[] = [];
-		const namedValueCandidates = this.namedParameterValueCandidates(code);
-		if (namedValueCandidates !== undefined) {
-			for (const candidate of namedValueCandidates) {
-				const item = new vscode.CompletionItem(
-					candidate,
-					vscode.CompletionItemKind.Value,
-				);
-				item.sortText = `0-${candidate}`;
-				items.push(item);
-			}
-			return new vscode.CompletionList(items, false);
-		}
 
 		if (argumentIndex === 0) {
 			for (const keyword of ROOT_KEYWORDS) {
@@ -207,29 +193,6 @@ class CompletionProvider implements vscode.CompletionItemProvider {
 			filterCompletions(items, partial),
 			false,
 		);
-	}
-
-	private namedParameterValueCandidates(
-		line: string,
-	): readonly string[] | undefined {
-		const match = /\[\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\]\s]*)$/u.exec(
-			line,
-		);
-		if (!match) {
-			return undefined;
-		}
-		const name = match[1] ?? "";
-		const partial = match[2] ?? "";
-		const statementTokens = tokenizeLine(line.slice(0, match.index));
-		const command = isDialogueStatement(statementTokens)
-			? "dialogue"
-			: commandKey(statementTokens.map((token) => token.text));
-		const definition = namedParametersForCommand(command)[name];
-		let values = definition?.values ?? [];
-		if (name === "framing" && command === "actor show") {
-			values = this.index.values("framings", statementTokens[2]?.text);
-		}
-		return values.filter((value) => value.startsWith(partial));
 	}
 
 	private namedParameterItems(
@@ -300,13 +263,6 @@ class CompletionProvider implements vscode.CompletionItemProvider {
 				}
 				if (argumentIndex === 3 && action === "motion") {
 					return this.index.values("motions", tokens[2]?.text);
-				}
-				if (argumentIndex === 3 && action === "framing") {
-					const values = this.index.values(
-						"framings",
-						tokens[2]?.text,
-					);
-					return values.length > 0 ? values : ACTOR_FRAMINGS;
 				}
 				if (
 					(argumentIndex === 3 && action === "move") ||
@@ -413,7 +369,6 @@ function isCompleteStatementForParameters(
 		"actor change": 4,
 		"actor move": 4,
 		"actor motion": 4,
-		"actor framing": 4,
 		"play bgm": 3,
 		"play sfx": 3,
 		stop: 1,
@@ -456,7 +411,7 @@ class HoverProvider implements vscode.HoverProvider {
 			const definitions =
 				reference.kind === "branches"
 					? localDefinitions(document, reference)
-					: scopedDefinitions(this.index, reference);
+					: this.index.definitions(reference.kind, reference.name);
 			const markdown = new vscode.MarkdownString();
 			markdown.appendCodeblock(
 				`${kindLabel(reference.kind)} ${reference.name}`,
@@ -543,30 +498,10 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 				? new vscode.Location(uri, new vscode.Position(0, 0))
 				: undefined;
 		}
-		return scopedDefinitions(this.index, reference).map(toLocation);
+		return this.index
+			.definitions(reference.kind, reference.name)
+			.map(toLocation);
 	}
-}
-
-function scopedDefinitions(
-	index: ProjectIndex,
-	reference: SymbolReference,
-): readonly IndexedDefinition[] {
-	const definitions = index.definitions(reference.kind, reference.name);
-	if (
-		!reference.scopeName ||
-		!(["states", "motions", "framings"] as SymbolKind[]).includes(
-			reference.kind,
-		)
-	) {
-		return definitions;
-	}
-	const scopeName = reference.scopeName;
-	return definitions.filter((definition) =>
-		reference.kind === "framings"
-			? definitionHasScope(definition, scopeName)
-			: (!definition.scopeName && !definition.scopeNames?.length) ||
-				definitionHasScope(definition, scopeName),
-	);
 }
 
 class ReferenceProvider implements vscode.ReferenceProvider {
@@ -717,7 +652,6 @@ class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 			"actors",
 			"states",
 			"motions",
-			"framings",
 			"backgrounds",
 			"bgms",
 			"sfx",
@@ -1133,7 +1067,6 @@ function symbolKind(kind: SymbolKind): vscode.SymbolKind {
 			actors: vscode.SymbolKind.Class,
 			states: vscode.SymbolKind.Property,
 			motions: vscode.SymbolKind.Method,
-			framings: vscode.SymbolKind.Property,
 			backgrounds: vscode.SymbolKind.Object,
 			bgms: vscode.SymbolKind.File,
 			sfx: vscode.SymbolKind.File,
@@ -1153,7 +1086,6 @@ function semanticType(kind: SymbolKind): number {
 		actors: "class",
 		states: "property",
 		motions: "property",
-		framings: "property",
 		backgrounds: "property",
 		bgms: "property",
 		sfx: "property",

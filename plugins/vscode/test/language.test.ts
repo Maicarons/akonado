@@ -3,22 +3,11 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
 	analyzeDocument,
-	definitionHasScope,
 	editDistance,
 	extractReferences,
 	referencesForLine,
 	tokenizeLine,
 } from "../src/language";
-import {
-	addResourceDependency,
-	collectExternalResources,
-	collectPropertyResourceKeys,
-	collectResourceBlocks,
-	expandResourceKeys,
-	findScriptStringDefault,
-	findStringProperty,
-	resolvePropertyResourceKey,
-} from "../src/godot-resource-index";
 
 describe("KonadoScript tokenizer", () => {
 	it("keeps comments inside strings and strips actual comments", () => {
@@ -38,23 +27,6 @@ describe("KonadoScript tokenizer", () => {
 });
 
 describe("KonadoScript semantic references", () => {
-	it("keeps every actor scope when resources are shared", () => {
-		const definition = {
-			kind: "framings" as const,
-			name: "close",
-			uri: "file:///shared-framing.tres",
-			line: 0,
-			start: 0,
-			end: 5,
-			scopeName: "Kona",
-			scopeNames: ["Kona", "Mia"],
-		};
-
-		expect(definitionHasScope(definition, "Kona")).toBe(true);
-		expect(definitionHasScope(definition, "Mia")).toBe(true);
-		expect(definitionHasScope(definition, "Noa")).toBe(false);
-	});
-
 	it("does not classify screen text as an actor", () => {
 		expect(referencesForLine('    "Full-screen text"', 2, true)).toEqual(
 			[],
@@ -148,117 +120,6 @@ describe("KonadoScript semantic references", () => {
 				}),
 			]),
 		);
-	});
-
-	it("indexes initial and transitional actor framings", () => {
-		const references = extractReferences(
-			[
-				"actor show Kona normal at 3 [framing=medium]",
-				"actor framing Mia close [duration=0.4]",
-			].join("\n"),
-		).filter((reference) => reference.kind === "framings");
-
-		expect(references).toEqual([
-			expect.objectContaining({ name: "medium", scopeName: "Kona" }),
-			expect.objectContaining({ name: "close", scopeName: "Mia" }),
-		]);
-	});
-});
-
-describe("Godot actor framing resources", () => {
-	it("reads StringName properties and exported StringName defaults", () => {
-		expect(
-			findStringProperty('preset_id = &"close"', "preset_id"),
-		).toMatchObject({ value: "close" });
-		expect(
-			findScriptStringDefault(
-				'@export var preset_id: StringName = &"default"',
-				"preset_id",
-			),
-		).toMatchObject({ value: "default" });
-	});
-
-	it("keeps inline profiles and their presets in separate resource scopes", () => {
-		const source = [
-			'[gd_resource type="Resource" load_steps=5 format=3]',
-			"",
-			'[ext_resource type="Script" path="res://addons/konado/runtime/stage/character/konado_actor_framing_profile.gd" id="1_profile"]',
-			'[ext_resource type="Script" path="res://addons/konado/runtime/stage/character/konado_actor_framing_preset.gd" id="2_preset"]',
-			"",
-			'[sub_resource type="Resource" id="PresetA"]',
-			'script = ExtResource("2_preset")',
-			'preset_id = &"close_a"',
-			"",
-			'[sub_resource type="Resource" id="ProfileA"]',
-			'script = ExtResource("1_profile")',
-			'presets = Array[Resource]([SubResource("PresetA")])',
-			"",
-			'[sub_resource type="Resource" id="PresetB"]',
-			'script = ExtResource("2_preset")',
-			'preset_id = "close_b"',
-			"",
-			'[sub_resource type="Resource" id="ProfileB"]',
-			'script = ExtResource("1_profile")',
-			"presets = Array[Resource]([",
-			'  SubResource("PresetB"),',
-			"])",
-			"",
-			"[resource]",
-			'actor_framing_profile = SubResource("ProfileA")',
-		].join("\n");
-		const path = "res://characters.tres";
-		const resources = collectExternalResources(source);
-		const blocks = collectResourceBlocks(source, path);
-		const profileA = blocks.find((block) =>
-			block.header.includes('id="ProfileA"'),
-		);
-		const profileB = blocks.find((block) =>
-			block.header.includes('id="ProfileB"'),
-		);
-		const root = blocks.find((block) => block.header === "[resource]");
-
-		expect(
-			resolvePropertyResourceKey(
-				root?.source ?? "",
-				"actor_framing_profile",
-				resources,
-				path,
-			),
-		).toBe("res://characters.tres::ProfileA");
-		expect(
-			collectPropertyResourceKeys(
-				profileA?.source ?? "",
-				"presets",
-				resources,
-				path,
-			),
-		).toEqual(["res://characters.tres::PresetA"]);
-		expect(
-			collectPropertyResourceKeys(
-				profileB?.source ?? "",
-				"presets",
-				resources,
-				path,
-			),
-		).toEqual(["res://characters.tres::PresetB"]);
-	});
-
-	it("expands external profile dependencies without looping on cycles", () => {
-		const dependencies = new Map<string, Set<string>>();
-		addResourceDependency(
-			dependencies,
-			"res://profile.tres",
-			"res://preset.tres",
-		);
-		addResourceDependency(
-			dependencies,
-			"res://preset.tres",
-			"res://profile.tres",
-		);
-
-		expect([
-			...expandResourceKeys("res://profile.tres", dependencies),
-		]).toEqual(["res://profile.tres", "res://preset.tres"]);
 	});
 });
 

@@ -29,7 +29,7 @@ export const ROOT_KEYWORDS = [
 export type RootKeyword = (typeof ROOT_KEYWORDS)[number];
 
 export const CONTEXT_KEYWORDS = {
-	actor: ["show", "exit", "change", "move", "motion", "framing"],
+	actor: ["show", "exit", "change", "move", "motion"],
 	play: ["bgm", "sfx"],
 	stop: ["bgm"],
 	cam: ["move", "reset", "shake"],
@@ -51,19 +51,6 @@ export const BACKGROUND_EFFECTS = [
 
 export const CAMERA_TRANSITIONS = ["none", "linear", "ease_in_out"] as const;
 export const ACTOR_POSITIONS = ["1", "2", "3", "4", "5"] as const;
-export const ACTOR_FRAMINGS = [
-	"default",
-	"full",
-	"medium",
-	"close",
-	"extreme_close",
-] as const;
-export const ACTOR_FRAMING_TRANSITIONS = [
-	"linear",
-	"ease_in",
-	"ease_out",
-	"ease_in_out",
-] as const;
 
 export interface CommandInfo {
 	signature: string;
@@ -72,9 +59,8 @@ export interface CommandInfo {
 }
 
 export interface NamedParameterInfo {
-	type: "identifier" | "number" | "boolean" | "enum";
+	type: "identifier" | "number";
 	defaultValue: string;
-	values?: readonly string[];
 	minimum?: number;
 	exclusiveMinimum?: number;
 }
@@ -97,7 +83,6 @@ export const COMMAND_NAMED_PARAMETERS: Readonly<
 	},
 	"actor show": {
 		duration: { type: "number", defaultValue: "0.3", minimum: 0 },
-		framing: { type: "identifier", defaultValue: "medium" },
 	},
 	"actor exit": {
 		duration: { type: "number", defaultValue: "0.3", minimum: 0 },
@@ -110,19 +95,6 @@ export const COMMAND_NAMED_PARAMETERS: Readonly<
 	},
 	"actor motion": {
 		duration: { type: "number", defaultValue: "0.3", minimum: 0 },
-	},
-	"actor framing": {
-		duration: { type: "number", defaultValue: "0.3", minimum: 0 },
-		transition: {
-			type: "enum",
-			defaultValue: "ease_in_out",
-			values: ACTOR_FRAMING_TRANSITIONS,
-		},
-		wait: {
-			type: "boolean",
-			defaultValue: "true",
-			values: ["true", "false"],
-		},
 	},
 	showtextbox: {
 		duration: { type: "number", defaultValue: "0.3", minimum: 0 },
@@ -162,7 +134,6 @@ const PARAMETERIZED_COMMANDS = new Set([
 	"actor change",
 	"actor move",
 	"actor motion",
-	"actor framing",
 	"play bgm",
 	"play sfx",
 	"stop",
@@ -229,7 +200,7 @@ export const COMMANDS: Readonly<Record<string, CommandInfo>> = {
 		descriptionZh: "切换当前背景。",
 	},
 	actor: {
-		signature: "actor <show|exit|change|move|motion|framing> ...",
+		signature: "actor <show|exit|change|move|motion> ...",
 		description: "Control an actor on the stage.",
 		descriptionZh: "控制舞台上的演员。",
 	},
@@ -257,13 +228,6 @@ export const COMMANDS: Readonly<Record<string, CommandInfo>> = {
 		signature: "actor motion <actor_name> <motion_name>",
 		description: "Play an actor motion.",
 		descriptionZh: "播放演员动作。",
-	},
-	"actor framing": {
-		signature:
-			"actor framing <actor_name> <preset_name> [duration=0.3] [transition=ease_in_out] [wait=true]",
-		description:
-			"Adjust one actor's local composition without moving the stage camera.",
-		descriptionZh: "调整单个演员的局部构图，不移动舞台摄像机。",
 	},
 	play: {
 		signature: "play <bgm|sfx> <resource_name>",
@@ -472,13 +436,6 @@ export const SNIPPETS: readonly SnippetInfo[] = [
 		detail: "Show an actor in a state and position",
 		detailZh: "以指定状态和位置显示演员",
 		body: "actor show ${1:actor_name} ${2:state_name} at ${3:2}",
-	},
-	{
-		label: "Set actor framing",
-		labelZh: "调整演员景别",
-		detail: "Adjust an actor-local composition preset",
-		detailZh: "调整单个演员的局部构图预设",
-		body: "actor framing ${1:actor_name} ${2:medium}",
 	},
 	{
 		label: "Switch background",

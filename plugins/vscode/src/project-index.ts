@@ -1,25 +1,11 @@
 import * as path from "node:path";
 import * as vscode from "vscode";
 import {
-	definitionHasScope,
 	extractReferences,
 	type IndexedDefinition,
 	type ProjectSnapshot,
 	type SymbolKind,
 } from "./language";
-import { ACTOR_FRAMINGS } from "./catalog";
-import {
-	addResourceDependency,
-	collectExternalResources,
-	collectPropertyResourceKeys,
-	collectResourceBlocks,
-	expandResourceKeys,
-	findScriptStringDefault,
-	findStringProperty,
-	isFramingProfileBlock,
-	resolvePropertyResourceKey,
-	resolvePropertyTarget,
-} from "./godot-resource-index";
 
 const RESOURCE_SCHEMAS = {
 	actors: { name: "character_id", target: "character_scene" },
@@ -36,8 +22,6 @@ const MAX_RESOURCE_BYTES = 8 * 1024 * 1024;
 interface InternalDefinition extends IndexedDefinition {
 	targetResourcePath?: string;
 	motionResourcePath?: string;
-	framingProfileResourceKey?: string;
-	resourceKey?: string;
 }
 
 export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
@@ -46,7 +30,6 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 		Map<string, InternalDefinition[]>
 	>();
 	private readonly indexedUris = new Set<string>();
-	private readonly framingDependencies = new Map<string, Set<string>>();
 	private readonly changeEmitter = new vscode.EventEmitter<void>();
 	private readonly watchers: vscode.Disposable[] = [];
 	private rebuildPromise: Promise<void> | undefined;
@@ -84,44 +67,19 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 	values(kind: SymbolKind, scopeName?: string): readonly string[] {
 		const definitions = this.byKind.get(kind);
 		if (!definitions) {
-			return kind === "framings" &&
-				!this.hasCustomFramingProfile(scopeName)
-				? ACTOR_FRAMINGS
-				: [];
+			return [];
 		}
-		const values = [...definitions.entries()]
+		return [...definitions.entries()]
 			.filter(([, items]) => {
 				if (!scopeName) {
 					return true;
 				}
-				if (kind === "framings") {
-					return items.some((item) =>
-						definitionHasScope(item, scopeName),
-					);
-				}
 				return items.some(
-					(item) =>
-						(!item.scopeName && !item.scopeNames?.length) ||
-						definitionHasScope(item, scopeName),
+					(item) => !item.scopeName || item.scopeName === scopeName,
 				);
 			})
 			.map(([name]) => name)
 			.sort((left, right) => left.localeCompare(right));
-		return kind === "framings" &&
-			scopeName &&
-			values.length === 0 &&
-			!this.hasCustomFramingProfile(scopeName)
-			? ACTOR_FRAMINGS
-			: values;
-	}
-
-	private hasCustomFramingProfile(actorName?: string): boolean {
-		if (!actorName) {
-			return false;
-		}
-		return (
-			this.definitions("actors", actorName) as InternalDefinition[]
-		).some((actor) => Boolean(actor.framingProfileResourceKey));
 	}
 
 	hasUri(uri: string): boolean {
@@ -182,7 +140,6 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 			.get<boolean>("projectIndex.enable", true);
 		this.byKind.clear();
 		this.indexedUris.clear();
-		this.framingDependencies.clear();
 		if (!enabled || !vscode.workspace.workspaceFolders?.length) {
 			this.changeEmitter.fire();
 			return;
@@ -276,19 +233,15 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 		sources: ReadonlyMap<string, string>,
 	): void {
 		const uriText = uri.toString();
-		// res:// paths are only unique inside one Godot project. Use the owning
-		// file URI for framing graph keys so multi-root workspaces cannot leak
-		// presets between projects that happen to share the same relative paths.
-		const resourceOwnerKey = uriText;
 		this.indexedUris.add(uriText);
 		const externalResources = collectExternalResources(source);
-		const blocks = collectResourceBlocks(source, resourceOwnerKey);
+		const blocks = collectBlocks(source);
 		for (const block of blocks) {
 			for (const [kind, schema] of Object.entries(RESOURCE_SCHEMAS) as [
 				keyof typeof RESOURCE_SCHEMAS,
 				(typeof RESOURCE_SCHEMAS)[keyof typeof RESOURCE_SCHEMAS],
 			][]) {
-				const name = findStringProperty(block.source, schema.name);
+				const name = findProperty(block.source, schema.name);
 				if (!name) {
 					continue;
 				}
@@ -305,18 +258,6 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 								externalResources,
 							)
 						: undefined;
-				const framingProfileKey =
-					kind === "actors"
-						? resolvePropertyResourceKey(
-								block.source,
-								"actor_framing_profile",
-								externalResources,
-								resourceOwnerKey,
-							)
-						: undefined;
-				const framingProfileResourceKey = framingProfileKey
-					? this.normalizeResourceKey(uri, framingProfileKey)
-					: undefined;
 				this.add({
 					kind,
 					name: name.value,
@@ -332,7 +273,6 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 						: undefined,
 					targetResourcePath,
 					motionResourcePath,
-					framingProfileResourceKey,
 				});
 			}
 
@@ -348,8 +288,8 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 					)
 				: undefined;
 			const state =
-				findStringProperty(block.source, "status_name") ??
-				findScriptStringDefault(scriptSource, "status_name");
+				findProperty(block.source, "status_name") ??
+				findScriptDefault(scriptSource, "status_name");
 			if (state) {
 				this.add({
 					kind: "states",
@@ -361,39 +301,9 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 					targetUri: uriText,
 				});
 			}
-			const framing =
-				findStringProperty(block.source, "preset_id") ??
-				findScriptStringDefault(scriptSource, "preset_id");
-			if (framing) {
-				this.add({
-					kind: "framings",
-					name: framing.value,
-					uri: uriText,
-					line: lineAt(source, block.start + framing.start),
-					start: framing.column,
-					end: framing.column + framing.value.length,
-					targetUri: uriText,
-					resourceKey: block.resourceKey,
-				});
-			}
-			if (isFramingProfileBlock(block, externalResources)) {
-				const targetKeys = collectPropertyResourceKeys(
-					block.source,
-					"presets",
-					externalResources,
-					resourceOwnerKey,
-				);
-				for (const targetKey of targetKeys) {
-					addResourceDependency(
-						this.framingDependencies,
-						block.resourceKey,
-						this.normalizeResourceKey(uri, targetKey),
-					);
-				}
-			}
 			const camera =
-				findStringProperty(block.source, "camera_setup") ??
-				findScriptStringDefault(scriptSource, "camera_setup");
+				findProperty(block.source, "camera_setup") ??
+				findScriptDefault(scriptSource, "camera_setup");
 			if (camera) {
 				this.add({
 					kind: "cameras",
@@ -451,13 +361,11 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 
 	private rebuildScopes(): void {
 		const actors = this.definitions("actors") as InternalDefinition[];
-		const actorByTarget = new Map<string, Set<string>>();
-		const actorByMotion = new Map<string, Set<string>>();
-		const actorByFraming = new Map<string, Set<string>>();
+		const actorByTarget = new Map<string, string>();
+		const actorByMotion = new Map<string, string>();
 		for (const actor of actors) {
 			if (actor.targetResourcePath) {
-				addResourceOwner(
-					actorByTarget,
+				actorByTarget.set(
 					this.resolveResourceUri(
 						vscode.Uri.parse(actor.uri),
 						actor.targetResourcePath,
@@ -466,8 +374,7 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 				);
 			}
 			if (actor.motionResourcePath) {
-				addResourceOwner(
-					actorByMotion,
+				actorByMotion.set(
 					this.resolveResourceUri(
 						vscode.Uri.parse(actor.uri),
 						actor.motionResourcePath,
@@ -475,38 +382,16 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 					actor.name,
 				);
 			}
-			if (actor.framingProfileResourceKey) {
-				for (const resourceKey of expandResourceKeys(
-					actor.framingProfileResourceKey,
-					this.framingDependencies,
-				)) {
-					addResourceOwner(actorByFraming, resourceKey, actor.name);
-				}
-			}
 		}
 		for (const definition of this.definitions(
 			"states",
 		) as InternalDefinition[]) {
-			assignDefinitionOwners(
-				definition,
-				actorByTarget.get(definition.uri),
-			);
+			definition.scopeName = actorByTarget.get(definition.uri);
 		}
 		for (const definition of this.definitions(
 			"motions",
 		) as InternalDefinition[]) {
-			assignDefinitionOwners(
-				definition,
-				actorByMotion.get(definition.uri),
-			);
-		}
-		for (const definition of this.definitions(
-			"framings",
-		) as InternalDefinition[]) {
-			assignDefinitionOwners(
-				definition,
-				actorByFraming.get(definition.resourceKey ?? ""),
-			);
+			definition.scopeName = actorByMotion.get(definition.uri);
 		}
 	}
 
@@ -555,40 +440,77 @@ export class ProjectIndex implements ProjectSnapshot, vscode.Disposable {
 		const relative = path.posix.relative(folder.uri.path, uri.path);
 		return `res://${relative}`;
 	}
+}
 
-	private normalizeResourceKey(uri: vscode.Uri, key: string): string {
-		if (!key.startsWith("res://")) {
-			return key;
+function collectExternalResources(source: string): Map<string, string> {
+	const resources = new Map<string, string>();
+	const pattern = /^\[ext_resource[^\]]*\]$/gmu;
+	for (const match of source.matchAll(pattern)) {
+		const header = match[0];
+		const id = /\bid="([^"]+)"/u.exec(header)?.[1];
+		const resourcePath = /\bpath="([^"]+)"/u.exec(header)?.[1];
+		if (id && resourcePath) {
+			resources.set(id, resourcePath);
 		}
-		return this.resolveResourceUri(uri, key)?.toString() ?? key;
 	}
+	return resources;
 }
 
-function addResourceOwner(
-	owners: Map<string, Set<string>>,
-	resourceUri: string,
-	actorName: string,
-): void {
-	if (!resourceUri) {
-		return;
-	}
-	const names = owners.get(resourceUri) ?? new Set<string>();
-	names.add(actorName);
-	owners.set(resourceUri, names);
+function collectBlocks(source: string): { start: number; source: string }[] {
+	const headers = [
+		...source.matchAll(/^\[(?:sub_resource|resource|node)[^\]]*\]$/gmu),
+	];
+	return headers.map((header, index) => {
+		const start = (header.index ?? 0) + header[0].length;
+		const end = headers[index + 1]?.index ?? source.length;
+		return { start, source: source.slice(start, end) };
+	});
 }
 
-function assignDefinitionOwners(
-	definition: InternalDefinition,
-	owners?: ReadonlySet<string>,
-): void {
-	if (!owners?.size) {
-		definition.scopeName = undefined;
-		definition.scopeNames = undefined;
-		return;
+function findProperty(
+	source: string,
+	property: string,
+): { value: string; start: number; column: number } | undefined {
+	const pattern = new RegExp(`^\\s*${property}\\s*=\\s*"([^"]+)"`, "mu");
+	const match = pattern.exec(source);
+	const value = match?.[1];
+	if (!match || !value) {
+		return undefined;
 	}
-	const names = [...owners].sort((left, right) => left.localeCompare(right));
-	definition.scopeName = names[0];
-	definition.scopeNames = names;
+	const start = match.index + match[0].lastIndexOf(value);
+	const lineStart = source.lastIndexOf("\n", start - 1) + 1;
+	return { value, start, column: start - lineStart };
+}
+
+function findScriptDefault(
+	source: string | undefined,
+	property: string,
+): { value: string; start: number; column: number } | undefined {
+	if (!source) {
+		return undefined;
+	}
+	const pattern = new RegExp(
+		`^\\s*(?:@export(?:_[A-Za-z0-9_]+)?(?:\\([^\\n]*\\))?\\s+)?var\\s+${property}\\s*(?::[^=\\n]+)?=\\s*"([^"]*)"`,
+		"mu",
+	);
+	const value = pattern.exec(source)?.[1];
+	if (!value) {
+		return undefined;
+	}
+	return { value, start: 0, column: 0 };
+}
+
+function resolvePropertyTarget(
+	source: string,
+	property: string,
+	resources: ReadonlyMap<string, string>,
+): string | undefined {
+	const pattern = new RegExp(
+		`^\\s*${property}\\s*=\\s*ExtResource\\("([^"]+)"\\)`,
+		"mu",
+	);
+	const id = pattern.exec(source)?.[1];
+	return id ? resources.get(id) : undefined;
 }
 
 function lineAt(source: string, offset: number): number {
