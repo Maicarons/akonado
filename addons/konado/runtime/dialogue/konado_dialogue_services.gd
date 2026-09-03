@@ -43,12 +43,7 @@ func _display_background(name: String, effect: int, duration: float, request_id 
 
 
 func _show_actor(
-	actor: String,
-	state: String,
-	position: int,
-	duration: float,
-	request_id := 0,
-	framing_id: StringName = &"",
+	actor: String, state: String, position: int, duration: float, request_id := 0
 ) -> Dictionary:
 	var target: KonadoCharacter
 	if _host.character_list != null:
@@ -77,14 +72,10 @@ func _show_actor(
 			position,
 			state,
 			target.character_scene,
-			{
-				"motion_layer_scene": target.actor_motion_layer,
-				"duration": duration,
-				"report_errors": false,
-				"request_id": request_id,
-				"framing_profile": target.actor_framing_profile,
-				"framing": framing_id,
-			},
+			target.actor_motion_layer,
+			duration,
+			false,
+			request_id,
 		)
 	)
 	return {"ok": true}

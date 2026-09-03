@@ -96,37 +96,6 @@ public sealed partial class KonadoRuntimeTests : Node
 		Check(
 			manager.Get("character_list").AsGodotObject() == characterList,
 			"DialogueManagerApi resource properties must map to the manager contract.");
-		Check(
-			api.SetActorFraming("Kona", "close", 0.4, "ease_in_out"),
-			"DialogueManagerApi must forward one actor framing request.");
-		var stage = manager.Get("stage_controller").AsGodotObject();
-		var actorFraming = stage.Get("last_actor_framing").AsGodotDictionary();
-		Check(
-			actorFraming["actor_id"].AsString() == "Kona"
-				&& actorFraming["preset_id"].AsString() == "close"
-				&& Math.Abs(actorFraming["duration"].AsDouble() - 0.4) < 0.0001
-				&& actorFraming["transition"].AsString() == "ease_in_out",
-			"Single actor framing parameters must preserve their typed values.");
-		var actorFramings = new System.Collections.Generic.Dictionary<string, string>
-		{
-			["Kona"] = "medium",
-			["Mia"] = "close",
-		};
-		Check(
-			api.SetActorFramings(actorFramings, 0.2, "linear"),
-			"DialogueManagerApi must forward prevalidated multi-actor framing requests.");
-		var framingBatch = stage.Get("last_actor_framings").AsGodotDictionary();
-		Check(
-			framingBatch["framings"].AsGodotDictionary().Count == 2,
-			"Multi-actor framing must preserve every actor/preset pair.");
-		manager.Set("stage_controller", default(Variant));
-		Check(
-			api.IsReady,
-			"An optional stage controller must not disable unrelated dialogue APIs.");
-		Check(
-			!api.SetActorFraming("Kona", "close"),
-			"Actor framing must fail locally when the optional stage controller is unavailable.");
-		manager.Set("stage_controller", stage);
 		Check(api.CanRollback(), "DialogueManagerApi must expose rollback capability.");
 		Check(api.Rollback(), "DialogueManagerApi must forward rollback requests.");
 		Check(

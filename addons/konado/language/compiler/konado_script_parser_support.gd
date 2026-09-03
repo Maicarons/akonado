@@ -33,21 +33,10 @@ func _validate_camera_values(
 func _parse_named_parameters(node: KonadoScriptSyntaxTree.ASTNode) -> bool:
 	while _check(KonadoScriptToken.Type.LBRACKET):
 		_advance()
-		# A named argument may intentionally share its spelling with a language
-		# keyword (for example actor show ... [framing=medium]). The lexer has no
-		# bracket-specific mode, so validate the lexeme here instead of requiring
-		# the generic IDENTIFIER token kind.
-		var name_token := _peek()
-		var name_text := String(name_token.value)
-		var is_identifier_token := (
-			name_token.type == KonadoScriptToken.Type.IDENTIFIER
-			or name_token.type in KonadoScriptToken.KEYWORDS.values()
-		)
-		if not is_identifier_token or not name_text.is_valid_identifier():
-			_error("命名参数名称无效：%s" % name_text)
+		var name_token := _expect(KonadoScriptToken.Type.IDENTIFIER)
+		if name_token == null:
 			return false
-		_advance()
-		var name := name_text
+		var name := String(name_token.value)
 		if node.parameters.has(name):
 			_error("命名参数 '%s' 重复" % name)
 			return false

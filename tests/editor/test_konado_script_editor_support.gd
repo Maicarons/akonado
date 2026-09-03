@@ -267,17 +267,9 @@ func _test_language_completion_and_outline() -> void:
 	_expect(
 		(
 			_completion_displays(result).has("[duration=]")
-			and _completion_displays(result).has("[framing=]")
 			and _completion_displays(result).has("[id=]")
 		),
 		"command completion derives named parameters from the compiler registry",
-	)
-	result = language._complete_code(
-		"actor show Kona happy at 3 [framing=me%s" % CARET_MARKER, "completion.ks", null
-	)
-	_expect(
-		_completion_displays(result).has("medium"),
-		"initial actor framing completes actor-scoped preset values",
 	)
 	result = (
 		language
@@ -393,7 +385,7 @@ func _test_language_indent_lookup_and_hints() -> void:
 		(
 			(
 				language.CALL_HINT_MARKER
-				+ "<show|exit|change|move|motion|framing>"
+				+ "<show|exit|change|move|motion>"
 				+ language.CALL_HINT_MARKER
 			)
 			in root_call_hint

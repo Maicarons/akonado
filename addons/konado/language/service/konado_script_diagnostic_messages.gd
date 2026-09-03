@@ -33,8 +33,6 @@ const EXACT_ENGLISH: Dictionary = {
 	"actor change 缺少新状态": "actor change requires a new state.",
 	"actor move 缺少角色名": "actor move requires an actor name.",
 	"actor move 缺少目标坐标": "actor move requires a target position.",
-	"actor framing 缺少角色名": "actor framing requires an actor name.",
-	"actor framing 缺少景别名": "actor framing requires a framing preset.",
 	"actor motion 缺少角色名": "actor motion requires an actor name.",
 	"actor motion 缺少动作名": "actor motion requires a motion name.",
 	"play 缺少音频类型": "play requires an audio type.",

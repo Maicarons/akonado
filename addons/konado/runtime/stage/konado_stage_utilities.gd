@@ -35,7 +35,6 @@ static func capture_state(
 					"horizontal_division": int(actor_data.get("horizontal_division", 5)),
 					"position": int(actor_data.get("horizontal_position", 0)),
 					"state": String(actor_data.get("state", "")),
-					"framing": String(actor_data.get("framing", "default")),
 				}
 			)
 		)

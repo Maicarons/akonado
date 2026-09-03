@@ -1,14 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://vn8ookpi8m80"]
+[gd_scene format=3 uid="uid://vn8ookpi8m80"]
 
 [ext_resource type="Script" uid="uid://b6h45twralmd1" path="res://addons/konado/templates/default/character/konado_actor_motion_layer.gd" id="1_x4bn7"]
-[ext_resource type="Script" uid="uid://i8up1jskqq8f" path="res://addons/konado/runtime/stage/character/konado_actor_framing_layer.gd" id="2_framing"]
 
 [sub_resource type="Animation" id="Animation_e3j0a"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -20,7 +19,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MotionTransform:rotation")
+tracks/1/path = NodePath("CharacterMount:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -32,7 +31,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("MotionTransform:scale")
+tracks/2/path = NodePath("CharacterMount:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -48,7 +47,7 @@ length = 0.28
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:scale")
+tracks/0/path = NodePath("CharacterMount:scale")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -64,7 +63,7 @@ length = 0.28
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -80,7 +79,7 @@ length = 0.56
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -96,7 +95,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -112,7 +111,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -124,7 +123,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MotionTransform:modulate:a")
+tracks/1/path = NodePath("CharacterMount:modulate:a")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -140,7 +139,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -156,7 +155,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -168,7 +167,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MotionTransform:modulate:a")
+tracks/1/path = NodePath("CharacterMount:modulate:a")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -184,7 +183,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -200,7 +199,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -212,7 +211,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MotionTransform:modulate:a")
+tracks/1/path = NodePath("CharacterMount:modulate:a")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -228,7 +227,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -244,7 +243,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -256,7 +255,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("MotionTransform:modulate:a")
+tracks/1/path = NodePath("CharacterMount:modulate:a")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -272,7 +271,7 @@ length = 0.28
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("MotionTransform:position")
+tracks/0/path = NodePath("CharacterMount:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -299,7 +298,7 @@ _data = {
 &"shake": SubResource("Animation_shake")
 }
 
-[node name="MotionLayer" type="Control" unique_id=423597021 node_paths=PackedStringArray("animation_player", "motion_node", "framing_layer", "mount_node")]
+[node name="MotionLayer" type="Control" unique_id=423597021 node_paths=PackedStringArray("animation_player", "mount_node")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -308,31 +307,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_x4bn7")
 animation_player = NodePath("AnimationPlayer")
-motion_node = NodePath("MotionTransform")
-framing_layer = NodePath("MotionTransform/FramingLayer")
-mount_node = NodePath("MotionTransform/FramingLayer/CharacterMount")
+mount_node = NodePath("CharacterMount")
 metadata/_edit_horizontal_guides_ = [520.0]
 
-[node name="MotionTransform" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset_ratio = Vector2(0.5, 0.5)
-
-[node name="FramingLayer" type="Control" parent="MotionTransform"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset_ratio = Vector2(0.5, 0.5)
-script = ExtResource("2_framing")
-
-[node name="CharacterMount" type="Control" parent="MotionTransform/FramingLayer" unique_id=297960300]
+[node name="CharacterMount" type="Control" parent="." unique_id=297960300]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -342,7 +320,7 @@ grow_horizontal = 2
 grow_vertical = 2
 pivot_offset_ratio = Vector2(0.5, 0.5)
 
-[node name="PlaceholderVisual" type="ColorRect" parent="MotionTransform/FramingLayer/CharacterMount" unique_id=2101308053]
+[node name="PlaceholderVisual" type="ColorRect" parent="CharacterMount" unique_id=2101308053]
 visible = false
 layout_mode = 0
 offset_left = 765.0

@@ -14,8 +14,6 @@ signal actor_moved
 signal actor_motion_started(motion_name: String)
 ## 演员舞台动作完成信号
 signal actor_motion_finished(motion_name: String)
-## 演员景别过渡完成；reason 在被新请求或生命周期操作中断时提供稳定原因。
-signal actor_framing_finished(preset_id: String, succeeded: bool, reason: String)
 ## 角色状态转场开始
 signal actor_status_change_started(status_name: String)
 ## 角色状态已应用；淡入动画可能仍在进行
@@ -65,10 +63,6 @@ var _is_visible := false
 var _status_transition: KonadoActorStateTransitionController
 var _visual_setup_serial := 0
 var _character_status_request_serial := 0
-var _stage_position_request_serial := 0
-var _framing_request_serial := 0
-var _framing_profile: KonadoActorFramingProfile
-var _framing_id: StringName = &"default"
 
 
 ## 判断角色是否在左侧区域（用于确定进场/退场方向）
@@ -121,8 +115,6 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if _status_transition:
 		_status_transition.cancel()
-	if motion_layer:
-		motion_layer.cancel_framing("actor_removed")
 
 
 func _on_resized(duration_override: float = -1.0) -> void:
@@ -168,10 +160,6 @@ func _on_resized(duration_override: float = -1.0) -> void:
 func set_stage_position(
 	target_h_division: int, target_h_character_position: int, duration: float = -1.0
 ) -> bool:
-	# Every accepted call owns a distinct logical request, including a caller
-	# joining an in-flight move to the same target. Transactions use this serial
-	# to avoid rolling back a newer request whose target values happen to match.
-	_stage_position_request_serial += 1
 	var next_horizontal_division: int = clamp(target_h_division, 2, 5)
 	var next_position: int = clamp(target_h_character_position, 0, next_horizontal_division)
 	if horizontal_division == next_horizontal_division and horizontal_position == next_position:
@@ -188,10 +176,6 @@ func set_stage_position(
 ## horizontal_division/horizontal_position 判断角色是否已经真正到达目标位置。
 func _is_stage_position_moving() -> bool:
 	return _move_tween != null and _move_tween.is_valid()
-
-
-func _get_stage_position_request_serial() -> int:
-	return _stage_position_request_serial
 
 
 ## 高亮
@@ -480,93 +464,6 @@ func can_play_actor_motion(motion_name: String) -> bool:
 	return motion_layer != null and motion_layer.has_motion(motion_name)
 
 
-## 配置演员可用的景别。空配置会使用内置预设。
-func set_framing_profile(profile: KonadoActorFramingProfile) -> bool:
-	if motion_layer == null:
-		return false
-	var previous_profile := _framing_profile
-	_framing_profile = profile
-	_framing_request_serial += 1
-	var request_serial := _framing_request_serial
-	if not motion_layer.set_framing_profile(profile):
-		if request_serial == _framing_request_serial:
-			_framing_profile = previous_profile
-		return false
-	# Profile replacement cancels an active framing request and can synchronously
-	# invoke user callbacks. Do not overwrite a newer reentrant request.
-	if request_serial != _framing_request_serial:
-		return true
-	var target := _framing_id
-	if not motion_layer.has_framing(target):
-		target = motion_layer.get_default_framing_id()
-	if not motion_layer.restore_framing(target):
-		_framing_profile = previous_profile
-		return false
-	_framing_id = target
-	return true
-
-
-func has_actor_framing(preset_id: StringName) -> bool:
-	return motion_layer != null and motion_layer.has_framing(preset_id)
-
-
-func get_actor_framing_ids() -> PackedStringArray:
-	return motion_layer.get_framing_ids() if motion_layer != null else PackedStringArray()
-
-
-func get_actor_framing() -> StringName:
-	return _framing_id
-
-
-func apply_actor_framing(
-	preset_id: StringName,
-	duration: float = -1.0,
-	transition: String = "",
-	completion: Callable = Callable(),
-) -> bool:
-	if motion_layer == null or not motion_layer.can_apply_framing(preset_id, duration, transition):
-		return false
-	# The logical target is committed when the request is accepted. Save/rollback
-	# therefore restore a deterministic endpoint instead of a transient Tween frame.
-	_framing_id = preset_id
-	_framing_request_serial += 1
-	var wrapped_completion := func(succeeded: bool, reason: String) -> void:
-		actor_framing_finished.emit(String(preset_id), succeeded, reason)
-		if completion.is_valid():
-			completion.call(succeeded, reason)
-	return motion_layer.apply_framing(preset_id, duration, transition, wrapped_completion)
-
-
-func restore_actor_framing(preset_id: StringName) -> bool:
-	if motion_layer == null:
-		return false
-	var observed_serial := _framing_request_serial
-	if not motion_layer.restore_framing(preset_id):
-		return false
-	# Restoring the layer terminates its previous request synchronously. If that
-	# callback starts a newer request, the newer logical target already owns the
-	# actor and must not be overwritten by this outer restore.
-	if observed_serial != _framing_request_serial:
-		return true
-	_framing_id = preset_id
-	_framing_request_serial += 1
-	return true
-
-
-func _get_actor_framing_request_serial() -> int:
-	return _framing_request_serial
-
-
-func cancel_actor_framing(reason := "cancelled") -> void:
-	if motion_layer:
-		motion_layer.cancel_framing(reason)
-
-
-func settle_actor_framing_to_target(reason := "cancelled") -> void:
-	if motion_layer:
-		motion_layer.settle_framing_to_target(reason)
-
-
 func _clear_status_node() -> void:
 	var status_node := _status_node
 	if _status_transition:
@@ -585,80 +482,46 @@ func _clear_status_node() -> void:
 
 ## 替换演员动作层。返回 false 时保留当前有效动作层。
 func set_motion_layer_scene(scene: PackedScene) -> bool:
-	if scene == null:
-		return true
 	return _set_motion_layer_scene_internal(scene)
 
 
 func _set_motion_layer_scene_internal(scene: PackedScene) -> bool:
+	if scene == null:
+		return true
 	if slot == null:
 		push_error("slot未赋值，无法替换演员动作层")
 		return false
 	var observed_serial := _visual_setup_serial
-	var observed_framing_serial := _framing_request_serial
-	var candidate := _prepare_motion_layer(scene)
-	if candidate == null:
-		return false
-	var candidate_framing := candidate.get_current_framing_id()
-
-	# 先完整实例化并验证新层，再提交替换。错误配置不能破坏仍在使用的动作层与角色状态。
-	if observed_serial != _visual_setup_serial:
-		candidate.free()
-		return false
-	_visual_setup_serial += 1
-	var setup_serial := _visual_setup_serial
-	var previous_motion_layer := motion_layer
-	if previous_motion_layer and is_instance_valid(previous_motion_layer):
-		# The validated replacement already contains the accepted logical framing.
-		# Complete its old Tween before mutating the current visual hierarchy;
-		# otherwise a reentrant completion callback could reject this stale
-		# replacement after the active character scene had already been removed.
-		previous_motion_layer.complete_framing("motion_layer_replaced")
-		if (
-			setup_serial != _visual_setup_serial
-			or observed_framing_serial != _framing_request_serial
-			or motion_layer != previous_motion_layer
-		):
-			candidate.free()
-			return false
-	_clear_status_node()
-	if setup_serial != _visual_setup_serial:
-		candidate.free()
-		return false
-	if previous_motion_layer and is_instance_valid(previous_motion_layer):
-		var previous_parent := previous_motion_layer.get_parent()
-		if previous_parent:
-			previous_parent.remove_child(previous_motion_layer)
-		previous_motion_layer.queue_free()
-	motion_layer = candidate
-	slot.add_child(motion_layer)
-	if motion_layer is Control:
-		motion_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	texture_rect = _find_texture_rect(motion_layer)
-	_bind_motion_layer_signals()
-	_framing_id = candidate_framing
-	_framing_request_serial += 1
-	return true
-
-
-func _prepare_motion_layer(scene: PackedScene) -> KonadoActorMotionLayer:
 	var instance := scene.instantiate()
 	if not (instance is KonadoActorMotionLayer):
 		push_warning("演员动作层场景必须继承 KonadoActorMotionLayer")
 		if instance != null:
 			instance.free()
-		return null
-	var candidate := instance as KonadoActorMotionLayer
-	if not candidate.set_framing_profile(_framing_profile):
-		candidate.free()
-		return null
-	var candidate_framing := _framing_id
-	if not candidate.has_framing(candidate_framing):
-		candidate_framing = candidate.get_default_framing_id()
-	if candidate_framing.is_empty() or not candidate.restore_framing(candidate_framing):
-		candidate.free()
-		return null
-	return candidate
+		return false
+
+	# 先完整实例化并验证新层，再提交替换。错误配置不能破坏仍在使用的动作层与角色状态。
+	if observed_serial != _visual_setup_serial:
+		instance.free()
+		return false
+	_visual_setup_serial += 1
+	var setup_serial := _visual_setup_serial
+	_clear_status_node()
+	if setup_serial != _visual_setup_serial:
+		instance.free()
+		return false
+	var previous_motion_layer := motion_layer
+	if previous_motion_layer and is_instance_valid(previous_motion_layer):
+		var previous_parent := previous_motion_layer.get_parent()
+		if previous_parent:
+			previous_parent.remove_child(previous_motion_layer)
+		previous_motion_layer.queue_free()
+	motion_layer = instance as KonadoActorMotionLayer
+	slot.add_child(motion_layer)
+	if motion_layer is Control:
+		motion_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	texture_rect = _find_texture_rect(motion_layer)
+	_bind_motion_layer_signals()
+	return true
 
 
 func _bind_motion_layer_signals() -> void:

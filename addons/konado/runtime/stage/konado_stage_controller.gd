@@ -17,8 +17,6 @@ signal actor_moved(succeeded: bool)
 signal actor_motion_started(actor_id: String, motion_name: String)
 ## 指定角色舞台动作完成的信号
 signal actor_motion_finished(actor_id: String, motion_name: String, succeeded: bool)
-## 指定演员景别过渡完成。
-signal actor_framing_changed(actor_id: String, preset_id: String, succeeded: bool, reason: String)
 ## Internal request-scoped completion used by the atomic runtime. Public stage
 ## signals above remain available for direct integrations.
 signal operation_finished(request_id: int, succeeded: bool, failure: Dictionary)
@@ -61,26 +59,6 @@ const STAGE_FAILURE_REPORTER := preload(
 	"res://addons/konado/runtime/stage/konado_stage_failure_reporter.gd"
 )
 const STAGE_UTILITIES := preload("res://addons/konado/runtime/stage/konado_stage_utilities.gd")
-const STAGE_TREE_BUILDER := preload(
-	"res://addons/konado/runtime/stage/konado_stage_tree_builder.gd"
-)
-const ACTOR_FRAMING_COORDINATOR := preload(
-	"res://addons/konado/runtime/stage/character/konado_actor_framing_coordinator.gd"
-)
-const ACTOR_PRESENTER := preload(
-	"res://addons/konado/runtime/stage/character/konado_actor_presenter.gd"
-)
-const ACTOR_UPSERT_TRANSACTION := preload(
-	"res://addons/konado/runtime/stage/character/konado_actor_upsert_transaction.gd"
-)
-const ACTOR_SHOW_OPTION_NAMES := [
-	"motion_layer_scene",
-	"framing_profile",
-	"duration",
-	"report_errors",
-	"request_id",
-	"framing",
-]
 
 ## 启用全局演员背景色调混合
 @export var background_tint_enabled: bool = true
@@ -116,9 +94,6 @@ var _actor_state_requests: Dictionary = {}
 var _highlighted_actor_id: String = ""
 var _last_failure: Dictionary = {}
 var _operation_tracker_instance := STAGE_OPERATION_TRACKER.new()
-var _actor_framing_coordinator: RefCounted
-var _actor_presenter_instance: RefCounted
-var _actor_upsert_transaction_instance: RefCounted
 
 ## 演员模板
 @onready var _konado_actor_template: PackedScene = preload(
@@ -141,7 +116,6 @@ var _actor_upsert_transaction_instance: RefCounted
 
 
 func _ready() -> void:
-	_actor_framing_coordinator = ACTOR_FRAMING_COORDINATOR.new(self)
 	_ensure_stage_nodes()
 	_background_controller.setup(_background_container, _background_transition_layer)
 	_background_controller.transition_finished.connect(_on_background_change_finished)
@@ -188,25 +162,64 @@ func get_last_failure() -> Dictionary:
 ## 确保表演舞台的层级存在。
 ## 背景已经全面转成场景，这里只兜住“场景挂载层”本身，避免旧模板实例没有 BackgroundContainer 时背景无法显示。
 func _ensure_stage_nodes() -> void:
-	var nodes := (
-		STAGE_TREE_BUILDER
-		. ensure(
-			self,
-			{
-				"background": _background,
-				"background_container": _background_container,
-				"background_transition_layer": _background_transition_layer,
-				"actor_layer": _actor_layer,
-				"effect_layer": _effect_layer,
-			},
-			BACKGROUND_TRANSITION_LAYER_SCRIPT,
-		)
-	)
-	_background = nodes["background"]
-	_background_container = nodes["background_container"]
-	_background_transition_layer = nodes["background_transition_layer"]
-	_actor_layer = nodes["actor_layer"]
-	_effect_layer = nodes["effect_layer"]
+	if _background == null:
+		_background = ColorRect.new()
+		_background.name = "BackgroundLayer"
+		_background.color = Color.BLACK
+		add_child(_background)
+	if _background_container == null:
+		_background_container = Control.new()
+		_background_container.name = "BackgroundContainer"
+		_background.add_child(_background_container)
+	elif _background_container.get_parent() != _background:
+		var container_parent := _background_container.get_parent()
+		if container_parent:
+			container_parent.remove_child(_background_container)
+		_background.add_child(_background_container)
+
+	if _background_transition_layer == null:
+		_background_transition_layer = BACKGROUND_TRANSITION_LAYER_SCRIPT.new()
+		_background_transition_layer.name = "BackgroundTransitionLayer"
+		add_child(_background_transition_layer)
+	elif _background_transition_layer.get_parent() != self:
+		var transition_parent := _background_transition_layer.get_parent()
+		if transition_parent:
+			transition_parent.remove_child(_background_transition_layer)
+		add_child(_background_transition_layer)
+
+	if _actor_layer == null:
+		_actor_layer = get_node_or_null("BackgroundLayer/ActorLayer") as Control
+	if _actor_layer == null:
+		_actor_layer = Control.new()
+		_actor_layer.name = "ActorLayer"
+		add_child(_actor_layer)
+	elif _actor_layer.get_parent() != self:
+		var actor_layer_parent := _actor_layer.get_parent()
+		if actor_layer_parent:
+			actor_layer_parent.remove_child(_actor_layer)
+		add_child(_actor_layer)
+
+	if _effect_layer == null:
+		_effect_layer = ColorRect.new()
+		_effect_layer.name = "EffectLayer"
+		_effect_layer.color = Color(0, 0, 0, 0)
+		add_child(_effect_layer)
+
+	STAGE_UTILITIES.set_full_rect(_background)
+	STAGE_UTILITIES.set_full_rect(_background_container)
+	STAGE_UTILITIES.set_full_rect(_background_transition_layer)
+	STAGE_UTILITIES.set_full_rect(_actor_layer)
+	STAGE_UTILITIES.set_full_rect(_effect_layer)
+
+	## 层级顺序固定为：背景场景 -> shader 转场 -> 角色 -> 全屏效果。
+	if _background.get_parent() == self:
+		move_child(_background, 0)
+	if _background_transition_layer.get_parent() == self:
+		move_child(_background_transition_layer, min(1, get_child_count() - 1))
+	if _actor_layer.get_parent() == self:
+		move_child(_actor_layer, min(2, get_child_count() - 1))
+	if _effect_layer.get_parent() == self:
+		move_child(_effect_layer, get_child_count() - 1)
 
 
 ## 返回舞台上的演员实例。
@@ -285,40 +298,12 @@ func show_actor(
 	horizontal_position: int,
 	state: String,
 	character_scene: PackedScene = null,
-	options: Dictionary = {},
+	motion_layer_scene: PackedScene = null,
+	duration: float = -1.0,
+	report_errors := true,
+	request_id := 0,
 ) -> void:
 	_last_failure.clear()
-	var option_result := _normalize_actor_show_options(options)
-	var normalized_options: Dictionary = option_result.get("options", {})
-	if option_result.has("cause"):
-		var report_errors := (
-			bool(normalized_options.get("report_errors", true))
-			if typeof(normalized_options.get("report_errors", true)) == TYPE_BOOL
-			else true
-		)
-		var request_id := (
-			int(normalized_options.get("request_id", 0))
-			if typeof(normalized_options.get("request_id", 0)) == TYPE_INT
-			else 0
-		)
-		_last_failure = (
-			STAGE_FAILURE_REPORTER
-			. record_actor(
-				&"stage.actor_show_options_invalid",
-				"显示角色失败：参数配置无效",
-				"actor.show",
-				actor_id,
-				report_errors,
-				String(option_result.get("cause", "")),
-			)
-		)
-		_emit_actor_shown(false, request_id)
-		return
-	options = normalized_options
-	var duration := float(options.get("duration", -1.0))
-	var report_errors := bool(options.get("report_errors", true))
-	var request_id := int(options.get("request_id", 0))
-	var framing_id := StringName(options.get("framing", ""))
 	var existing_actor := get_actor(actor_id) as KonadoActor
 	if existing_actor != null:
 		_update_existing_actor(
@@ -330,82 +315,130 @@ func show_actor(
 			duration,
 			report_errors,
 			request_id,
-			framing_id,
 		)
 		return
-	_create_actor(
-		actor_id, horizontal_division, horizontal_position, state, character_scene, options
+
+	# actor_states 可能残留旧数据；没有有效节点时按新建处理。
+	_invalidate_actor_state_request(actor_id)
+	if actor_states.has(actor_id):
+		actor_states.erase(actor_id)
+
+	if character_scene == null:
+		_last_failure = (
+			STAGE_FAILURE_REPORTER
+			. record_actor(
+				&"stage.actor_scene_missing",
+				"显示角色失败：角色[%s]没有配置角色场景" % actor_id,
+				"actor.show",
+				actor_id,
+				report_errors,
+				"目标状态=%s" % state,
+			)
+		)
+		_emit_actor_shown(false, request_id)
+		return
+
+	var initial_horizontal_division: int = clamp(horizontal_division, 2, 5)
+	var initial_horizontal_position: int = clamp(
+		horizontal_position, 0, initial_horizontal_division
 	)
+	var actor_state: Dictionary = {
+		"id": actor_id,
+		"horizontal_division": initial_horizontal_division,
+		"horizontal_position": initial_horizontal_position,
+		"state": state
+	}
 
-
-func _normalize_actor_show_options(options: Dictionary) -> Dictionary:
-	var normalized := {}
-	var cause := ""
-	for option_key: Variant in options:
-		if typeof(option_key) not in [TYPE_STRING, TYPE_STRING_NAME]:
-			if cause.is_empty():
-				cause = "参数名必须是 String 或 StringName"
-			continue
-		var option_name := String(option_key)
-		if option_name not in ACTOR_SHOW_OPTION_NAMES:
-			if cause.is_empty():
-				cause = "未知参数=%s" % option_name
-			continue
-		if normalized.has(option_name):
-			if cause.is_empty():
-				cause = "参数重复=%s" % option_name
-			continue
-		normalized[option_name] = options[option_key]
-	var motion_layer_scene: Variant = normalized.get("motion_layer_scene")
-	if cause.is_empty() and motion_layer_scene != null and not motion_layer_scene is PackedScene:
-		cause = "motion_layer_scene 必须是 PackedScene 或 null"
-	var framing_profile: Variant = normalized.get("framing_profile")
-	if (
-		cause.is_empty()
-		and framing_profile != null
-		and not framing_profile is KonadoActorFramingProfile
-	):
-		cause = "framing_profile 必须是 KonadoActorFramingProfile 或 null"
-	var duration: Variant = normalized.get("duration", -1.0)
-	if cause.is_empty() and typeof(duration) not in [TYPE_INT, TYPE_FLOAT]:
-		cause = "duration 必须是数值"
-	elif cause.is_empty():
-		var duration_value := float(duration)
-		if (
-			not is_finite(duration_value)
-			or (duration_value < 0.0 and not is_equal_approx(duration_value, -1.0))
-		):
-			cause = "duration 必须为 -1 或非负有限数值"
-	if cause.is_empty() and typeof(normalized.get("report_errors", true)) != TYPE_BOOL:
-		cause = "report_errors 必须是 bool"
-	var request_id: Variant = normalized.get("request_id", 0)
-	if cause.is_empty() and (typeof(request_id) != TYPE_INT or int(request_id) < 0):
-		cause = "request_id 必须是非负整数"
-	if (
-		cause.is_empty()
-		and typeof(normalized.get("framing", &"")) not in [TYPE_STRING, TYPE_STRING_NAME]
-	):
-		cause = "framing 必须是 String 或 StringName"
-	return {"options": normalized} if cause.is_empty() else {"options": normalized, "cause": cause}
-
-
-func _create_actor(
-	actor_id: String,
-	horizontal_division: int,
-	horizontal_position: int,
-	state: String,
-	character_scene: PackedScene,
-	options: Dictionary,
-) -> void:
-	_actor_presenter().create_actor(
-		actor_id, horizontal_division, horizontal_position, state, character_scene, options
+	var node_name: String = str(actor_state["id"])
+	var temp_node: KonadoActor = _konado_actor_template.instantiate() as KonadoActor
+	if temp_node == null:
+		_last_failure = (
+			STAGE_FAILURE_REPORTER
+			. record_actor(
+				&"stage.actor_template_failed",
+				"显示角色失败：无法实例化演员模板",
+				"actor.show",
+				actor_id,
+				report_errors,
+			)
+		)
+		_emit_actor_shown(false, request_id)
+		return
+	var state_request_token := _begin_actor_state_request(actor_id)
+	# 初始化阶段使用内部名称并隐藏根节点。这样角色场景能够正常进入 SceneTree、执行
+	# @onready/_ready，又不会被 get_actor 当成已经公开的演员。
+	temp_node.name = "_KonadoPendingActor_%d" % temp_node.get_instance_id()
+	temp_node.visible = false
+	temp_node.use_tween = false
+	temp_node.set_stage_position(horizontal_division, horizontal_position)
+	temp_node.actor_motion_started.connect(_on_actor_motion_started.bind(actor_id))
+	temp_node.actor_motion_finished.connect(_on_actor_motion_finished.bind(actor_id))
+	_actor_layer.add_child(temp_node)
+	if not temp_node.set_motion_layer_scene(motion_layer_scene):
+		_last_failure = (
+			STAGE_FAILURE_REPORTER
+			. record_actor(
+				&"stage.actor_motion_layer_invalid",
+				"显示角色失败：角色[%s]的动作层配置无效" % actor_id,
+				"actor.show",
+				actor_id,
+				report_errors,
+				"",
+				true,
+			)
+		)
+		if _is_actor_state_request_current(actor_id, state_request_token):
+			_invalidate_actor_state_request(actor_id)
+		_discard_pending_actor(temp_node)
+		_emit_actor_shown(false, request_id)
+		return
+	if not temp_node.set_character_scene(character_scene, state):
+		_last_failure = (
+			STAGE_FAILURE_REPORTER
+			. record_actor(
+				&"stage.actor_state_invalid",
+				"显示角色失败：角色[%s]无法应用状态[%s]" % [actor_id, state],
+				"actor.show",
+				actor_id,
+				report_errors,
+				"目标状态=%s" % state,
+				true,
+			)
+		)
+		if _is_actor_state_request_current(actor_id, state_request_token):
+			_invalidate_actor_state_request(actor_id)
+		_discard_pending_actor(temp_node)
+		_emit_actor_shown(false, request_id)
+		return
+	if not _is_actor_state_request_current(actor_id, state_request_token):
+		# 初始化期间若同一演员已被更新请求取代，不允许旧请求进入场景树。
+		_discard_pending_actor(temp_node)
+		_last_failure = (
+			STAGE_FAILURE_REPORTER
+			. record_actor(
+				&"stage.actor_request_superseded",
+				"显示角色失败：角色[%s]的请求已被更新操作取代" % actor_id,
+				"actor.show",
+				actor_id,
+				report_errors,
+			)
+		)
+		_emit_actor_shown(false, request_id)
+		return
+	# 初始化事务成功后才使用公开名称并写入运行时索引。
+	temp_node.name = node_name
+	# 只有节点和初始状态都创建成功后，才提交存档使用的演员数据。
+	actor_states[actor_state["id"]] = actor_state
+	# 角色场景创建完成后应用色调混合，确保新角色在显示前就已带有正确的色调
+	apply_background_tint_to_actors()
+	actor_instances[actor_id] = temp_node
+	temp_node.actor_moved.connect(_on_actor_moved.bind(actor_id))
+	temp_node.actor_entered.connect(
+		_on_actor_entered.bind(actor_id, state, request_id), ConnectFlags.CONNECT_ONE_SHOT
 	)
-
-
-func _actor_presenter() -> RefCounted:
-	if _actor_presenter_instance == null:
-		_actor_presenter_instance = ACTOR_PRESENTER.new(self)
-	return _actor_presenter_instance
+	temp_node.use_tween = true
+	temp_node.visible = true
+	temp_node.enter_actor(true, duration)
 
 
 func _update_existing_actor(
@@ -417,28 +450,139 @@ func _update_existing_actor(
 	duration: float = -1.0,
 	report_errors := true,
 	request_id := 0,
-	framing_id: StringName = &"",
 ) -> void:
-	(
-		_actor_upsert_transaction()
-		. execute(
+	var previous_state := ""
+	if actor_states.has(actor_id):
+		previous_state = str(actor_states[actor_id].get("state", ""))
+
+	var next_horizontal_division: int = clamp(horizontal_division, 2, 5)
+	var next_horizontal_position: int = clamp(horizontal_position, 0, next_horizontal_division)
+	var position_changed: bool = (
+		actor.horizontal_division != next_horizontal_division
+		or actor.horizontal_position != next_horizontal_position
+	)
+	var movement_in_progress := actor._is_stage_position_moving()
+	# 持续中的转场也必须由这次 upsert 明确取代，即使已提交状态恰好相同。
+	var state_changed: bool = previous_state != state or _actor_pending_states.has(actor_id)
+
+	actor_instances[actor_id] = actor
+	var next_actor_state: Dictionary = {
+		"id": actor_id,
+		"horizontal_division": next_horizontal_division,
+		"horizontal_position": next_horizontal_position,
+		"state": previous_state,
+	}
+	if not state_changed:
+		next_actor_state["state"] = state
+	# 位置是独立且已经接受的更新；状态仅在角色场景实际应用后提交。
+	actor_states[actor_id] = next_actor_state
+
+	var waits := {
+		"succeeded": true,
+		"failure": {},
+		"state_done": not state_changed,
+		"movement_done":
+		not (
+			movement_in_progress
+			or (
+				position_changed
+				and actor.slot != null
+				and actor.use_tween
+				and actor.animation_time > 0.0
+			)
+		),
+		"finished": false,
+	}
+	var actor_ref := weakref(actor)
+	var finish_if_ready := func() -> void:
+		if waits.finished or not waits.state_done or not waits.movement_done:
+			return
+		waits.finished = true
+		if actor_states.has(actor_id) and waits.succeeded:
+			var committed_state := str(actor_states[actor_id].get("state", ""))
+			print("复用已有演员：" + str(actor_id) + " 演员状态：" + committed_state)
+		else:
+			waits.succeeded = false
+		_emit_actor_shown(bool(waits.succeeded), request_id, waits.failure)
+
+	var movement_exit_handler_ref := [Callable()]
+	var movement_handler := func() -> void:
+		waits.movement_done = true
+		var active_actor := actor_ref.get_ref() as KonadoActor
+		var movement_exit_handler: Callable = movement_exit_handler_ref[0]
+		movement_exit_handler_ref[0] = Callable()
+		if (
+			active_actor != null
+			and movement_exit_handler.is_valid()
+			and active_actor.tree_exiting.is_connected(movement_exit_handler)
+		):
+			active_actor.tree_exiting.disconnect(movement_exit_handler)
+		finish_if_ready.call()
+	if not waits.movement_done:
+		var movement_exit_handler := func() -> void:
+			movement_exit_handler_ref[0] = Callable()
+			if waits.movement_done:
+				return
+			waits.movement_done = true
+			waits.succeeded = false
+			waits.failure = {
+				"code": "stage.actor_node_removed",
+				"message": "显示角色失败：角色[%s]在操作完成前离开舞台" % actor_id,
+				"subsystem": "stage",
+				"operation": "actor.show",
+				"resource_kind": "actor",
+				"resource_id": actor_id,
+			}
+			var active_actor := actor_ref.get_ref() as KonadoActor
+			if active_actor != null and active_actor.actor_moved.is_connected(movement_handler):
+				active_actor.actor_moved.disconnect(movement_handler)
+			finish_if_ready.call()
+		movement_exit_handler_ref[0] = movement_exit_handler
+		actor.actor_moved.connect(movement_handler, ConnectFlags.CONNECT_ONE_SHOT)
+		actor.tree_exiting.connect(movement_exit_handler, ConnectFlags.CONNECT_ONE_SHOT)
+	if position_changed:
+		var movement_started := actor.set_stage_position(
+			next_horizontal_division, next_horizontal_position, duration
+		)
+		if not movement_started and not waits.movement_done:
+			if actor.actor_moved.is_connected(movement_handler):
+				actor.actor_moved.disconnect(movement_handler)
+			var movement_exit_handler: Callable = movement_exit_handler_ref[0]
+			movement_exit_handler_ref[0] = Callable()
+			if (
+				movement_exit_handler.is_valid()
+				and actor.tree_exiting.is_connected(movement_exit_handler)
+			):
+				actor.tree_exiting.disconnect(movement_exit_handler)
+			waits.movement_done = true
+
+	if state_changed:
+		_request_actor_state(
 			actor,
 			actor_id,
-			horizontal_division,
-			horizontal_position,
 			state,
-			duration,
+			duration if duration >= 0.0 else 0.0,
+			"显示角色失败：角色[%s]无法应用状态[%s]" % [actor_id, state],
+			"actor.show",
 			report_errors,
-			request_id,
-			framing_id,
+			func(succeeded: bool, actor_exited: bool, owned_request: bool) -> void:
+				waits.succeeded = waits.succeeded and succeeded
+				if not succeeded:
+					waits.failure = (
+						_last_failure.duplicate(true)
+						if owned_request
+						else _operation_tracker().superseded_failure(
+							"actor.show", "actor", actor_id
+						)
+					)
+				# 演员离树后移动信号也不会再到达；两个等待必须一起释放。
+				if actor_exited:
+					waits.movement_done = true
+				waits.state_done = true
+				finish_if_ready.call()
 		)
-	)
 
-
-func _actor_upsert_transaction() -> RefCounted:
-	if _actor_upsert_transaction_instance == null:
-		_actor_upsert_transaction_instance = ACTOR_UPSERT_TRANSACTION.new(self)
-	return _actor_upsert_transaction_instance
+	finish_if_ready.call()
 
 
 func _on_actor_entered(actor_id: String, state: String, request_id := 0) -> void:
@@ -687,36 +831,6 @@ func play_actor_motion(
 	actor.play_actor_motion(motion_name, params)
 
 
-## 将单个演员切换到持久景别。它不会移动背景、其他演员或全局相机。
-func set_actor_framing(
-	actor_id: String,
-	preset_id: StringName,
-	duration: float = -1.0,
-	transition: String = "",
-	report_errors := true,
-	request_id := 0,
-) -> bool:
-	return _framing_coordinator().set_actor(
-		actor_id, preset_id, duration, transition, report_errors, request_id
-	)
-
-
-## 同一帧中接受多个演员的景别更新。所有请求会先完整校验，任一无效时不修改舞台。
-func set_actor_framings(
-	framings: Dictionary,
-	duration: float = -1.0,
-	transition: String = "",
-	report_errors := true,
-) -> bool:
-	return _framing_coordinator().set_actors(framings, duration, transition, report_errors)
-
-
-func _framing_coordinator() -> RefCounted:
-	if _actor_framing_coordinator == null:
-		_actor_framing_coordinator = ACTOR_FRAMING_COORDINATOR.new(self)
-	return _actor_framing_coordinator
-
-
 ## 高亮指定演员并弱化舞台上的其他演员。
 func highlight_actor(actor_id: String) -> void:
 	_highlighted_actor_id = actor_id if actor_states.has(actor_id) else ""
@@ -769,7 +883,6 @@ func remove_actor(
 		actor_removed.emit(false)
 		return
 	actor._cancel_character_status_transition()
-	actor.cancel_actor_framing("actor_removed")
 	actor.tree_exited.connect(
 		func() -> void:
 			_operation_tracker().complete(request_id, true)
@@ -791,7 +904,6 @@ func remove_all_actors(immediate: bool = false) -> void:
 		if actor == null:
 			continue
 		actor._cancel_character_status_transition()
-		actor.cancel_actor_framing("actor_removed")
 		if immediate:
 			actor.free()
 		else:
@@ -825,15 +937,7 @@ func move_actor(
 		_operation_tracker().complete(request_id, false, _last_failure)
 		actor_moved.emit(false)
 		return
-	var movement_started := actor.set_stage_position(
-		actor.horizontal_division, target_h_division, duration
-	)
-	if actor_states.has(actor_id):
-		# The logical target is committed with the accepted request, matching the
-		# save/restore semantics used by background and actor-framing transitions.
-		actor_states[actor_id]["horizontal_division"] = actor.horizontal_division
-		actor_states[actor_id]["horizontal_position"] = actor.horizontal_position
-	if not movement_started:
+	if not actor.set_stage_position(actor.horizontal_division, target_h_division, duration):
 		# 目标值在补间开始时就会更新。重复请求同一目标时必须继续等待正在运行的
 		# 补间，不能提前释放 KonadoScript 的移动指令。
 		if not actor._is_stage_position_moving():
@@ -892,4 +996,3 @@ func cancel_pending_operations() -> void:
 		var actor := get_actor(String(actor_id)) as KonadoActor
 		if actor != null:
 			actor._cancel_character_status_transition()
-			actor.settle_actor_framing_to_target("runtime_cancelled")

@@ -335,7 +335,7 @@ func _parse_background() -> KonadoScriptSyntaxTree.BackgroundNode:
 	return node
 
 
-## 演员解析：  actor show/exit/change/move/motion/framing ...
+## 演员解析：  actor show/exit/change/move/motion ...
 func _parse_actor() -> KonadoScriptSyntaxTree.ActorNode:
 	var node := KonadoScriptSyntaxTree.ActorNode.new()
 	node.line = _peek().line
@@ -361,8 +361,6 @@ func _parse_actor() -> KonadoScriptSyntaxTree.ActorNode:
 				is_valid = _parse_actor_move(node)
 			KonadoScriptToken.Type.KW_MOTION:
 				is_valid = _parse_actor_motion(node)
-			KonadoScriptToken.Type.KW_FRAMING:
-				is_valid = _parse_actor_framing(node)
 			_:
 				_error("未知的 actor 操作: %s" % str(action_tok.value))
 				is_valid = false
@@ -455,22 +453,6 @@ func _parse_actor_motion(node: KonadoScriptSyntaxTree.ActorNode) -> bool:
 		return false
 	node.actor_name = str(name_tok.value)
 	node.motion_name = str(motion_tok.value)
-	return true
-
-
-func _parse_actor_framing(node: KonadoScriptSyntaxTree.ActorNode) -> bool:
-	node.action = "framing"
-	_advance()
-	var name_tok := _expect_any_value()
-	if name_tok == null:
-		_error("actor framing 缺少角色名")
-		return false
-	var framing_tok := _expect_any_value()
-	if framing_tok == null:
-		_error("actor framing 缺少景别名")
-		return false
-	node.actor_name = str(name_tok.value)
-	node.framing_name = str(framing_tok.value)
 	return true
 
 

@@ -190,34 +190,12 @@ static func _references_from_spans(
 						"states",
 						String(tokens[2]["text"]),
 					)
-					if action == "show":
-						for index: int in tokens.size() - 2:
-							if (
-								String(tokens[index]["text"]) == "framing"
-								and String(tokens[index + 1]["text"]) == "="
-							):
-								_append_argument_reference(
-									references,
-									tokens,
-									index + 2,
-									"framings",
-									String(tokens[2]["text"]),
-								)
-								break
 				elif action == "motion":
 					_append_argument_reference(
 						references,
 						tokens,
 						3,
 						"motions",
-						String(tokens[2]["text"]),
-					)
-				elif action == "framing":
-					_append_argument_reference(
-						references,
-						tokens,
-						3,
-						"framings",
 						String(tokens[2]["text"]),
 					)
 		"play":

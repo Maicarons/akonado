@@ -515,8 +515,6 @@ public sealed partial class DialogueManagerApi : Node
 	{
 		public static readonly StringName InitDialogue = "init_dialogue";
 		public static readonly StringName SetShot = "set_shot";
-		public static readonly StringName SetActorFraming = "set_actor_framing";
-		public static readonly StringName SetActorFramings = "set_actor_framings";
 		public static readonly StringName StartDialogue = "start_dialogue";
 		public static readonly StringName StopDialogue = "stop_dialogue";
 		public static readonly StringName StartAutoplay = "start_autoplay";
@@ -545,7 +543,6 @@ public sealed partial class DialogueManagerApi : Node
 		public static readonly StringName VoiceList = "voice_list";
 		public static readonly StringName SoundEffectList = "sound_effect_list";
 		public static readonly StringName VariableStore = "variable_store";
-		public static readonly StringName StageController = "stage_controller";
 		public static readonly StringName PendingRuntimeFailure = "pending_runtime_failure";
 	}
 
@@ -572,62 +569,6 @@ public sealed partial class DialogueManagerApi : Node
 	{
 		System.ArgumentNullException.ThrowIfNull(shot);
 		SetShot(shot.SourceResource);
-	}
-
-	/// <summary>Adjusts one actor's local framing without moving the stage camera.</summary>
-	public bool SetActorFraming(
-		string actorId,
-		string presetId,
-		double duration = -1.0,
-		string transition = "")
-	{
-		System.ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
-		System.ArgumentException.ThrowIfNullOrWhiteSpace(presetId);
-		var stage = GetReadySource()?.Get(GDScriptPropertyName.StageController).AsGodotObject();
-		return stage != null
-			&& stage.Call(
-				GDScriptMethodName.SetActorFraming,
-				actorId,
-				presetId,
-				duration,
-				transition).AsBool();
-	}
-
-	/// <summary>
-	/// Validates all actor/preset pairs before starting their transitions in the same frame.
-	/// </summary>
-	public bool SetActorFramings(
-		System.Collections.Generic.IReadOnlyDictionary<string, string> framings,
-		double duration = -1.0,
-		string transition = "")
-	{
-		System.ArgumentNullException.ThrowIfNull(framings);
-		var values = new Godot.Collections.Dictionary();
-		foreach (var (actorId, presetId) in framings)
-		{
-			System.ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
-			System.ArgumentException.ThrowIfNullOrWhiteSpace(presetId);
-			values[actorId] = presetId;
-		}
-		return SetActorFramings(values, duration, transition);
-	}
-
-	/// <summary>
-	/// Godot collection overload for callers that already own a Variant dictionary.
-	/// </summary>
-	public bool SetActorFramings(
-		Godot.Collections.Dictionary framings,
-		double duration = -1.0,
-		string transition = "")
-	{
-		System.ArgumentNullException.ThrowIfNull(framings);
-		var stage = GetReadySource()?.Get(GDScriptPropertyName.StageController).AsGodotObject();
-		return stage != null
-			&& stage.Call(
-				GDScriptMethodName.SetActorFramings,
-				framings,
-				duration,
-				transition).AsBool();
 	}
 
 	/// <summary>

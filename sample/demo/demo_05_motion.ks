@@ -1,16 +1,12 @@
 # 改变角色的表情
-actor show Kona 正常 at 3 [framing=medium]
-Kona "景别只调整当前演员，不会移动背景或其他演员"
-actor framing Kona close [duration=0.4] [transition=ease_in_out]
-Kona "不同演员可以独立使用不同景别"
-actor framing Kona default [duration=0.4]
+actor show Kona 正常 at 3
 # 改变角色的状态
 actor change Kona 介绍说话
 
 Kona "konado内置了一些动作"
 
 # addons/konado/templates/default/character/konado_actor_motion_layer.tscn
-# 可以自行扩展动作；动画应作用于 MotionTransform，避免覆盖持久景别
+# 可以自行扩展动作，作用于CharacterMount上即可
 Kona "内置动作shake"
 actor motion Kona shake
 Kona "内置动作jump"

@@ -36,7 +36,7 @@ const ROOT_KEYWORDS: PackedStringArray = [
 ]
 
 const CONTEXT_COMPLETIONS: Dictionary = {
-	"actor": ["show", "exit", "change", "move", "motion", "framing"],
+	"actor": ["show", "exit", "change", "move", "motion"],
 	"play": ["bgm", "sfx"],
 	"stop": ["bgm"],
 	"cam": ["move", "reset", "shake"],
@@ -46,9 +46,6 @@ const CONTEXT_COMPLETIONS: Dictionary = {
 
 const STRUCTURAL_KEYWORDS: PackedStringArray = ["at"]
 const CAMERA_TRANSITIONS: PackedStringArray = ["none", "linear", "ease_in_out"]
-const ACTOR_FRAMING_TRANSITIONS: PackedStringArray = [
-	"linear", "ease_in", "ease_out", "ease_in_out"
-]
 const POSITION_VALUES: PackedStringArray = ["1", "2", "3", "4", "5"]
 const LIKELY_POSITION_VALUES: PackedStringArray = ["3", "2", "1"]
 
@@ -58,17 +55,12 @@ const SIGNATURES: Dictionary = {
 	"hidetextbox": "hidetextbox [duration]",
 	"waitsignal": "waitsignal <signal_name>",
 	"background": "background <background_name> [transition]",
-	"actor": "actor <show|exit|change|move|motion|framing> ...",
-	"actor show": "actor show <actor_name> <state_name> at <position> [framing=<preset>]",
+	"actor": "actor <show|exit|change|move|motion> ...",
+	"actor show": "actor show <actor_name> <state_name> at <position>",
 	"actor exit": "actor exit <actor_name>",
 	"actor change": "actor change <actor_name> <state_name>",
 	"actor move": "actor move <actor_name> <position>",
 	"actor motion": "actor motion <actor_name> <motion_name>",
-	"actor framing":
-	(
-		"actor framing <actor_name> <preset_name> [duration=0.3] "
-		+ "[transition=ease_in_out] [wait=true]"
-	),
 	"play": "play <bgm|sfx> <resource_name>",
 	"play bgm": "play bgm <background_music_name>",
 	"play sfx": "play sfx <sound_effect_name>",
@@ -286,14 +278,6 @@ const SNIPPETS: Array[Dictionary] = [
 		"snippet": "actor motion actor_name motion_name",
 		"description": "Play an actor stage-layer motion",
 		"description_zh": "播放演员舞台层动作",
-	},
-	{
-		"group": "actor",
-		"label": "Set actor framing",
-		"label_zh": "调整演员景别",
-		"snippet": "actor framing actor_name medium",
-		"description": "Adjust one actor's local composition without moving the stage camera",
-		"description_zh": "调整单个演员的局部构图，不移动舞台摄像机",
 	},
 	{
 		"group": "audio",

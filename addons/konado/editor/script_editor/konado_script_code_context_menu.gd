@@ -11,7 +11,6 @@ const RESOURCE_KINDS := [
 	"voices",
 	"states",
 	"motions",
-	"framings",
 	"cameras",
 	"scripts",
 ]
@@ -188,7 +187,7 @@ func _go_to_definition(_context: Variant) -> void:
 			_focus_code_line(_active_code_edit, line, _active_symbol)
 		return
 	var targets: Array[Dictionary]
-	if _active_kind in ["states", "motions", "framings"]:
+	if _active_kind in ["states", "motions"]:
 		targets = (
 			_project_index
 			. get_actor_scoped_targets(

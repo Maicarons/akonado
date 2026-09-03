@@ -119,11 +119,6 @@ INTERNAL_GDSCRIPT_TYPES = {
     Path("addons/konado/runtime/dialogue/konado_choice_controller.gd"),
     Path("addons/konado/runtime/integrations/konado_settings_adapter.gd"),
     Path("addons/konado/runtime/stage/background/konado_background_transition_layer.gd"),
-    Path("addons/konado/runtime/stage/character/konado_actor_framing_coordinator.gd"),
-    Path("addons/konado/runtime/stage/character/konado_actor_framing_layer.gd"),
-    Path("addons/konado/runtime/stage/character/konado_actor_presenter.gd"),
-    Path("addons/konado/runtime/stage/character/konado_actor_upsert_transaction.gd"),
-    Path("addons/konado/runtime/stage/konado_stage_tree_builder.gd"),
     Path("addons/konado/runtime/ui/dialogue_box/konado_voice_progress_display.gd"),
     Path("addons/konado/runtime/ui/save/konado_save_panel.gd"),
 }

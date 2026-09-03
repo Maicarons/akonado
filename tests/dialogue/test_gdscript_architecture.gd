@@ -1,8 +1,104 @@
 extends SceneTree
 
 const SAVE_SYSTEM_SCRIPT := preload("res://addons/konado/runtime/save/konado_save_system.gd")
-const STAGE_TEST_DOUBLES := preload("res://tests/dialogue/fixtures/stage_test_doubles.gd")
 var _failures := 0
+
+
+class FakeActor:
+	extends KonadoActor
+
+	var requested_statuses: Array[String] = []
+	var last_transition_duration := -1.0
+	var next_result := true
+	var before_status_applied := Callable()
+	var delay_next_move := false
+	var delay_next_status := false
+	var validation_result := true
+	var validation_count := 0
+	var validation_results: Array[bool] = []
+	var before_status_validation := Callable()
+	var fake_move_in_progress := false
+
+	func _submit_character_status_request(
+		status_name: String, transition_duration: float = 0.0, completion: Callable = Callable()
+	) -> bool:
+		requested_statuses.append(status_name)
+		last_transition_duration = transition_duration
+		var hook := before_status_applied
+		before_status_applied = Callable()
+		if hook.is_valid():
+			hook.call()
+		if delay_next_status:
+			delay_next_status = false
+			_finish_fake_status.call_deferred(status_name, completion, next_result)
+			return true
+		_finish_fake_status(status_name, completion, next_result)
+		return true
+
+	func _finish_fake_status(status_name: String, completion: Callable, succeeded: bool) -> void:
+		if succeeded:
+			actor_status_applied.emit(status_name)
+		if completion.is_valid():
+			completion.call(succeeded)
+
+	func set_stage_position(
+		_target_h_division: int, _target_position: int, _duration: float = 0.0
+	) -> bool:
+		if fake_move_in_progress:
+			return false
+		if not delay_next_move:
+			return true
+		delay_next_move = false
+		fake_move_in_progress = true
+		_emit_fake_move.call_deferred()
+		return true
+
+	func _emit_fake_move() -> void:
+		fake_move_in_progress = false
+		actor_moved.emit()
+
+	func _is_stage_position_moving() -> bool:
+		return fake_move_in_progress
+
+	func _can_apply_character_status(_status_name: String) -> bool:
+		validation_count += 1
+		var hook := before_status_validation
+		before_status_validation = Callable()
+		if hook.is_valid():
+			hook.call()
+		if not validation_results.is_empty():
+			return validation_results.pop_front()
+		return validation_result
+
+
+class DeferredActor:
+	extends KonadoActor
+
+	var saved_completion := Callable()
+
+	func _submit_character_status_request(
+		_status_name: String, _transition_duration: float = 0.0, completion: Callable = Callable()
+	) -> bool:
+		saved_completion = completion
+		return true
+
+	func _can_apply_character_status(_status_name: String) -> bool:
+		return true
+
+
+class FakeStageController:
+	extends KonadoStageController
+
+	func _init() -> void:
+		_actor_layer = Control.new()
+		add_child(_actor_layer)
+		_konado_actor_template = (
+			load("res://addons/konado/templates/default/character/character_template.tscn")
+			as PackedScene
+		)
+
+	func apply_background_tint_to_actors() -> void:
+		pass
 
 
 func _init() -> void:
@@ -105,7 +201,7 @@ func _test_actor_commands() -> void:
 
 
 func _test_actor_status_validation_reentry() -> void:
-	var actor := STAGE_TEST_DOUBLES.FakeActor.new()
+	var actor := FakeActor.new()
 	actor._status_node = KonadoCharacterSceneBase.new()
 	actor.add_child(actor._status_node)
 	var results: Array[String] = []
@@ -149,7 +245,7 @@ func _test_actor_status_validation_reentry() -> void:
 
 func _test_acting_interface_state_change() -> void:
 	var acting_interface := KonadoStageController.new()
-	var actor := STAGE_TEST_DOUBLES.FakeActor.new()
+	var actor := FakeActor.new()
 	actor._status_node = KonadoCharacterSceneBase.new()
 	actor.add_child(actor._status_node)
 	acting_interface.actor_instances["Kona"] = actor
@@ -215,47 +311,29 @@ func _test_acting_interface_state_change() -> void:
 
 
 func _test_existing_actor_state_transaction() -> void:
-	var acting_interface := STAGE_TEST_DOUBLES.FakeStageController.new()
-	var actor := STAGE_TEST_DOUBLES.FakeActor.new()
+	var acting_interface := FakeStageController.new()
+	var actor := FakeActor.new()
 	actor._status_node = KonadoCharacterSceneBase.new()
 	actor.add_child(actor._status_node)
 	acting_interface.actor_instances["Kona"] = actor
 	acting_interface.actor_states["Kona"] = {
-		"id": "Kona",
-		"horizontal_division": 5,
-		"horizontal_position": 3,
-		"state": "idle",
-		"framing": "default",
+		"id": "Kona", "horizontal_division": 5, "horizontal_position": 3, "state": "idle"
 	}
 
 	actor.next_result = false
 	acting_interface._update_existing_actor(actor, "Kona", 4, 2, "missing")
 	_expect_equal(
 		acting_interface.actor_states["Kona"],
-		{
-			"id": "Kona",
-			"horizontal_division": 5,
-			"horizontal_position": 3,
-			"state": "idle",
-			"framing": "default",
-		},
-		"failed reused actors roll back state, position, and framing as one transaction"
+		{"id": "Kona", "horizontal_division": 4, "horizontal_position": 2, "state": "idle"},
+		"failed reused states preserve the committed status while keeping valid position updates"
 	)
-	_expect_equal(actor.horizontal_division, 5, "failed reused actors restore the live division")
-	_expect_equal(actor.horizontal_position, 3, "failed reused actors restore the live position")
-	_expect_equal(actor.fake_framing, &"default", "failed reused actors restore live framing")
 
 	actor.next_result = true
-	acting_interface._update_existing_actor(actor, "Kona", 4, 2, "happy", -1.0, true, 0, &"close")
+	acting_interface._update_existing_actor(actor, "Kona", 4, 2, "happy")
 	_expect_equal(
 		acting_interface.actor_states["Kona"]["state"],
 		"happy",
 		"successful reused states commit their target status"
-	)
-	_expect_equal(
-		acting_interface.actor_states["Kona"]["framing"],
-		"close",
-		"successful reused actors commit framing with their state",
 	)
 
 	actor.before_status_applied = func() -> void:
@@ -281,11 +359,11 @@ func _test_existing_actor_state_transaction() -> void:
 	acting_interface._update_existing_actor(actor, "Kona", 5, 3, "newer")
 	_expect_equal(
 		shown_count[0],
-		2,
-		"a failed moving upsert rolls back promptly and a valid replacement completes once",
+		0,
+		"repeated upserts wait for an already accepted movement instead of completing early"
 	)
 	await process_frame
-	_expect_equal(shown_count[0], 2, "cancelled movement callbacks cannot complete an upsert twice")
+	_expect_equal(shown_count[0], 2, "one movement completion releases both waiting upserts")
 	_expect_equal(
 		acting_interface.actor_states["Kona"]["state"],
 		"newer",
@@ -321,57 +399,14 @@ func _test_existing_actor_state_transaction() -> void:
 		"asynchronous state changes release their lifecycle coordinator after completion"
 	)
 
-	actor.next_result = false
-	actor.delay_next_status = true
-	acting_interface._update_existing_actor(
-		actor, "Kona", 4, 2, "rejected", -1.0, false, 0, &"default"
-	)
-	# These requests intentionally repeat the transaction's target values. Value
-	# comparison alone cannot distinguish them from the older transaction.
-	acting_interface.move_actor("Kona", 2, 0.0, false)
-	acting_interface.set_actor_framing("Kona", &"default", 0.0, "linear", false)
-	await process_frame
-	_expect_equal(
-		actor.horizontal_position,
-		2,
-		"a rejected upsert cannot roll back a newer same-target movement request",
-	)
-	_expect_equal(
-		actor.fake_framing,
-		&"default",
-		"a rejected upsert cannot roll back a newer same-target framing request",
-	)
-	_expect_equal(
-		acting_interface.actor_states["Kona"]["horizontal_position"],
-		2,
-		"same-target ownership keeps the newer persisted movement endpoint",
-	)
-	_expect_equal(
-		acting_interface.actor_states["Kona"]["framing"],
-		"default",
-		"same-target ownership keeps the newer persisted framing endpoint",
-	)
-	_expect_equal(
-		acting_interface.actor_states["Kona"]["state"],
-		"async",
-		"same-target ownership protection still rolls back only the rejected state",
-	)
-
 	actor.free()
 	acting_interface.free()
 
 
 func _test_repeated_move_command() -> void:
-	var acting_interface := STAGE_TEST_DOUBLES.FakeStageController.new()
-	var actor := STAGE_TEST_DOUBLES.FakeActor.new()
+	var acting_interface := FakeStageController.new()
+	var actor := FakeActor.new()
 	acting_interface.actor_instances["Kona"] = actor
-	acting_interface.actor_states["Kona"] = {
-		"id": "Kona",
-		"horizontal_division": 5,
-		"horizontal_position": 3,
-		"state": "idle",
-		"framing": "default",
-	}
 	actor.actor_moved.connect(acting_interface._on_actor_moved)
 	actor.delay_next_move = true
 	var moved_count := [0]
@@ -384,11 +419,6 @@ func _test_repeated_move_command() -> void:
 		0,
 		"repeating a move to its in-progress target does not emit premature completion"
 	)
-	_expect_equal(
-		acting_interface.actor_states["Kona"]["horizontal_position"],
-		2,
-		"accepted actor moves persist their logical endpoint for save and restore",
-	)
 	await process_frame
 	_expect_equal(moved_count[0], 1, "the active move emits one completion when it actually ends")
 
@@ -397,11 +427,11 @@ func _test_repeated_move_command() -> void:
 
 
 func _test_actor_state_request_lifecycle() -> void:
-	var acting_interface := STAGE_TEST_DOUBLES.FakeStageController.new()
+	var acting_interface := FakeStageController.new()
 	get_root().add_child(acting_interface)
 	await process_frame
 
-	var changed_actor := STAGE_TEST_DOUBLES.DeferredActor.new()
+	var changed_actor := DeferredActor.new()
 	changed_actor._status_node = KonadoCharacterSceneBase.new()
 	changed_actor.add_child(changed_actor._status_node)
 	acting_interface._actor_layer.add_child(changed_actor)
@@ -437,7 +467,7 @@ func _test_actor_state_request_lifecycle() -> void:
 		"late custom state completions cannot restore deleted actor data"
 	)
 
-	var reused_actor := STAGE_TEST_DOUBLES.DeferredActor.new()
+	var reused_actor := DeferredActor.new()
 	reused_actor._status_node = KonadoCharacterSceneBase.new()
 	reused_actor.add_child(reused_actor._status_node)
 	acting_interface._actor_layer.add_child(reused_actor)
@@ -466,7 +496,7 @@ func _test_actor_state_request_lifecycle() -> void:
 
 
 func _test_new_actor_state_transaction() -> void:
-	var acting_interface := STAGE_TEST_DOUBLES.FakeStageController.new()
+	var acting_interface := FakeStageController.new()
 	var character_scene := load("res://sample/demo/sample_character.tscn") as PackedScene
 	var shown_count := [0]
 	acting_interface.actor_shown.connect(func(_succeeded: bool) -> void: shown_count[0] += 1)
@@ -486,9 +516,7 @@ func _test_new_actor_state_transaction() -> void:
 	)
 	_expect_equal(shown_count[0], 1, "failed initial states still release dialogue flow once")
 
-	acting_interface.show_actor(
-		"InvalidLayer", 5, 3, "介绍正常", character_scene, {"motion_layer_scene": character_scene}
-	)
+	acting_interface.show_actor("InvalidLayer", 5, 3, "介绍正常", character_scene, character_scene)
 	_expect(
 		not acting_interface.actor_states.has("InvalidLayer"),
 		"invalid motion layers never enter the persisted actor dictionary"
@@ -498,81 +526,6 @@ func _test_new_actor_state_transaction() -> void:
 		"invalid motion layers never enter the live actor cache"
 	)
 	_expect_equal(shown_count[0], 2, "invalid motion layers still release dialogue flow once")
-
-	(
-		acting_interface
-		. show_actor(
-			"InvalidOptions",
-			5,
-			3,
-			"介绍正常",
-			character_scene,
-			{"framing_profile": "not-a-resource", "report_errors": false},
-		)
-	)
-	_expect(
-		not acting_interface.actor_states.has("InvalidOptions"),
-		"invalid show options are rejected before actor creation",
-	)
-	_expect_equal(shown_count[0], 3, "invalid show options complete exactly once")
-	_expect_equal(
-		acting_interface.get_last_failure().get("code"),
-		"stage.actor_show_options_invalid",
-		"invalid show options expose a stable failure code",
-	)
-	var option_failure_results: Array[Dictionary] = []
-	acting_interface.operation_finished.connect(
-		func(request_id: int, succeeded: bool, failure: Dictionary) -> void:
-			option_failure_results.append(
-				{"request_id": request_id, "succeeded": succeeded, "failure": failure}
-			)
-	)
-	var invalid_options_request := acting_interface.begin_operation_request()
-	(
-		acting_interface
-		. show_actor(
-			"InvalidOrderedOptions",
-			5,
-			3,
-			"介绍正常",
-			character_scene,
-			{
-				"unknown": true,
-				&"report_errors": false,
-				&"request_id": invalid_options_request,
-			},
-		)
-	)
-	_expect(
-		(
-			option_failure_results.size() == 1
-			and option_failure_results[0].request_id == invalid_options_request
-			and not bool(option_failure_results[0].succeeded)
-			and option_failure_results[0].failure.get("code") == "stage.actor_show_options_invalid"
-		),
-		"invalid options preserve later request-correlation controls regardless of key order",
-	)
-
-	(
-		acting_interface
-		. show_actor(
-			"StringNameOptions",
-			5,
-			3,
-			"介绍正常",
-			character_scene,
-			{&"duration": 0.0, &"framing": &"medium", &"report_errors": false},
-		)
-	)
-	_expect(
-		acting_interface.actor_states.has("StringNameOptions"),
-		"StringName show options are normalized instead of being silently ignored",
-	)
-	_expect_equal(
-		acting_interface.actor_states["StringNameOptions"].get("framing"),
-		"medium",
-		"normalized StringName options preserve their values",
-	)
 
 	acting_interface.show_actor("Kona", 5, 3, "介绍正常", character_scene)
 	_expect(

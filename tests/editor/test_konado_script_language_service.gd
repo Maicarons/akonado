@@ -4,15 +4,6 @@ const CARET_MARKER := "\uFFFF"
 const SCRIPT_LINK_OVERLAY := preload(
 	"res://addons/konado/editor/script_editor/konado_script_link_overlay.gd"
 )
-const CHARACTER_SCRIPT_PATH := (
-	"res://addons/konado/runtime/stage/character/" + "konado_character.gd"
-)
-const FRAMING_PROFILE_SCRIPT_PATH := (
-	"res://addons/konado/runtime/stage/character/" + "konado_actor_framing_profile.gd"
-)
-const FRAMING_PRESET_SCRIPT_PATH := (
-	"res://addons/konado/runtime/stage/character/" + "konado_actor_framing_preset.gd"
-)
 
 var _failures := 0
 var _selected_filesystem_path := ""
@@ -103,48 +94,6 @@ func _test_parser_strictness() -> void:
 	_expect(
 		compiler.compile_string("showtextbox\nhidetextbox\nend", "strictness.ks") != null,
 		"optional text-box durations match the language signature",
-	)
-	_expect(
-		(
-			(
-				compiler
-				. compile_string(
-					(
-						"actor show Kona normal at 3 [framing=medium]\n"
-						+ "actor framing Kona close [duration=0.4] "
-						+ "[transition=ease_in_out] [wait=false]\nend"
-					),
-					"strictness.ks",
-				)
-			)
-			!= null
-		),
-		"actor framing accepts typed initial, transition, and wait parameters",
-	)
-	_expect(
-		(
-			compiler.compile_string(
-				"actor show Kona normal at 3 [framing=close-up]", "strictness.ks"
-			)
-			!= null
-		),
-		"named parameter values follow the same hyphenated identifier grammar as the lexer",
-	)
-	_expect(
-		(
-			compiler.compile_string(
-				"actor framing Kona close [transition=elastic]", "strictness.ks"
-			)
-			== null
-		),
-		"actor framing rejects unsupported transitions at compile time",
-	)
-	_expect(
-		(
-			compiler.compile_string('actor framing Kona close ["duration"=0.2]', "strictness.ks")
-			== null
-		),
-		"quoted strings cannot masquerade as named parameter names",
 	)
 	_expect(
 		(
@@ -360,30 +309,6 @@ func _test_project_index() -> void:
 		project_index.get_actor_scoped_values("Kona", "states").has("正常"),
 		"state completion is scoped to the selected actor scene",
 	)
-	_expect(
-		project_index.get_actor_scoped_values("Kona", "framings").has("medium"),
-		"actors without a custom framing profile expose the built-in presets",
-	)
-	var isolated_index := KonadoScriptProjectIndex.new()
-	isolated_index._dirty = false
-	isolated_index._definitions = {
-		"actors":
-		{
-			"Custom":
-			[
-				{
-					"name": "Custom",
-					"framing_profile_key": "res://custom_framing_profile.tres",
-				}
-			]
-		},
-		"framings": {},
-	}
-	_expect(
-		isolated_index.get_actor_scoped_values("Custom", "framings").is_empty(),
-		"an empty custom framing profile is not silently replaced by built-in presets",
-	)
-	_test_framing_resource_graph()
 	var default_camera := project_index.get_definition("cameras", "cam1")
 	_expect(
 		(
@@ -391,126 +316,6 @@ func _test_project_index() -> void:
 			== "res://sample/demo/backgrounds/background_parallax.tscn"
 		),
 		"camera IDs include exported defaults omitted from serialized scenes",
-	)
-
-
-func _test_framing_resource_graph() -> void:
-	var index := KonadoScriptProjectIndex.new()
-	var actor_path := "res://test/actors.tres"
-	var actor_source := (
-		"\n"
-		. join(
-			[
-				'[gd_resource type="Resource" load_steps=8 format=3]',
-				_ext_resource_line("Script", CHARACTER_SCRIPT_PATH, "1_actor"),
-				_ext_resource_line("Script", FRAMING_PROFILE_SCRIPT_PATH, "2_profile"),
-				_ext_resource_line("Script", FRAMING_PRESET_SCRIPT_PATH, "3_preset"),
-				'[ext_resource type="Resource" path="res://test/shared_preset.tres" id="4_shared"]',
-				'[ext_resource type="Resource" path="res://test/external_profile.tres" id="5_external"]',
-				'[sub_resource type="Resource" id="PresetA"]',
-				'script = ExtResource("3_preset")',
-				'preset_id = &"close_a"',
-				'[sub_resource type="Resource" id="PresetDefault"]',
-				'script = ExtResource("3_preset")',
-				'[sub_resource type="Resource" id="ProfileA"]',
-				'script = ExtResource("2_profile")',
-				(
-					'presets = Array[Resource]([SubResource("PresetA"), '
-					+ 'SubResource("PresetDefault"), ExtResource("4_shared")])'
-				),
-				'[sub_resource type="Resource" id="PresetB"]',
-				'script = ExtResource("3_preset")',
-				'preset_id = "close_b"',
-				'[sub_resource type="Resource" id="ProfileB"]',
-				'script = ExtResource("2_profile")',
-				"presets = Array[Resource]([",
-				'    SubResource("PresetB"),',
-				"])",
-				'[sub_resource type="Resource" id="ActorA"]',
-				'script = ExtResource("1_actor")',
-				'character_id = "ActorA"',
-				'actor_framing_profile = SubResource("ProfileA")',
-				'[sub_resource type="Resource" id="ActorB"]',
-				'script = ExtResource("1_actor")',
-				'character_id = "ActorB"',
-				'actor_framing_profile = SubResource("ProfileB")',
-				'[sub_resource type="Resource" id="ActorExternal"]',
-				'script = ExtResource("1_actor")',
-				'character_id = "ActorExternal"',
-				'actor_framing_profile = ExtResource("5_external")',
-				"[resource]",
-			]
-		)
-	)
-	var external_profile_path := "res://test/external_profile.tres"
-	var external_profile_source := (
-		"\n"
-		. join(
-			[
-				'[gd_resource type="Resource" load_steps=3 format=3]',
-				_ext_resource_line("Script", FRAMING_PROFILE_SCRIPT_PATH, "1_profile"),
-				'[ext_resource type="Resource" path="res://test/shared_preset.tres" id="2_shared"]',
-				"[resource]",
-				'script = ExtResource("1_profile")',
-				'presets = Array[Resource]([ExtResource("2_shared")])',
-			]
-		)
-	)
-	var shared_preset_path := "res://test/shared_preset.tres"
-	var shared_preset_source := (
-		"\n"
-		. join(
-			[
-				'[gd_resource type="Resource" load_steps=2 format=3]',
-				_ext_resource_line("Script", FRAMING_PRESET_SCRIPT_PATH, "1_preset"),
-				"[resource]",
-				'script = ExtResource("1_preset")',
-				'preset_id = "shared"',
-			]
-		)
-	)
-	index._file_cache = {
-		actor_path:
-		{
-			"definitions": index._parse_text_resource(actor_path, actor_source, "tres"),
-		},
-		external_profile_path:
-		{
-			"definitions":
-			index._parse_text_resource(external_profile_path, external_profile_source, "tres"),
-		},
-		shared_preset_path:
-		{
-			"definitions":
-			index._parse_text_resource(shared_preset_path, shared_preset_source, "tres"),
-		},
-	}
-	index._rebuild_indexes()
-	index._dirty = false
-	index._inventory_dirty = false
-	_expect_equal(
-		Array(index.get_actor_scoped_values("ActorA", "framings")),
-		["close_a", "default", "shared"],
-		(
-			"inline framing profiles expose serialized StringName values, script defaults, "
-			+ "and shared dependencies"
-		),
-	)
-	_expect_equal(
-		Array(index.get_actor_scoped_values("ActorB", "framings")),
-		["close_b"],
-		"separate inline profiles in one file do not leak presets into each other",
-	)
-	_expect_equal(
-		Array(index.get_actor_scoped_values("ActorExternal", "framings")),
-		["shared"],
-		"external framing profiles follow their preset dependency graph",
-	)
-	index._framing_dependencies[shared_preset_path] = PackedStringArray([external_profile_path])
-	_expect_equal(
-		index._expand_framing_resource_keys({external_profile_path: true}).size(),
-		2,
-		"cyclic framing resource references terminate without duplicating resources",
 	)
 
 
@@ -856,14 +661,6 @@ func _expect(condition: bool, message: String) -> void:
 		return
 	_failures += 1
 	push_error("FAIL: %s" % message)
-
-
-func _expect_equal(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (actual=%s expected=%s)" % [message, actual, expected])
-
-
-func _ext_resource_line(type_name: String, path: String, id: String) -> String:
-	return '[ext_resource type="%s" path="%s" id="%s"]' % [type_name, path, id]
 
 
 func _record_filesystem_selection(path: String) -> void:

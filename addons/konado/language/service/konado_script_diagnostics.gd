@@ -101,23 +101,13 @@ func _append_project_diagnostics(
 				"voices",
 				"states",
 				"motions",
-				"framings",
 				"cameras",
 			]
 		):
 			continue
 		var name := String(reference.get("name", ""))
-		if (
-			kind == "framings"
-			and (
-				_project_index
-				. get_actor_scoped_values(String(reference.get("scope_name", "")), "framings")
-				. has(name)
-			)
-		):
-			continue
 		var definitions: Array[Dictionary]
-		if kind in ["states", "motions", "framings"]:
+		if kind in ["states", "motions"]:
 			definitions = (
 				_project_index
 				. get_actor_scoped_targets(
@@ -208,7 +198,6 @@ func _kind_label(kind: String) -> String:
 			"voices": "语音",
 			"states": "角色状态",
 			"motions": "演员动作",
-			"framings": "演员景别",
 			"cameras": "镜头配置",
 		}
 		. get(kind, kind)

@@ -44,35 +44,5 @@ static func _validate_value(
 			if definition.has("min_exclusive") and number <= float(definition["min_exclusive"]):
 				errors.append("参数 '%s' 必须大于 %s" % [name, definition["min_exclusive"]])
 		"identifier":
-			if typeof(value) != TYPE_STRING or not _is_konado_identifier(String(value)):
+			if typeof(value) != TYPE_STRING or not String(value).is_valid_identifier():
 				errors.append("参数 '%s' 必须是有效标识符" % name)
-		"boolean":
-			if typeof(value) != TYPE_BOOL:
-				errors.append("参数 '%s' 必须是 true 或 false" % name)
-		"enum":
-			if typeof(value) != TYPE_STRING or value not in definition.get("values", []):
-				errors.append(
-					(
-						"参数 '%s' 必须是以下值之一：%s"
-						% [name, ", ".join(PackedStringArray(definition.get("values", [])))]
-					)
-				)
-
-
-static func _is_konado_identifier(value: String) -> bool:
-	if value.is_empty() or not _is_identifier_start(value[0]):
-		return false
-	for index in range(1, value.length()):
-		if not _is_identifier_character(value[index]):
-			return false
-	return true
-
-
-static func _is_identifier_start(character: String) -> bool:
-	var code := character.unicode_at(0)
-	return (code >= 65 and code <= 90) or (code >= 97 and code <= 122) or code == 95 or code >= 0x80
-
-
-static func _is_identifier_character(character: String) -> bool:
-	var code := character.unicode_at(0)
-	return _is_identifier_start(character) or (code >= 48 and code <= 57) or code == 45

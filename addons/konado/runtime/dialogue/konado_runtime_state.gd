@@ -32,7 +32,6 @@ const ACTOR_STATE_OPCODES := [
 	KonadoOpcode.Type.ACTOR_CHANGE,
 	KonadoOpcode.Type.ACTOR_MOVE,
 	KonadoOpcode.Type.ACTOR_MOTION,
-	KonadoOpcode.Type.ACTOR_FRAMING,
 	KonadoOpcode.Type.ACTOR_EXIT,
 ]
 
@@ -276,12 +275,8 @@ static func _restore_stage(state: Dictionary, manager: KonadoDialogueManager) ->
 				int(actor_state.get("position", 0)),
 				String(actor_state.get("state", "")),
 				character.character_scene,
-				{
-					"motion_layer_scene": character.actor_motion_layer,
-					"duration": 0.0,
-					"framing_profile": character.actor_framing_profile,
-					"framing": StringName(actor_state.get("framing", "default")),
-				},
+				character.actor_motion_layer,
+				0.0,
 			)
 		)
 	var highlighted := String(state.get("highlighted_actor", ""))
@@ -309,16 +304,6 @@ static func _validate_stage(state: Dictionary, manager: KonadoDialogueManager) -
 		actor_ids[actor_id] = true
 		var character := _find_character(actor_id, manager.character_list)
 		if character == null or character.character_scene == null:
-			return false
-		var framing_id := StringName(actor_state.get("framing", "default"))
-		var framing_profile := character.actor_framing_profile
-		if framing_profile == null:
-			framing_profile = KonadoActorFramingProfile.create_builtin()
-		if (
-			framing_id.is_empty()
-			or not framing_profile.validate().is_empty()
-			or not framing_profile.has_preset(framing_id)
-		):
 			return false
 	var highlighted := String(state.get("highlighted_actor", ""))
 	if not highlighted.is_empty() and not actor_ids.has(highlighted):

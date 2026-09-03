@@ -18,11 +18,8 @@ const RESOURCE_SCHEMAS: Dictionary = {
 }
 const SCOPED_PROPERTY_SCHEMAS: Dictionary = {
 	"states": "status_name",
-	"framings": "preset_id",
 	"cameras": "marker_id",
 }
-const FRAMING_DEPENDENCY_KIND := "_framing_dependencies"
-const BUILTIN_FRAMINGS := ["default", "full", "medium", "close", "extreme_close"]
 const ANIMATION_PATTERN := '"name"\\s*:\\s*&?"([^"]+)"'
 const MOTION_PATTERN := '(?m)^\\s*resource_name\\s*=\\s*"([^"]+)"'
 const EXT_RESOURCE_HEADER_PATTERN := "(?m)^\\[ext_resource[^\\]]*\\]$"
@@ -44,7 +41,6 @@ static var _regex_cache: Dictionary = {}
 var _symbols := {}
 var _symbol_sets := {}
 var _definitions := {}
-var _framing_dependencies := {}
 var _file_cache := {}
 var _script_default_cache := {}
 var _seen_paths := {}
@@ -126,19 +122,23 @@ func get_duplicate_definitions() -> Array[Dictionary]:
 
 func get_actor_scoped_values(actor_name: String, kind: String) -> PackedStringArray:
 	_ensure_index()
-	if kind not in ["states", "motions", "framings"]:
+	if kind not in ["states", "motions"]:
 		return PackedStringArray()
 	var actor_definitions := get_definitions("actors", actor_name)
-	var owner_keys := _actor_scope_keys(actor_definitions, kind)
-	if kind == "framings" and owner_keys.is_empty():
-		return PackedStringArray(BUILTIN_FRAMINGS)
-	if kind == "motions" and owner_keys.is_empty():
+	var owner_paths := {}
+	for actor_definition: Dictionary in actor_definitions:
+		var actor_scene := String(actor_definition.get("target_path", ""))
+		if not actor_scene.is_empty():
+			owner_paths[actor_scene] = true
+		var motion_scene := String(actor_definition.get("motion_path", ""))
+		if not motion_scene.is_empty():
+			owner_paths[motion_scene] = true
+	if kind == "motions" and owner_paths.is_empty():
 		return get_values(kind)
 	var values := PackedStringArray()
 	var seen_values := {}
 	for definition: Dictionary in get_definitions(kind):
-		var resource_key := String(definition.get("resource_key", definition.get("owner_path", "")))
-		if owner_keys.has(resource_key):
+		if owner_paths.has(String(definition.get("owner_path", ""))):
 			var value := String(definition.get("name", ""))
 			if not value.is_empty() and not seen_values.has(value):
 				values.append(value)
@@ -154,17 +154,21 @@ func get_actor_scoped_targets(
 	kind: String,
 	name: String,
 ) -> Array[Dictionary]:
-	if kind not in ["states", "motions", "framings"]:
+	if kind not in ["states", "motions"]:
 		return get_navigation_targets(kind, name)
 	var actor_definitions := get_definitions("actors", actor_name)
-	var owner_keys := _actor_scope_keys(actor_definitions, kind)
-	if kind == "framings" and owner_keys.is_empty():
-		return []
+	var owner_paths := {}
+	for actor_definition: Dictionary in actor_definitions:
+		var actor_scene := String(actor_definition.get("target_path", ""))
+		var motion_scene := String(actor_definition.get("motion_path", ""))
+		if kind == "states" and not actor_scene.is_empty():
+			owner_paths[actor_scene] = true
+		if kind == "motions" and not motion_scene.is_empty():
+			owner_paths[motion_scene] = true
 	var targets: Array[Dictionary] = []
 	var seen_paths := {}
 	for definition: Dictionary in get_definitions(kind, name):
-		var resource_key := String(definition.get("resource_key", definition.get("owner_path", "")))
-		if not owner_keys.is_empty() and not owner_keys.has(resource_key):
+		if not owner_paths.is_empty() and not owner_paths.has(definition.get("owner_path")):
 			continue
 		var target := definition.duplicate(true)
 		var target_path := String(definition.get("target_path", definition.get("owner_path", "")))
@@ -173,38 +177,9 @@ func get_actor_scoped_targets(
 		seen_paths[target_path] = true
 		target["path"] = target_path
 		targets.append(target)
-	if kind == "motions" and targets.is_empty() and owner_keys.is_empty():
+	if kind == "motions" and targets.is_empty() and owner_paths.is_empty():
 		return get_navigation_targets(kind, name)
 	return targets
-
-
-func _actor_scope_keys(actor_definitions: Array[Dictionary], kind: String) -> Dictionary:
-	var keys := {}
-	for actor_definition: Dictionary in actor_definitions:
-		var resource_key := ""
-		match kind:
-			"states":
-				resource_key = String(actor_definition.get("target_path", ""))
-			"motions":
-				resource_key = String(actor_definition.get("motion_path", ""))
-			"framings":
-				resource_key = String(actor_definition.get("framing_profile_key", ""))
-		if not resource_key.is_empty():
-			keys[resource_key] = true
-	return _expand_framing_resource_keys(keys) if kind == "framings" else keys
-
-
-func _expand_framing_resource_keys(initial: Dictionary) -> Dictionary:
-	var expanded := initial.duplicate()
-	var pending: Array = initial.keys()
-	while not pending.is_empty():
-		var owner_key := String(pending.pop_back())
-		for target_key: String in _framing_dependencies.get(owner_key, PackedStringArray()):
-			if expanded.has(target_key):
-				continue
-			expanded[target_key] = true
-			pending.append(target_key)
-	return expanded
 
 
 func invalidate() -> void:
@@ -282,7 +257,6 @@ func _rebuild_indexes() -> void:
 	_symbols = {}
 	_symbol_sets = {}
 	_definitions = {}
-	_framing_dependencies = {}
 	for kind: String in [
 		"actors",
 		"backgrounds",
@@ -291,7 +265,6 @@ func _rebuild_indexes() -> void:
 		"voices",
 		"states",
 		"motions",
-		"framings",
 		"cameras",
 		"scripts",
 		"branches",
@@ -302,8 +275,6 @@ func _rebuild_indexes() -> void:
 		_symbols[kind] = PackedStringArray()
 		_symbol_sets[kind] = {}
 		_definitions[kind] = {}
-	for cached: Dictionary in _file_cache.values():
-		_merge_framing_dependencies(cached.get("definitions", {}))
 	for cached: Dictionary in _file_cache.values():
 		_merge_file_definitions(cached.get("definitions", {}))
 	for kind: String in _symbols:
@@ -466,7 +437,6 @@ func _parse_text_resource(path: String, source: String, extension: String) -> Di
 	var external_resources := _collect_external_resources(source)
 	for block: Dictionary in _collect_blocks(source):
 		var block_source := String(block["source"])
-		var resource_key := _resource_key_for_block(path, String(block.get("header", "")))
 		for kind: String in RESOURCE_SCHEMAS:
 			var schema: Dictionary = RESOURCE_SCHEMAS[kind]
 			var name_match := _find_property(block_source, String(schema["name"]))
@@ -490,12 +460,6 @@ func _parse_text_resource(path: String, source: String, extension: String) -> Di
 					"actor_motion_layer",
 					external_resources,
 				)
-				definition["framing_profile_key"] = _resolve_property_resource_key(
-					block_source,
-					"actor_framing_profile",
-					external_resources,
-					path,
-				)
 			_append_definition(definitions, definition)
 		for scoped_kind: String in SCOPED_PROPERTY_SCHEMAS:
 			var name_match := _find_property_or_script_default(
@@ -505,28 +469,16 @@ func _parse_text_resource(path: String, source: String, extension: String) -> Di
 			)
 			if name_match.is_empty():
 				continue
-			var scoped_definition := _make_definition(
-				scoped_kind,
-				String(name_match["value"]),
-				path,
-				_line_at(line_starts, int(block["start"]) + int(name_match["start"])),
-				path,
+			_append_definition(
+				definitions,
+				_make_definition(
+					scoped_kind,
+					String(name_match["value"]),
+					path,
+					_line_at(line_starts, int(block["start"]) + int(name_match["start"])),
+					path,
+				),
 			)
-			scoped_definition["resource_key"] = (
-				resource_key if scoped_kind == "framings" else path
-			)
-			_append_definition(definitions, scoped_definition)
-		if _is_framing_profile_block(
-			block_source, String(block.get("header", "")), external_resources
-		):
-			for target_key: String in _collect_property_resource_keys(
-				block_source, "presets", external_resources, path
-			):
-				if not definitions.has(FRAMING_DEPENDENCY_KIND):
-					definitions[FRAMING_DEPENDENCY_KIND] = []
-				definitions[FRAMING_DEPENDENCY_KIND].append(
-					{"owner_key": resource_key, "target_key": target_key}
-				)
 	if extension == "tscn":
 		_collect_pattern_definitions(
 			definitions, source, path, "states", ANIMATION_PATTERN, line_starts
@@ -567,7 +519,6 @@ func _collect_blocks(source: String) -> Array[Dictionary]:
 			. append(
 				{
 					"start": content_start,
-					"header": headers[index].get_string(),
 					"source": source.substr(content_start, content_end - content_start),
 				}
 			)
@@ -584,7 +535,7 @@ func _get_header_attribute(header: String, attribute: String) -> String:
 
 
 func _find_property(block_source: String, property_name: String) -> Dictionary:
-	var regex := _get_regex('(?m)^\\s*%s\\s*=\\s*&?"([^"]+)"' % property_name)
+	var regex := _get_regex('(?m)^\\s*%s\\s*=\\s*"([^"]+)"' % property_name)
 	if regex == null:
 		return {}
 	var match_result := regex.search(block_source)
@@ -630,7 +581,7 @@ func _get_script_string_defaults(path: String) -> Dictionary:
 	var regex := _get_regex(
 		(
 			"(?m)^\\s*(?:@export(?:_[A-Za-z0-9_]+)?(?:\\([^\\n]*\\))?\\s+)?"
-			+ 'var\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*(?::[^=\\n]+)?=\\s*&?"([^"]*)"'
+			+ 'var\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*(?::[^=\\n]+)?=\\s*"([^"]*)"'
 		)
 	)
 	if regex == null:
@@ -658,85 +609,6 @@ func _resolve_property_target(
 	if match_result == null:
 		return ""
 	return String(external_resources.get(match_result.get_string(1), ""))
-
-
-func _resolve_property_resource_key(
-	block_source: String,
-	property_name: String,
-	external_resources: Dictionary,
-	owner_path: String,
-) -> String:
-	var external_pattern := _get_regex(
-		'(?m)^\\s*%s\\s*=\\s*ExtResource\\("([^"]+)"\\)' % property_name
-	)
-	var external_match := (
-		external_pattern.search(block_source) if external_pattern != null else null
-	)
-	if external_match != null:
-		return String(external_resources.get(external_match.get_string(1), ""))
-	var subresource_pattern := _get_regex(
-		'(?m)^\\s*%s\\s*=\\s*SubResource\\("([^"]+)"\\)' % property_name
-	)
-	var subresource_match := (
-		subresource_pattern.search(block_source) if subresource_pattern != null else null
-	)
-	return (
-		_resource_key(owner_path, subresource_match.get_string(1))
-		if subresource_match != null
-		else ""
-	)
-
-
-func _collect_property_resource_keys(
-	block_source: String,
-	property_name: String,
-	external_resources: Dictionary,
-	owner_path: String,
-) -> PackedStringArray:
-	var result := PackedStringArray()
-	var assignment_pattern := _get_regex(
-		"(?ms)^\\s*%s\\s*=\\s*(.*?)(?=^\\s*[A-Za-z_][A-Za-z0-9_/]*\\s*=|\\z)" % property_name
-	)
-	var assignment := (
-		assignment_pattern.search(block_source) if assignment_pattern != null else null
-	)
-	if assignment == null:
-		return result
-	var value_source := assignment.get_string(1)
-	var external_pattern := _get_regex('ExtResource\\("([^"]+)"\\)')
-	if external_pattern != null:
-		for match_result: RegExMatch in external_pattern.search_all(value_source):
-			var target := String(external_resources.get(match_result.get_string(1), ""))
-			if not target.is_empty() and not result.has(target):
-				result.append(target)
-	var subresource_pattern := _get_regex('SubResource\\("([^"]+)"\\)')
-	if subresource_pattern != null:
-		for match_result: RegExMatch in subresource_pattern.search_all(value_source):
-			var target := _resource_key(owner_path, match_result.get_string(1))
-			if not result.has(target):
-				result.append(target)
-	return result
-
-
-func _is_framing_profile_block(
-	block_source: String, header: String, external_resources: Dictionary
-) -> bool:
-	if header.contains('script_class="KonadoActorFramingProfile"'):
-		return true
-	var script_path := _resolve_property_target(block_source, "script", external_resources)
-	return script_path.ends_with("/konado_actor_framing_profile.gd")
-
-
-func _resource_key_for_block(path: String, header: String) -> String:
-	return (
-		_resource_key(path, _get_header_attribute(header, "id"))
-		if header.begins_with("[sub_resource")
-		else path
-	)
-
-
-func _resource_key(path: String, subresource_id: String) -> String:
-	return path if subresource_id.is_empty() else "%s::%s" % [path, subresource_id]
 
 
 func _collect_pattern_definitions(
@@ -804,19 +676,6 @@ func _merge_file_definitions(file_definitions: Dictionary) -> void:
 	for kind: String in file_definitions:
 		for definition: Dictionary in file_definitions[kind]:
 			_add_index_definition(definition)
-
-
-func _merge_framing_dependencies(file_definitions: Dictionary) -> void:
-	for dependency: Dictionary in file_definitions.get(FRAMING_DEPENDENCY_KIND, []):
-		var owner_key := String(dependency.get("owner_key", ""))
-		var target_key := String(dependency.get("target_key", ""))
-		if owner_key.is_empty() or target_key.is_empty():
-			continue
-		if not _framing_dependencies.has(owner_key):
-			_framing_dependencies[owner_key] = PackedStringArray()
-		var targets: PackedStringArray = _framing_dependencies[owner_key]
-		if not targets.has(target_key):
-			targets.append(target_key)
 
 
 func _add_index_definition(definition: Dictionary) -> void:

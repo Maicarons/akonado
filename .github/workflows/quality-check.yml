@@ -112,7 +112,6 @@ jobs:
       - name: Test character state transitions
         run: |
           python3 .github/scripts/run_godot_test.py tests/character/test_actor_initial_state.gd
-          python3 .github/scripts/run_godot_test.py tests/character/test_actor_framing.gd
           python3 .github/scripts/run_godot_test.py tests/character/test_actor_state_transition.gd
           python3 .github/scripts/run_godot_test.py tests/character/test_character_transition_frame.gd
           xvfb-run -a python3 .github/scripts/run_godot_test.py --rendering tests/character/test_character_transition_rendering.gd

@@ -360,9 +360,6 @@ func _get_completion_candidates(source: String, line_prefix: String) -> Array[Di
 	var stripped := line_prefix.strip_edges()
 	var ends_with_space := line_prefix.ends_with(" ") or line_prefix.ends_with("\t")
 	var token_spans := KonadoScriptSymbolIndex.get_line_tokens(line_prefix)
-	var named_value_candidates := _get_named_parameter_value_candidates(line_prefix, token_spans)
-	if named_value_candidates != null:
-		return named_value_candidates
 	var tokens := PackedStringArray()
 	for token_span: Dictionary in token_spans:
 		tokens.append(String(token_span["text"]))
@@ -460,11 +457,6 @@ func _get_completion_candidates(source: String, line_prefix: String) -> Array[Di
 					_project_index.get_actor_scoped_values(String(tokens[2]), "motions"),
 					partial,
 				)
-			elif actor_action == "framing" and argument_index == 3:
-				candidates = _make_candidates(
-					_project_index.get_actor_scoped_values(String(tokens[2]), "framings"),
-					partial,
-				)
 		elif root_keyword in ["set", "add", "sub", "mul", "div", "if"] and argument_index == 1:
 			var variables := _collect_matches(
 				source,
@@ -511,35 +503,6 @@ func _get_completion_candidates(source: String, line_prefix: String) -> Array[Di
 		_get_named_parameter_candidates(line_prefix, token_spans, ends_with_space)
 	)
 	return candidates
-
-
-func _get_named_parameter_value_candidates(
-	line_prefix: String, token_spans: Array[Dictionary]
-) -> Variant:
-	var regex := RegEx.new()
-	if regex.compile("\\[\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*([^\\]\\s]*)$") != OK:
-		return null
-	var match_result := regex.search(line_prefix)
-	if match_result == null:
-		return null
-	var parameter_name := match_result.get_string(1)
-	var partial := match_result.get_string(2)
-	var statement_spans: Array[Dictionary] = []
-	for span: Dictionary in token_spans:
-		if String(span.get("text", "")) == "[":
-			break
-		statement_spans.append(span)
-	var command := _registry_command_for_spans(statement_spans)
-	var values := PackedStringArray()
-	if parameter_name == "framing" and command == "actor.show" and statement_spans.size() >= 3:
-		values = _project_index.get_actor_scoped_values(
-			String(statement_spans[2].get("text", "")), "framings"
-		)
-	elif parameter_name == "transition" and command == "actor.framing":
-		values = KonadoScriptLanguageCatalog.ACTOR_FRAMING_TRANSITIONS
-	elif parameter_name == "wait" and command == "actor.framing":
-		values = PackedStringArray(["true", "false"])
-	return _make_candidates(values, partial)
 
 
 func _get_named_parameter_candidates(
@@ -667,7 +630,6 @@ func _is_complete_parameterized_statement(token_spans: Array[Dictionary]) -> boo
 		"actor change": 4,
 		"actor move": 4,
 		"actor motion": 4,
-		"actor framing": 4,
 		"play bgm": 3,
 		"play sfx": 3,
 		"stop": 1,

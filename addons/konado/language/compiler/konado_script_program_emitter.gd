@@ -273,50 +273,37 @@ func _instruction_for(node: KonadoScriptSyntaxTree.ASTNode) -> Dictionary:
 
 
 func _actor_instruction(node: KonadoScriptSyntaxTree.ActorNode) -> Dictionary:
-	var result := {}
 	match node.action:
 		"show":
-			result = _instruction(
+			return _instruction(
 				KonadoOpcode.Type.ACTOR_SHOW,
 				[
 					_intern(node.actor_name),
 					_intern(node.state),
 					Vector2(node.position, 0.0),
-					_duration(node),
-					_intern(String(node.parameters.get("framing", ""))),
+					_duration(node)
 				]
 			)
 		"exit":
-			result = _instruction(
+			return _instruction(
 				KonadoOpcode.Type.ACTOR_EXIT, [_intern(node.actor_name), _duration(node)]
 			)
 		"change":
-			result = _instruction(
+			return _instruction(
 				KonadoOpcode.Type.ACTOR_CHANGE,
 				[_intern(node.actor_name), _intern(node.state), _duration(node)]
 			)
 		"move":
-			result = _instruction(
+			return _instruction(
 				KonadoOpcode.Type.ACTOR_MOVE,
 				[_intern(node.actor_name), Vector2(node.position, 0.0), _duration(node)]
 			)
 		"motion":
-			result = _instruction(
+			return _instruction(
 				KonadoOpcode.Type.ACTOR_MOTION,
 				[_intern(node.actor_name), _intern(node.motion_name), _duration(node)]
 			)
-		"framing":
-			result = _instruction(
-				KonadoOpcode.Type.ACTOR_FRAMING,
-				[
-					_intern(node.actor_name),
-					_intern(node.framing_name),
-					_duration(node),
-					_intern(String(node.parameters.get("transition", ""))),
-					bool(node.parameters.get("wait", true)),
-				]
-			)
-	return result
+	return {}
 
 
 func _audio_instruction(node: KonadoScriptSyntaxTree.AudioNode) -> Dictionary:

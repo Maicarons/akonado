@@ -38,7 +38,6 @@ enum Type {
 	CAMERA_RESET_ASYNC,
 	CAMERA_SHAKE_ASYNC,
 	CAMERA_STOP_ASYNC,
-	ACTOR_FRAMING,
 }
 
 const NAMES := [
@@ -74,7 +73,6 @@ const NAMES := [
 	"camera.reset.async",
 	"camera.shake.async",
 	"camera.stop.async",
-	"actor.framing",
 ]
 
 

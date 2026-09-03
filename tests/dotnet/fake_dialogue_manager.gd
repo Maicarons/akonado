@@ -16,7 +16,6 @@ var background_music_list: Resource
 var voice_list: Resource
 var sound_effect_list: Resource
 var variable_store: Resource
-var stage_controller := preload("res://tests/dotnet/fake_stage_controller.gd").new()
 var rollback_calls := 0
 var history_cleared := false
 var restored_checkpoint := ""

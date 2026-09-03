@@ -32,7 +32,6 @@ func _run() -> void:
 	await _test_committed_variable_can_rollback_while_waiting()
 	await _test_checkpoint_restores_committed_boundary()
 	await _test_execution_snapshot_restores_original_program()
-	await _test_actor_framing_checkpoint_restore()
 	if _failures == 0:
 		print("PASS: atomic dialogue lifecycle tests")
 	quit(_failures)
@@ -622,44 +621,4 @@ func _test_execution_snapshot_restores_original_program() -> void:
 		"snapshot restoration reinstalls the original Program",
 	)
 	manager.stop_dialogue()
-	await _free_node(manager)
-
-
-func _test_actor_framing_checkpoint_restore() -> void:
-	var manager := await _create_manager()
-	manager.character_list = load("res://sample/demo/character_list.tres")
-	manager.set_shot(
-		_compile_shot(
-			(
-				"actor show Kona 正常 at 3 [duration=0] [id=show_actor]\n"
-				+ '"Kona" "before" [id=before_framing]\n'
-				+ "actor framing Kona close [duration=0] [id=close_actor]\n"
-				+ '"Kona" "after" [id=after_framing]\nend'
-			)
-		)
-	)
-	manager.start_dialogue()
-	await _wait_for_instruction_and_state(
-		manager, "ks:id:before_framing", KonadoDialogueManager.DialogState.WAITING
-	)
-	var actor := manager.stage_controller.get_actor("Kona") as KonadoActor
-	_expect(actor != null, "actor show creates the framing target")
-	_expect_equal(actor.get_actor_framing(), &"default", "actor starts at the default framing")
-	var checkpoint := manager.create_checkpoint("before-framing")
-	await _finish_current_dialogue(manager)
-	await _wait_for_instruction_and_state(
-		manager, "ks:id:after_framing", KonadoDialogueManager.DialogState.WAITING
-	)
-	actor = manager.stage_controller.get_actor("Kona") as KonadoActor
-	_expect_equal(actor.get_actor_framing(), &"close", "framing command commits its endpoint")
-	_expect(manager.restore_checkpoint(checkpoint), "framing checkpoint restore succeeds")
-	await _wait_for_instruction_and_state(
-		manager, "ks:id:before_framing", KonadoDialogueManager.DialogState.WAITING
-	)
-	actor = manager.stage_controller.get_actor("Kona") as KonadoActor
-	_expect_equal(
-		actor.get_actor_framing(),
-		&"default",
-		"checkpoint restore recreates the actor with its saved framing",
-	)
 	await _free_node(manager)

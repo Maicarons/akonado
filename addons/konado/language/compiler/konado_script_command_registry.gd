@@ -3,7 +3,7 @@ class_name KonadoScriptCommandRegistry
 
 ## Canonical KonadoScript command contract shared by compiler, IDE and VM.
 
-const SCHEMA_VERSION := 4
+const SCHEMA_VERSION := 3
 const STRING := "string"
 const STRING_ARRAY := "string_array"
 const CHOICES := "choices"
@@ -28,7 +28,6 @@ const RUNTIME_HANDLERS := {
 	KonadoOpcode.Type.ACTOR_CHANGE: &"_actor_change",
 	KonadoOpcode.Type.ACTOR_MOVE: &"_actor_move",
 	KonadoOpcode.Type.ACTOR_MOTION: &"_actor_motion",
-	KonadoOpcode.Type.ACTOR_FRAMING: &"_actor_framing",
 	KonadoOpcode.Type.ACTOR_EXIT: &"_actor_exit",
 	KonadoOpcode.Type.BGM_PLAY: &"_audio_bgm_play",
 	KonadoOpcode.Type.BGM_STOP: &"_audio_bgm_stop",
@@ -59,7 +58,6 @@ const RUNTIME_HANDLERS := {
 const RESOURCE_OPERANDS := {
 	KonadoOpcode.Type.BACKGROUND: &"background",
 	KonadoOpcode.Type.ACTOR_SHOW: &"actor",
-	KonadoOpcode.Type.ACTOR_FRAMING: &"actor",
 	KonadoOpcode.Type.BGM_PLAY: &"resource",
 	KonadoOpcode.Type.SFX_PLAY: &"resource",
 	KonadoOpcode.Type.JUMP_SCRIPT: &"path",
@@ -74,7 +72,6 @@ const STATE_DOMAINS := {
 	KonadoOpcode.Type.ACTOR_CHANGE: [&"stage"],
 	KonadoOpcode.Type.ACTOR_MOVE: [&"stage"],
 	KonadoOpcode.Type.ACTOR_MOTION: [&"stage"],
-	KonadoOpcode.Type.ACTOR_FRAMING: [&"stage"],
 	KonadoOpcode.Type.ACTOR_EXIT: [&"stage"],
 	KonadoOpcode.Type.BGM_PLAY: [&"audio"],
 	KonadoOpcode.Type.BGM_STOP: [&"audio"],
@@ -121,14 +118,9 @@ const COMMANDS := {
 			["actor", STRING, true],
 			["state", STRING, true],
 			["position", VALUE, true],
-			["duration", VALUE, true],
-			["framing", STRING, true],
+			["duration", VALUE, true]
 		],
-		"parameters":
-		{
-			"duration": {"type": "number", "min": 0.0},
-			"framing": {"type": "identifier"},
-		},
+		"parameters": {"duration": {"type": "number", "min": 0.0}},
 		"blocking": true,
 		"rollback": ROLLBACK_REVERSIBLE
 	},
@@ -161,30 +153,6 @@ const COMMANDS := {
 		"opcode": KonadoOpcode.Type.ACTOR_MOTION,
 		"operands": [["actor", STRING, true], ["motion", STRING, true], ["duration", VALUE, true]],
 		"parameters": {"duration": {"type": "number", "min": 0.0}},
-		"blocking": true,
-		"rollback": ROLLBACK_REVERSIBLE
-	},
-	"actor.framing":
-	{
-		"opcode": KonadoOpcode.Type.ACTOR_FRAMING,
-		"operands":
-		[
-			["actor", STRING, true],
-			["framing", STRING, true],
-			["duration", VALUE, true],
-			["transition", STRING, true],
-			["wait", VALUE, true],
-		],
-		"parameters":
-		{
-			"duration": {"type": "number", "min": 0.0},
-			"transition":
-			{
-				"type": "enum",
-				"values": ["linear", "ease_in", "ease_out", "ease_in_out"],
-			},
-			"wait": {"type": "boolean"},
-		},
 		"blocking": true,
 		"rollback": ROLLBACK_REVERSIBLE
 	},

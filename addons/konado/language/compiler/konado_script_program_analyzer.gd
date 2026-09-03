@@ -81,7 +81,6 @@ func _validate(program: KonadoProgram, pc: int, state: Dictionary) -> void:
 			KonadoOpcode.Type.ACTOR_CHANGE,
 			KonadoOpcode.Type.ACTOR_MOVE,
 			KonadoOpcode.Type.ACTOR_MOTION,
-			KonadoOpcode.Type.ACTOR_FRAMING,
 			KonadoOpcode.Type.ACTOR_EXIT
 		]
 	):

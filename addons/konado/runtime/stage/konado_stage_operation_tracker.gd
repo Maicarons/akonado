@@ -11,7 +11,6 @@ var _request_serial := 0
 var _background_request := 0
 var _actor_move_requests: Dictionary[String, int] = {}
 var _actor_motion_requests: Dictionary[String, Dictionary] = {}
-var _actor_framing_requests: Dictionary[String, Dictionary] = {}
 
 
 func begin_request() -> int:
@@ -80,28 +79,6 @@ func take_actor_motion(actor_id: String, motion_name: String) -> int:
 	return request_id
 
 
-func register_actor_framing(actor_id: String, preset_id: String, request_id: int) -> void:
-	var previous: Dictionary = _actor_framing_requests.get(actor_id, {})
-	var previous_request := int(previous.get("request_id", 0))
-	if previous_request > 0 and previous_request != request_id:
-		supersede(previous_request, "actor.framing", "actor", actor_id)
-	if request_id > 0:
-		_actor_framing_requests[actor_id] = {
-			"request_id": request_id,
-			"preset_id": preset_id,
-		}
-	else:
-		_actor_framing_requests.erase(actor_id)
-
-
-func take_actor_framing(actor_id: String, request_id: int) -> int:
-	var request: Dictionary = _actor_framing_requests.get(actor_id, {})
-	if int(request.get("request_id", 0)) != request_id:
-		return 0
-	_actor_framing_requests.erase(actor_id)
-	return request_id
-
-
 func supersede(
 	request_id: int, operation: String, resource_kind: String, resource_id: String
 ) -> void:
@@ -125,4 +102,3 @@ func cancel() -> void:
 	_background_request = 0
 	_actor_move_requests.clear()
 	_actor_motion_requests.clear()
-	_actor_framing_requests.clear()
