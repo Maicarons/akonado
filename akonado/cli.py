@@ -855,10 +855,15 @@ CG ID: {", ".join(cg_ids) if cg_ids else "（无）"}
 BGM ID: {", ".join(bgm_ids)}
 SE ID: {", ".join(se_ids)}
 角色ID: {", ".join(char_ids)}
-角色表情: {_json.dumps(
-    {c: list(char_manifest["items"][c]["expressions"].keys()) for c in char_ids},
-    ensure_ascii=False,
-)}
+角色表情: {
+                    _json.dumps(
+                        {
+                            c: list(char_manifest["items"][c]["expressions"].keys())
+                            for c in char_ids
+                        },
+                        ensure_ascii=False,
+                    )
+                }
 """,
             }
             ks_result = _run_skill(llm, "generate_scene_script", scene_vars, temperature)
@@ -975,7 +980,7 @@ def main(argv: list[str] | None = None) -> None:
     gen_parser.add_argument(
         "type",
         help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/"
-             "dialogue/character_scenes/background_scenes/cg_scenes/tres/all",
+        "dialogue/character_scenes/background_scenes/cg_scenes/tres/all",
     )
     gen_parser.add_argument(
         "--force",
