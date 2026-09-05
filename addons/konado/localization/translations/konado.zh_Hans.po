@@ -1,0 +1,217 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Konado 2.8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_Hans\n"
+
+msgid "KONADO_ACHIEVEMENT_HIDDEN"
+msgstr "此成就是隐藏的。"
+
+msgid "KONADO_ACHIEVEMENT_LOCKED"
+msgstr "未解锁"
+
+msgid "KONADO_ACHIEVEMENT_POINTS"
+msgstr "%d 点"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED"
+msgstr "已解锁"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED_TITLE"
+msgstr "成就解锁"
+
+msgid "KONADO_ACHIEVEMENTS"
+msgstr "成就"
+
+msgid "KONADO_ACHIEVEMENTS_RESET"
+msgstr "重置所有成就"
+
+msgid "KONADO_AUTO_PLAY"
+msgstr "自动播放"
+
+msgid "KONADO_AUTO_PLAY_STOP"
+msgstr "停止播放"
+
+msgid "KONADO_CLOSE"
+msgstr "关闭"
+
+msgid "KONADO_CLOSE_INTERFACE"
+msgstr "关闭界面"
+
+msgid "KONADO_DEMO_QUICK_START"
+msgstr "Konado视觉小说插件 简要使用教程"
+
+msgid "KONADO_DEMO_QUICK_START_BANNER"
+msgstr "—— · Konado视觉小说插件 简要使用教程 · ——"
+
+msgid "KONADO_DEMO_QUIT"
+msgstr "退出游戏"
+
+msgid "KONADO_DEMO_START"
+msgstr "开始游戏"
+
+msgid "KONADO_RUNTIME_ERROR_TITLE"
+msgstr "KonadoScript 运行错误"
+
+msgid "KONADO_RUNTIME_ERROR_UNKNOWN"
+msgstr "未知运行时错误"
+
+msgid "KONADO_ERROR_RETRY"
+msgstr "重试"
+
+msgid "KONADO_ERROR_SKIP_INSTRUCTION"
+msgstr "跳过当前指令"
+
+msgid "KONADO_ERROR_CONTINUE_TRUE"
+msgstr "按 true 分支继续"
+
+msgid "KONADO_ERROR_CONTINUE_FALSE"
+msgstr "按 false 分支继续"
+
+msgid "KONADO_ERROR_STOP"
+msgstr "停止对话"
+
+msgid "KONADO_ERROR_CLOSE"
+msgstr "关闭"
+
+msgid "KONADO_LOAD_CONFIRM"
+msgstr "读取会失去未保存的进度。\n\n你确定要这么做吗？"
+
+msgid "KONADO_LOCALE_ENGLISH"
+msgstr "英语"
+
+msgid "KONADO_LOCALE_JAPANESE"
+msgstr "日语"
+
+msgid "KONADO_LOCALE_KOREAN"
+msgstr "韩语"
+
+msgid "KONADO_LOCALE_SIMPLIFIED_CHINESE"
+msgstr "简体中文"
+
+msgid "KONADO_LOCALE_TRADITIONAL_CHINESE"
+msgstr "繁體中文"
+
+msgid "KONADO_MAIN_MENU"
+msgstr "主菜单"
+
+msgid "KONADO_QUICK_LOAD"
+msgstr "快速读取"
+
+msgid "KONADO_QUICK_LOAD_FAILED"
+msgstr "快速读取失败"
+
+msgid "KONADO_QUICK_SAVE"
+msgstr "快速保存"
+
+msgid "KONADO_QUICK_SAVE_FAILED"
+msgstr "快速保存失败"
+
+msgid "KONADO_QUICK_SAVE_MISSING"
+msgstr "无快速存档可读取"
+
+msgid "KONADO_QUICK_SAVE_SUCCEEDED"
+msgstr "快速保存成功"
+
+msgid "KONADO_SAVE_ACTION"
+msgstr "保存进度"
+
+msgid "KONADO_SAVE_DATA"
+msgstr "存档"
+
+msgid "KONADO_SAVE_DELETE"
+msgstr "删除存档"
+
+msgid "KONADO_SAVE_DELETE_CONFIRM"
+msgstr "确定删除这个存档吗？"
+
+msgid "KONADO_SAVE_DELETE_FAILED"
+msgstr "删除存档失败"
+
+msgid "KONADO_SAVE_DELETE_SUCCEEDED"
+msgstr "存档已删除"
+
+msgid "KONADO_SAVE_EMPTY_SLOT"
+msgstr "空存档"
+
+msgid "KONADO_SAVE_LOAD"
+msgstr "读取存档"
+
+msgid "KONADO_SAVE_LOAD_FAILED"
+msgstr "读取存档失败"
+
+msgid "KONADO_SAVE_FAILED"
+msgstr "保存失败"
+
+msgid "KONADO_SAVE_SUCCEEDED"
+msgstr "保存成功"
+
+msgid "KONADO_SAVE_SLOT"
+msgstr "存档%02d"
+
+msgid "KONADO_SETTINGS"
+msgstr "设置"
+
+msgid "KONADO_SETTINGS_AUDIO"
+msgstr "音频"
+
+msgid "KONADO_SETTINGS_AUTO_DELAY"
+msgstr "自动等待"
+
+msgid "KONADO_SETTINGS_AUTO_MODE"
+msgstr "自动模式"
+
+msgid "KONADO_SETTINGS_DEBUG_MODE"
+msgstr "调试模式"
+
+msgid "KONADO_SETTINGS_DISPLAY"
+msgstr "画面"
+
+msgid "KONADO_SETTINGS_FULLSCREEN"
+msgstr "全屏"
+
+msgid "KONADO_SETTINGS_LANGUAGE"
+msgstr "语言"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME"
+msgstr "主音量"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME_TOOLTIP"
+msgstr "调节游戏的整体音量"
+
+msgid "KONADO_SETTINGS_MUSIC_VOLUME"
+msgstr "音乐音量"
+
+msgid "KONADO_SETTINGS_RESET"
+msgstr "恢复默认"
+
+msgid "KONADO_SETTINGS_RESET_CONFIRM"
+msgstr "确定要将当前类别恢复为默认设置吗？"
+
+msgid "KONADO_SETTINGS_SFX_VOLUME"
+msgstr "音效音量"
+
+msgid "KONADO_SETTINGS_SKIP_ALL"
+msgstr "跳过全部"
+
+msgid "KONADO_SETTINGS_SKIP_READ"
+msgstr "跳过已读"
+
+msgid "KONADO_SETTINGS_TEXT"
+msgstr "文本播放"
+
+msgid "KONADO_SETTINGS_TEXT_SPEED"
+msgstr "文字速度"
+
+msgid "KONADO_SETTINGS_TITLE"
+msgstr "游戏设置"
+
+msgid "KONADO_SETTINGS_VOICE_VOLUME"
+msgstr "语音音量"
+
+msgid "KONADO_UNKNOWN"
+msgstr "未知"
+
+msgid "KONADO_UNKNOWN_TIME"
+msgstr "未知时间"

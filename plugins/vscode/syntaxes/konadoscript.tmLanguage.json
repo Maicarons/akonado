@@ -1,0 +1,292 @@
+{
+	"name": "KonadoScript",
+	"scopeName": "source.konado",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#screenText"
+		},
+		{
+			"include": "#dialogue"
+		},
+		{
+			"include": "#commands"
+		},
+		{
+			"include": "#namedParameters"
+		},
+		{
+			"include": "#resourcePath"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#constants"
+		}
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"begin": "^\\s*#\\s*region\\b",
+					"beginCaptures": {
+						"0": {
+							"name": "comment.line.number-sign.konado keyword.control.region.konado"
+						}
+					},
+					"end": "$",
+					"name": "comment.line.number-sign.konado"
+				},
+				{
+					"match": "#.*$",
+					"name": "comment.line.number-sign.konado"
+				}
+			]
+		},
+		"screenText": {
+			"begin": "^\\s*(screentext)\\s*(\\{)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.konado"
+				},
+				"2": {
+					"name": "punctuation.section.block.begin.konado"
+				}
+			},
+			"end": "^\\s*(\\})",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.section.block.end.konado"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#strings"
+				}
+			]
+		},
+		"dialogue": {
+			"match": "^\\s*(?:(\"(?:[^\"\\\\]|\\\\.)*\")|([%$][\\p{L}_][\\p{L}\\p{N}_-]*)|([\\p{L}_][\\p{L}\\p{N}_-]*))\\s+(\"(?:[^\"\\\\]|\\\\.)*\")(?:\\s+([\\p{L}_][\\p{L}\\p{N}_-]*))?(?=\\s*(?:\\[|$))",
+			"captures": {
+				"1": {
+					"name": "string.quoted.double.speaker.konado"
+				},
+				"2": {
+					"name": "variable.other.readwrite.konado"
+				},
+				"3": {
+					"name": "entity.name.character.konado"
+				},
+				"4": {
+					"name": "string.quoted.double.dialogue.konado"
+				},
+				"5": {
+					"name": "entity.name.tag.voice.konado"
+				}
+			}
+		},
+		"commands": {
+			"patterns": [
+				{
+					"match": "^\\s*(actor)\\s+(show|exit|change|move|motion)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "keyword.other.command.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(play|stop)\\s+(bgm|sfx)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "storage.type.resource.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(cam|asyncam)\\s+(move|reset|shake|stop)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "keyword.other.command.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(achievement)\\s+(unlock|increment|set_flag)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "keyword.other.command.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(branch)\\s+([\\p{L}_][\\p{L}\\p{N}_-]*)",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "entity.name.label.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(choice)\\s+(\"(?:[^\"\\\\]|\\\\.)*\")\\s*(->)\\s*([\\p{L}_][\\p{L}\\p{N}_-]*)",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						},
+						"2": {
+							"name": "string.quoted.double.konado"
+						},
+						"3": {
+							"name": "keyword.operator.arrow.konado"
+						},
+						"4": {
+							"name": "entity.name.label.reference.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(if|else|endif)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.conditional.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(set|add|sub|mul|div)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.assignment.konado"
+						}
+					}
+				},
+				{
+					"match": "^\\s*(screentext|showtextbox|hidetextbox|waitsignal|background|jump_branch|jump|signal|end)\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.control.konado"
+						}
+					}
+				},
+				{
+					"match": "\\b(at|none|linear|ease_in_out|true|false)\\b",
+					"name": "constant.language.konado"
+				}
+			]
+		},
+		"resourcePath": {
+			"match": "\\bres://[^\\s#]+\\.ks\\b",
+			"name": "string.other.link.resource.konado"
+		},
+		"namedParameters": {
+			"begin": "(\\[)\\s*([\\p{L}_][\\p{L}\\p{N}_-]*)\\s*(=)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.section.brackets.begin.konado"
+				},
+				"2": {
+					"name": "variable.parameter.konado"
+				},
+				"3": {
+					"name": "keyword.operator.assignment.konado"
+				}
+			},
+			"end": "(\\])",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.section.brackets.end.konado"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#variables"
+				},
+				{
+					"include": "#constants"
+				}
+			]
+		},
+		"strings": {
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.konado"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.konado"
+				}
+			},
+			"name": "string.quoted.double.konado",
+			"patterns": [
+				{
+					"include": "#variables"
+				},
+				{
+					"match": "\\\\[\"\\\\nrt]",
+					"name": "constant.character.escape.konado"
+				}
+			]
+		},
+		"variables": {
+			"patterns": [
+				{
+					"match": "%[\\p{L}_][\\p{L}\\p{N}_-]*",
+					"name": "variable.other.persistent.konado"
+				},
+				{
+					"match": "\\$[\\p{L}_][\\p{L}\\p{N}_-]*",
+					"name": "variable.other.temporary.konado"
+				}
+			]
+		},
+		"operators": {
+			"match": "->|==|!=|>=|<=|>|<|=",
+			"name": "keyword.operator.konado"
+		},
+		"constants": {
+			"patterns": [
+				{
+					"match": "(?<![\\p{L}\\p{N}_])[-+]?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?![\\p{L}\\p{N}_])",
+					"name": "constant.numeric.konado"
+				},
+				{
+					"match": "\\b(true|false)\\b",
+					"name": "constant.language.boolean.konado"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dcwk5so2ohcc2"]
+
+[ext_resource type="Script" uid="uid://mksyuojdc6ns" path="res://addons/konado/templates/default/character/konado_actor.gd" id="1_gnto7"]
+[ext_resource type="PackedScene" uid="uid://vn8ookpi8m80" path="res://addons/konado/templates/default/character/konado_actor_motion_layer.tscn" id="2_lmolw"]
+
+[node name="Character" type="Control" unique_id=1241920877 node_paths=PackedStringArray("motion_layer", "slot")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gnto7")
+motion_layer = NodePath("Slot/MotionLayer")
+slot = NodePath("Slot")
+
+[node name="Slot" type="Control" parent="." unique_id=610558886]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 191.99933
+offset_right = 191.99805
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MotionLayer" parent="Slot" unique_id=687488771 instance=ExtResource("2_lmolw")]
+layout_mode = 1

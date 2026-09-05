@@ -1,0 +1,126 @@
+{
+	"categories": [
+		{
+			"id": "audio",
+			"display_name": "KONADO_SETTINGS_AUDIO",
+			"items": [
+				{
+					"key": "master_volume",
+					"label": "KONADO_SETTINGS_MASTER_VOLUME",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"],
+					"tooltip": "KONADO_SETTINGS_MASTER_VOLUME_TOOLTIP"
+				},
+				{
+					"key": "music_volume",
+					"label": "KONADO_SETTINGS_MUSIC_VOLUME",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 0.8,
+					"platforms": ["all"]
+				},
+				{
+					"key": "sfx_volume",
+					"label": "KONADO_SETTINGS_SFX_VOLUME",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"]
+				},
+				{
+					"key": "voice_volume",
+					"label": "KONADO_SETTINGS_VOICE_VOLUME",
+					"type": 0,
+					"min_value": 0.0,
+					"max_value": 1.0,
+					"step": 0.01,
+					"default_value": 1.0,
+					"platforms": ["all"]
+				}
+			]
+		},
+		{
+			"id": "text",
+			"display_name": "KONADO_SETTINGS_TEXT",
+			"items": [
+				{
+					"key": "text_speed",
+					"label": "KONADO_SETTINGS_TEXT_SPEED",
+					"type": 0,
+					"min_value": 0.01,
+					"max_value": 0.2,
+					"step": 0.005,
+					"default_value": 0.05,
+					"platforms": ["all"]
+				},
+				{
+					"key": "auto_delay",
+					"label": "KONADO_SETTINGS_AUTO_DELAY",
+					"type": 0,
+					"min_value": 1.0,
+					"max_value": 5.0,
+					"step": 0.5,
+					"default_value": 2.0,
+					"platforms": ["all"]
+				},
+				{
+					"key": "auto_mode",
+					"label": "KONADO_SETTINGS_AUTO_MODE",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "skip_read",
+					"label": "KONADO_SETTINGS_SKIP_READ",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "skip_all",
+					"label": "KONADO_SETTINGS_SKIP_ALL",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				}
+			]
+		},
+		{
+			"id": "display",
+			"display_name": "KONADO_SETTINGS_DISPLAY",
+			"items": [
+				{
+					"key": "fullscreen",
+					"label": "KONADO_SETTINGS_FULLSCREEN",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["all"]
+				},
+				{
+					"key": "language",
+					"label": "KONADO_SETTINGS_LANGUAGE",
+					"type": 2,
+					"options": ["zh_Hans", "zh_Hant", "en", "ja", "ko"],
+					"default_value": "zh_Hans",
+					"platforms": ["all"]
+				},
+				{
+					"key": "debug_mode",
+					"label": "KONADO_SETTINGS_DEBUG_MODE",
+					"type": 1,
+					"default_value": false,
+					"platforms": ["debug"]
+				}
+			]
+		}
+	]
+}

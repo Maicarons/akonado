@@ -1,0 +1,212 @@
+name: Identity Check
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: pr-identity-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Reject AI-attributed commits
+    runs-on: ubuntu-24.04
+    steps:
+      # pull_request_target intentionally inspects metadata through the API only.
+      # Never check out or execute code from the pull request in this workflow.
+      - name: Inspect commit identities
+        uses: actions/github-script@v9
+        with:
+          retries: 3
+          script: |
+            const blockedIdentities = [
+              {
+                agent: "Anthropic Claude",
+                pattern: /^(?:noreply|claude)@anthropic\.com$/i,
+              },
+              {
+                agent: "OpenAI Codex",
+                pattern: /^(?:noreply|codex)@openai\.com$/i,
+              },
+              {
+                agent: "OpenAI Codex",
+                pattern:
+                  /^(?:\d+\+)?chatgpt-codex-connector(?:\[bot\])?@users\.noreply\.github\.com$/i,
+              },
+              {
+                agent: "GitHub Copilot",
+                pattern:
+                  /^(?:\d+\+)?(?:copilot|copilot-swe-agent)(?:\[bot\])?@users\.noreply\.github\.com$/i,
+              },
+              {
+                agent: "Cursor",
+                pattern: /^(?:cursoragent|agent)@cursor\.com$/i,
+              },
+              {
+                agent: "Gemini Code Assist",
+                pattern:
+                  /^(?:\d+\+)?gemini-code-assist(?:\[bot\])?@users\.noreply\.github\.com$/i,
+              },
+              {
+                agent: "Devin AI",
+                pattern:
+                  /^(?:\d+\+)?devin-ai-integration(?:\[bot\])?@users\.noreply\.github\.com$/i,
+              },
+              {
+                agent: "Aider",
+                pattern: /^noreply@aider\.chat$/i,
+              },
+              {
+                agent: "OpenHands",
+                pattern: /^openhands@all-hands\.dev$/i,
+              },
+            ];
+
+            const matchIdentity = (email) => {
+              if (typeof email !== "string") {
+                return null;
+              }
+              const normalizedEmail = email.trim().toLowerCase();
+              if (!normalizedEmail) {
+                return null;
+              }
+              const identity = blockedIdentities.find(({ pattern }) =>
+                pattern.test(normalizedEmail)
+              );
+              if (!identity) {
+                return null;
+              }
+              return { agent: identity.agent, email: normalizedEmail };
+            };
+
+            const trailerPattern =
+              /^(?:co-authored-by|signed-off-by):\s*.*?<([^<>\s]+@[^<>\s]+)>\s*$/gim;
+            const declaredCommitCount = context.payload.pull_request.commits;
+            if (
+              !Number.isInteger(declaredCommitCount) ||
+              declaredCommitCount > 250
+            ) {
+              const body = [
+                "This pull request was automatically closed because its complete",
+                "commit identity history could not be verified.",
+                "",
+                "GitHub's pull-request commits API returns at most 250 commits.",
+                `This pull request reports ${declaredCommitCount ?? "an unknown number of"} commits.`,
+                "Please rebase or split the changes into an auditable commit series",
+                "of no more than 250 commits before reopening it.",
+              ].join("\n");
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                state: "closed",
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              core.setFailed(
+                `Closed PR #${context.issue.number}: commit identity history exceeds the verifiable limit.`
+              );
+              return;
+            }
+
+            const commits = await github.paginate(
+              github.rest.pulls.listCommits,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+            const violations = [];
+
+            const record = (commit, source, email) => {
+              const identity = matchIdentity(email);
+              if (!identity) {
+                return;
+              }
+              violations.push({
+                sha: commit.sha.slice(0, 12),
+                source,
+                ...identity,
+              });
+            };
+
+            for (const commit of commits) {
+              record(commit, "author", commit.commit.author?.email);
+              record(commit, "committer", commit.commit.committer?.email);
+
+              trailerPattern.lastIndex = 0;
+              for (
+                let match = trailerPattern.exec(commit.commit.message);
+                match !== null;
+                match = trailerPattern.exec(commit.commit.message)
+              ) {
+                record(commit, "commit trailer", match[1]);
+              }
+            }
+
+            const uniqueViolations = [
+              ...new Map(
+                violations.map((violation) => [
+                  [
+                    violation.sha,
+                    violation.source,
+                    violation.email,
+                  ].join(":"),
+                  violation,
+                ])
+              ).values(),
+            ];
+
+            if (uniqueViolations.length === 0) {
+              core.info(
+                `Checked ${commits.length} commit(s); no blocked AI identity was found.`
+              );
+              return;
+            }
+
+            const details = uniqueViolations
+              .map(
+                ({ sha, source, agent, email }) =>
+                  `- \`${sha}\`: ${source} identifies ${agent} as \`${email}\``
+              )
+              .join("\n");
+            const body = [
+              "This pull request was automatically closed because it contains",
+              "commit metadata attributed to a blocked AI coding agent.",
+              "",
+              details,
+              "",
+              "Remove every matching author, committer, or commit-trailer identity",
+              "from the pull request's commits before reopening it.",
+            ].join("\n");
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              state: "closed",
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+            core.setFailed(
+              `Closed PR #${context.issue.number}: found ${uniqueViolations.length} blocked AI identity occurrence(s).`
+            );

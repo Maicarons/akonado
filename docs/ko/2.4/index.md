@@ -6,7 +6,7 @@ hero:
   text: "Visual Novel Framework"
   tagline: "Godot Engine 기반 비주얼 노벨 및 범용 대화 솔루션"
   image:
-    src: "https://godothub.atomgit.net/web/icon/konado/kona/kona.png"
+    src: "https://legacy.godothub.com/kbgirl/kona/kona.png"
   actions:
     - theme: brand
       text: 빠른 시작

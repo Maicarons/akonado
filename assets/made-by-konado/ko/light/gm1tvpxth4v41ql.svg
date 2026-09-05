@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="592" height="204" viewBox="0 0 592 204" role="img" aria-labelledby="card-title card-description">
+<title id="card-title">雨落草听的短篇小说</title>
+<desc id="card-description">제작자: 雨落草听 · 인기도: 290</desc>
+<defs>
+<clipPath id="card-clip"><rect width="592" height="204" rx="28"/></clipPath>
+<clipPath id="icon-clip"><rect x="20" y="20" width="80" height="80" rx="16"/></clipPath>
+<filter id="icon-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity=".16"/></filter>
+<linearGradient id="light-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".76"/><stop offset=".54" stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#f8fafc" stop-opacity=".98"/></linearGradient>
+<linearGradient id="dark-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f172a" stop-opacity=".76"/><stop offset=".54" stop-color="#020617" stop-opacity=".9"/><stop offset="1" stop-color="#020617" stop-opacity=".98"/></linearGradient>
+<style>
+.card-base{fill:#fff}.card-overlay{fill:url("#light-overlay")}.card-border{fill:none;stroke:#dbe3ec}.panel{fill:#f1f5f9;fill-opacity:.88}.badge{fill:#e5f2fa}.badge-text{fill:#2475a8}.online-badge{fill:#eef2f7}.online-text{fill:#475569}.title{fill:#0f172a}.summary,.meta{fill:#64748b}.heat-pill{fill:#f1f5f9;fill-opacity:.92}.heat-text{fill:#0f172a}.icon-ring{fill:#fff;stroke:#fff;stroke-width:2}
+</style>
+</defs>
+<g clip-path="url(#card-clip)">
+<rect width="592" height="204" class="card-base"/>
+<rect width="592" height="204" class="card-overlay"/>
+</g>
+<rect x=".5" y=".5" width="591" height="203" rx="27.5" class="card-border"/>
+<g filter="url(#icon-shadow)"><rect x="20" y="20" width="80" height="80" rx="16" class="icon-ring"/></g>
+<image href="data:image/webp;base64,UklGRh4FAABXRUJQVlA4WAoAAAAQAAAAfwAAfwAAQUxQSMMAAAABDzD/ERECbmzbcZuvFSFKYCkoDSgNpaAEhJLNwQ0++bg5chTR/wmwf8yNh1Ygah3QBhCUChCV7oIy3CQUgKQ0IFkSZiCULADZlAokq0IDovQBgjSAhzVWCsBNqc6UDmR3W/psmoEksdRXipuU6oLSNnX3UD7upszOzNrKALKZVWwRIJlZyQtlbbUe1tyk9E2ffaIy7xM2PZThboeZyi75iLJPOqK66XRRadcIR/RzPI74XOOmzJcbfw5XK5erp2su234AVlA4IDQEAADQFwCdASqAAIAAPoE6l0ilI6IhLJPZOKAQCUAar0Vrt8SKMbuG/4Iot6/3b1NbZPzAftB6u/o63ij0AOlB/uWC1voHZs9E83tIFmF8eh8J6Epuu2VXv/trr+yBHvROs1nHe7BlCz0hK4FOztsfhLvoPOqAe5uVlST8Tof/EEu8NhCNYXPEsCMbGDz/1gEOWQ7woBzg/QbnR7VLSUehklHm474gtcVKdqy97CqtPRTauuh4Qo5YtEN7Brz6RH/3jBDYWppLq1IAAP78rRAAAACm/0C9l54TE1S9AUvClUe9u7wqiuUSIY5w+BmRczZKEz2E+USCPTkl39ZKFd8t8zV7QNqQ/wZ41iMXeoP8GN/w2F4hGppTZMrYswlCCbMm5LObJ/lfwr4vnsFGIOcK94ATX+cQcEzWOG1Epdqqd80LG8IyB3h/yyP82/RP09Q6H19KvcxkgZ39Qmuh2HVibPnuUXsOnENJmJcNY7p+Qjn+XrnNbbV8TwS+lCwRVuMrQ6aNsGGgnYXNkoWRkm5NOS25+AVr1fcWxdPnZIUU88vP/71jhPu0nE1nm69P8rmbUGucmlZ3hKL4pM5BlgREPPifv8ouvrRDPi2/X97xST+OwTNUki1mrYGO9FnNMKBQv43n8Bk1Pfw9j7B6eXt3eXkm1h0ArhSMizODbyGy0g0wkgkMA4z8xc6G9R1USURxixL8Ivb4PJrQHZXT8zfayn70D/lkx/gGe6uTqsFDsXfBRi6hM9whrV7ht3HtWYJXQ17+Ns8hut5xODVSgb3eSFKHxCiDrgGJ2KAKcQRO58AOJgPKE4DaEgowNoLIAA3RhrZ+BApmdqnGcIHk0f1MQvK3k/9jjqzlhKP/xZkk0woOrpeP0TdqJFDwRGh3RTjGMzSjSWKE0P9VDluuQidY8znqqmmuoq5Rc4oFXCUUflAME4rKWCchY8TEyXyJ1D91r5LPYraaI3WRr2UDsh0H47FD1qqJzQ3vXuXm0Eov9SBArvW8xRoLuU3GfNhHeEpM8lmOFhO44t9S0YXRL8kP4c1YGNb4GvT3uSsuzepAfsqQe21WOEhS8IzH0tcTfp08/UAl/B9pBwVi9jci6EPYyvVoe+7Q4GJYirE26hk6uDBREXwFAt9lebdZKf4zBR/nor9zCJht24yQNGygBDtNaMj8nEDwb3v+ly/hvEe7SYXgR+5JNQkryI3OEzjfkGsskmFct7zzSbrCA3TOFsPrQCnFPZhoDn5U7WElBI4P3Zuyu0wHdOEVWCr3XZ/FsZP+SByeAtiE7XmS4y4Jv3UiWLibhHQVAfvbT//+8UrCHSzNh33NnoJoQm9PxFm5/W/1qntdY7WxRClG3JyP/w/5y3PlRWmiD4vbzgxBR+QcNc7imd83xK/cLYf2XX8Pjr/1n1GPu5h+STfye9ZlrjKvOhXGgAAAAA==" x="20" y="20" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#icon-clip)"/>
+<rect x="116" y="22" width="52" height="25" rx="12.5" class="badge"/>
+<text x="142" y="39" text-anchor="middle" class="badge-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">게임</text>
+<rect x="176" y="22" width="86" height="25" rx="12.5" class="online-badge"/>
+<text x="219" y="39" text-anchor="middle" class="online-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">온라인 실행</text>
+<text x="118" y="87" class="meta" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14">제작자: 雨落草听</text>
+<rect x="484" y="68" width="88" height="30" rx="15" class="heat-pill"/>
+<path d="M502 90c-4 0-7-2.8-7-6.7 0-2.7 1.4-5.2 4.1-7.6-.1 2.5 1.2 3.8 2.6 4.8-.2-3.4 1.8-6.2 4.3-8.5 0 3.7 3 5.3 3 9.7 0 4.7-3 8.3-7 8.3Z" fill="#f97316"/>
+<text x="515" y="88" class="heat-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14" font-weight="600">290</text>
+<rect x="20" y="116" width="552" height="68" rx="16" class="panel"/>
+<text x="36" y="143" class="title" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="20" font-weight="700">雨落草听的短篇小说</text>
+<text x="36" y="169" class="summary" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="13">在“我”浑浑噩噩的日子里</text>
+</svg>

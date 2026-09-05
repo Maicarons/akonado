@@ -1,0 +1,7 @@
+[gd_resource type="EditorSyntaxHighlighter" script_class="KonadoScriptSyntaxHighlighter" format=3 uid="uid://dj1uoip1wfxuw"]
+
+[ext_resource type="Script" uid="uid://b7qcydfl4hoxc" path="res://addons/konado/editor/script_editor/konado_script_syntax_highlighter.gd" id="1_65n6k"]
+
+[resource]
+script = ExtResource("1_65n6k")
+metadata/_custom_type_script = "uid://b7qcydfl4hoxc"

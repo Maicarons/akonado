@@ -1,0 +1,53 @@
+name: Update Showcase
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-showcase-main
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Refresh README showcase
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Generate showcase
+        run: node .github/scripts/generate-konado-case.mjs
+
+      - name: Commit refreshed assets
+        shell: bash
+        run: |
+          git add -A -- \
+            README.md \
+            README.zh-CN.md \
+            README.zh-TW.md \
+            README.ja.md \
+            README.ko.md \
+            assets/made-by-konado
+
+          if git diff --cached --quiet; then
+            echo "Showcase is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: refresh Made by Konado showcase [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

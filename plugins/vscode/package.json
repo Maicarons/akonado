@@ -1,0 +1,187 @@
+{
+	"name": "Konado",
+	"displayName": "Konado",
+	"description": "A complete KonadoScript IDE experience for Visual Studio Code.",
+	"version": "2.8.0",
+	"packageManager": "pnpm@10.19.0",
+	"publisher": "GodotHub",
+	"author": {
+		"name": "GodotHub",
+		"email": "app@godothub.com"
+	},
+	"license": "MIT",
+	"icon": "images/icon.png",
+	"homepage": "https://godothub.com/oss/konado",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/godothub/konado.git",
+		"directory": "plugins/vscode"
+	},
+	"bugs": {
+		"url": "https://github.com/godothub/konado/issues"
+	},
+	"keywords": [
+		"konado",
+		"konadoscript",
+		"godot",
+		"visual novel",
+		"galgame",
+		"dialogue",
+		"narrative",
+		"ks",
+		"language support"
+	],
+	"engines": {
+		"vscode": "^1.96.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Linters",
+		"Formatters",
+		"Snippets"
+	],
+	"extensionKind": [
+		"workspace"
+	],
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": false,
+			"description": "Konado indexes Godot project resources to provide semantic language features."
+		},
+		"virtualWorkspaces": false
+	},
+	"activationEvents": [
+		"workspaceContains:project.godot"
+	],
+	"main": "./dist/extension.js",
+	"scripts": {
+		"clean": "node ./scripts/clean.mjs",
+		"compile": "node ./scripts/build.mjs",
+		"compile:watch": "node ./scripts/build.mjs --watch",
+		"typecheck": "tsc --noEmit",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"test": "vitest run",
+		"check": "pnpm format:check && pnpm typecheck && pnpm test && pnpm compile",
+		"package:vsix": "pnpm check && vsce package --out dist/konado.vsix"
+	},
+	"contributes": {
+		"languages": [
+			{
+				"id": "konadoscript",
+				"aliases": [
+					"KonadoScript",
+					"Konado Script",
+					"ks"
+				],
+				"extensions": [
+					".ks"
+				],
+				"configuration": "./language-configuration.json",
+				"icon": {
+					"light": "./images/ks-icon.svg",
+					"dark": "./images/ks-icon.svg"
+				}
+			}
+		],
+		"grammars": [
+			{
+				"language": "konadoscript",
+				"scopeName": "source.konado",
+				"path": "./syntaxes/konadoscript.tmLanguage.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "konado.openDocumentation",
+				"title": "%command.openDocumentation%"
+			},
+			{
+				"command": "konado.switchLocalization",
+				"title": "%command.switchLocalization%"
+			},
+			{
+				"command": "konado.reindexProject",
+				"title": "%command.reindexProject%"
+			},
+			{
+				"command": "konado.validateWorkspace",
+				"title": "%command.validateWorkspace%"
+			}
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "konado.openDocumentation",
+					"when": "resourceLangId == konadoscript",
+					"group": "navigation@10"
+				},
+				{
+					"command": "konado.switchLocalization",
+					"when": "resourceLangId == konadoscript && konado.hasLocalizations",
+					"group": "navigation@11"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "konado.openDocumentation",
+					"when": "editorLangId == konadoscript",
+					"group": "navigation@50"
+				}
+			]
+		},
+		"configuration": {
+			"title": "Konado",
+			"properties": {
+				"konado.diagnostics.enable": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.diagnostics.enable%"
+				},
+				"konado.projectIndex.enable": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.projectIndex.enable%"
+				},
+				"konado.format.indentStyle": {
+					"type": "string",
+					"enum": [
+						"tab",
+						"space"
+					],
+					"default": "tab",
+					"description": "%config.format.indentStyle%"
+				},
+				"konado.format.indentSize": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 8,
+					"default": 4,
+					"description": "%config.format.indentSize%"
+				},
+				"konado.documentation.language": {
+					"type": "string",
+					"enum": [
+						"auto",
+						"zh",
+						"tc",
+						"en",
+						"ja",
+						"ko"
+					],
+					"default": "auto",
+					"description": "%config.documentation.language%"
+				}
+			}
+		}
+	},
+	"devDependencies": {
+		"@types/node": "^20.17.10",
+		"@types/vscode": "1.96.0",
+		"@vscode/vsce": "^3.9.2",
+		"esbuild": "^0.28.1",
+		"prettier": "^3.9.6",
+		"typescript": "^7.0.0",
+		"vitest": "^4.1.10"
+	}
+}

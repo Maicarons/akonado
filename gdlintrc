@@ -1,0 +1,17 @@
+class-name: "([A-Z][A-Z0-9]*_)?([A-Z][a-z0-9]*)+"
+enum-element-name: "([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|([A-Z][a-z0-9]*)+)"
+class-definitions-order:
+  - tools
+  - extends
+  - classnames
+  - docstrings
+  - signals
+  - enums
+  - consts
+  - staticvars
+  - exports
+  - pubvars
+  - prvvars
+  - onreadypubvars
+  - onreadyprvvars
+  - others

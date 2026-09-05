@@ -1,0 +1,11 @@
+{
+	"command.openDocumentation": "Konado: Open Documentation",
+	"command.switchLocalization": "Konado: Switch Script Language",
+	"command.reindexProject": "Konado: Reindex Godot Project",
+	"command.validateWorkspace": "Konado: Validate Workspace Scripts",
+	"config.diagnostics.enable": "Enable real-time KonadoScript syntax and semantic diagnostics.",
+	"config.projectIndex.enable": "Index Godot text resources for completion, diagnostics, and navigation.",
+	"config.format.indentStyle": "Indentation style used by the KonadoScript formatter.",
+	"config.format.indentSize": "Number of spaces in one indentation level when space indentation is selected.",
+	"config.documentation.language": "Documentation language. Auto follows the Visual Studio Code display language."
+}

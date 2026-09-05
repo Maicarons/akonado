@@ -21,5 +21,5 @@ Kona は Konado のあらゆる場面に登場します。起動画面、公式�
 > 公開日：2025-09-15
 
 <p align="center">
-<img src="https://godothub.atomgit.net/web/icon/konado/kona/kona.png" alt="Kona 2.0 メインビジュアル" width="300"/>
+<img src="https://legacy.godothub.com/kbgirl/kona/kona.png" alt="Kona 2.0 メインビジュアル" width="300"/>
 </p>

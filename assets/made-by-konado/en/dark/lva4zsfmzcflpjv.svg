@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="592" height="204" viewBox="0 0 592 204" role="img" aria-labelledby="card-title card-description">
+<title id="card-title">最后一家奶茶店</title>
+<desc id="card-description">Author: Mai · Heat: 179</desc>
+<defs>
+<clipPath id="card-clip"><rect width="592" height="204" rx="28"/></clipPath>
+<clipPath id="icon-clip"><rect x="20" y="20" width="80" height="80" rx="16"/></clipPath>
+<filter id="icon-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity=".16"/></filter>
+<linearGradient id="light-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".76"/><stop offset=".54" stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#f8fafc" stop-opacity=".98"/></linearGradient>
+<linearGradient id="dark-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f172a" stop-opacity=".76"/><stop offset=".54" stop-color="#020617" stop-opacity=".9"/><stop offset="1" stop-color="#020617" stop-opacity=".98"/></linearGradient>
+<style>
+.card-base{fill:#020617}.card-overlay{fill:url("#dark-overlay")}.card-border{fill:none;stroke:#263244}.panel{fill:#0f172a;fill-opacity:.9}.badge{fill:#10324a}.badge-text{fill:#75c7f5}.online-badge{fill:#172033}.online-text{fill:#b8c3d4}.title,.heat-text{fill:#f8fafc}.summary,.meta{fill:#9aa7ba}.heat-pill{fill:#111c2e;fill-opacity:.94}.icon-ring{fill:#111827;stroke:#fff;stroke-opacity:.14;stroke-width:2}
+</style>
+</defs>
+<g clip-path="url(#card-clip)">
+<rect width="592" height="204" class="card-base"/>
+<rect width="592" height="204" class="card-overlay"/>
+</g>
+<rect x=".5" y=".5" width="591" height="203" rx="27.5" class="card-border"/>
+<g filter="url(#icon-shadow)"><rect x="20" y="20" width="80" height="80" rx="16" class="icon-ring"/></g>
+<image href="data:image/webp;base64,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" x="20" y="20" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#icon-clip)"/>
+<rect x="116" y="22" width="52" height="25" rx="12.5" class="badge"/>
+<text x="142" y="39" text-anchor="middle" class="badge-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">Game</text>
+<rect x="176" y="22" width="86" height="25" rx="12.5" class="online-badge"/>
+<text x="219" y="39" text-anchor="middle" class="online-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">Play online</text>
+<text x="118" y="87" class="meta" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14">Author: Mai</text>
+<rect x="484" y="68" width="88" height="30" rx="15" class="heat-pill"/>
+<path d="M502 90c-4 0-7-2.8-7-6.7 0-2.7 1.4-5.2 4.1-7.6-.1 2.5 1.2 3.8 2.6 4.8-.2-3.4 1.8-6.2 4.3-8.5 0 3.7 3 5.3 3 9.7 0 4.7-3 8.3-7 8.3Z" fill="#f97316"/>
+<text x="515" y="88" class="heat-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14" font-weight="600">179</text>
+<rect x="20" y="116" width="552" height="68" rx="16" class="panel"/>
+<text x="36" y="143" class="title" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="20" font-weight="700">最后一家奶茶店</text>
+<text x="36" y="169" class="summary" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="13">22岁大学毕业生林夏试图拯救即将倒闭的小店</text>
+</svg>

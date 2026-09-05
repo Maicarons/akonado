@@ -23,19 +23,19 @@ KND_Shot is responsible for organizing scattered KND_Dialogue data objects and a
 
 Unlike a film shot, however, KND_Shot does not necessarily represent a continuous, linear story. It may be composed of multiple branch sections, each containing a series of dialogues, and can be combined with choice to implement multi-option branches so users can choose different dialogue paths.
 
-### Relationship Between KND_Shot and Konado Script
+### Relationship Between KND_Shot and KonadoScript
 
-During use, you will notice that KND_Shot does not normally need to be created manually. It is created automatically by Konado Script, and its data is updated automatically. This is because we use a custom Konado Script syntax and a Konado Script parser to parse script files. Lines from the source file are parsed into KND_Dialogue objects, then organized into KND_Shot objects according to specific rules.
+During use, you will notice that KND_Shot does not normally need to be created manually. It is created automatically by KonadoScript, and its data is updated automatically. This is because we use a custom KonadoScript syntax and a KonadoScript parser to parse script files. Lines from the source file are parsed into KND_Dialogue objects, then organized into KND_Shot objects according to specific rules.
 
-Expressed as a flowchart, the process from Konado Script to multiple KND_Dialogue objects and then to KND_Shot is roughly:
+Expressed as a flowchart, the process from KonadoScript to multiple KND_Dialogue objects and then to KND_Shot is roughly:
 
 ```mermaid
 graph TD
-    A["Konado Script source file"] --> B["Parser"]
+    A["KonadoScript source file"] --> B["Parser"]
     B --> C["Generate KND_Dialogue objects"]
     C --> D["Organize by rules"]
     D --> E["Automatically create/update KND_Shot"]
 
 ```
 
-If you want to learn more about how Konado Script is parsed, refer to the Konado Script documentation and the parser source code.
+If you want to learn more about how KonadoScript is parsed, refer to the KonadoScript documentation and the parser source code.

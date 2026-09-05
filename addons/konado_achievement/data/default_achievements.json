@@ -1,0 +1,74 @@
+{
+  "achievements": [
+	{
+	  "id": "first_blood",
+	  "name": "初遇篇章",
+	  "description": "解锁第一条主线剧情分支。",
+	  "icon": "",
+	  "hidden": false,
+	  "category": "story",
+	  "points": 10,
+	  "conditions": {
+		"type": "counter",
+		"target_key": "story_branch_unlocked",
+		"target_value": 1
+	  }
+	},
+	{
+	  "id": "warrior",
+	  "name": "剧情行者",
+	  "description": "累计阅读解锁 10 段关键剧情章节。",
+	  "icon": "",
+	  "hidden": false,
+	  "category": "story",
+	  "points": 25,
+	  "conditions": {
+		"type": "counter",
+		"target_key": "chapter_read",
+		"target_value": 10
+	  }
+	},
+	{
+	  "id": "explorer",
+	  "name": "细节探寻者",
+	  "description": "解锁 5 处隐藏剧情与特殊对白。",
+	  "icon": "",
+	  "hidden": false,
+	  "category": "exploration",
+	  "points": 20,
+	  "conditions": {
+		"type": "counter",
+		"target_key": "hidden_text_found",
+		"target_value": 5
+	  }
+	},
+	{
+	  "id": "secret_ending",
+	  "name": "???",
+	  "description": "抵达不为人知的隐秘结局。",
+	  "icon": "",
+	  "hidden": true,
+	  "category": "ending",
+	  "points": 50,
+	  "conditions": {
+		"type": "flag",
+		"target_key": "secret_ending_unlocked",
+		"target_value": true
+	  }
+	},
+	{
+	  "id": "speedrun",
+	  "name": "速通阅览者",
+	  "description": "在 30 分钟内通关任意一条完整路线。",
+	  "icon": "",
+	  "hidden": false,
+	  "category": "challenge",
+	  "points": 100,
+	  "conditions": {
+		"type": "flag",
+		"target_key": "fast_route_complete",
+		"target_value": true
+	  }
+	}
+  ]
+}

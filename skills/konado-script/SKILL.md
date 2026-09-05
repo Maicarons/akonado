@@ -1,28 +1,28 @@
 ---
 name: konado-script
 description: 视觉小说引擎 Konado DSL (.ks) 的编辑器增强技能包，提供语法高亮、代码补全、静态诊断和代码格式化参考配置。
-version: 1.0.0
-author: DSOE1024
+version: 2.8.0
+author: Konado Contributors
 tags: [visual-novel, dsl, konado]
 license: MIT
 ---
 
-# Konado Script Skill
+# KonadoScript Skill
 
-Konado Script Skill是Konado项目的一部分。
+KonadoScript Skill 是 Konado 项目的一部分。
 
-用于视觉小说引擎框架 **Konado** 的 DSL（`.ks` 文件）编辑器增强技能包，为支持 Konado Script 语法高亮、代码补全、静态诊断和代码格式化的工具提供配置参考。
+用于视觉小说引擎框架 **Konado** 的 DSL（`.ks` 文件）编辑器增强技能包，为支持 KonadoScript 语法高亮、代码补全、静态诊断和代码格式化的工具提供配置参考。
 
 ## 适用 DSL
 
-- **语言名称**：Konado Script
+- **语言名称**：KonadoScript
 - **文件扩展名**：`.ks`
 - **编码**：UTF-8
-- **设计理念**：将故事内容与程序逻辑分离，编剧无需编程知识即可创作
+- **设计理念**：将故事内容与程序逻辑分离，并用可检查、可跳转的结构化指令组织剧情
 
 ## 配置到工具中
 
-1. 将本目录下各 `.md` 文件中的正则、补全项、诊断规则按目标工具的配置格式转换。
+1. 将本目录下各 `.md` 文件中的语法、补全项和诊断规则按目标工具的配置格式转换。
 2. 将 `examples/` 下的 `.ks` 示例脚本放入项目模板目录。
 3. 补全项与代码片段定义见 [completions.md](./completions.md)。
 4. 静态检查规则见 [diagnostics.md](./diagnostics.md)。

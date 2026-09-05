@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://bdrpbjndbe325"]
+
+[ext_resource type="PackedScene" uid="uid://buq324t8ugy0q" path="res://addons/konado/templates/default/dialogue_runtime.tscn" id="1_gbvxg"]
+[ext_resource type="Theme" uid="uid://cnfi2f032rdqf" path="res://addons/konado/templates/centered_dialogue/theme/centered_theme.tres" id="2_7f1ma"]
+[ext_resource type="Shader" uid="uid://dvxdvdhi0klnr" path="res://addons/konado/runtime/ui/typewriter/typewriter_fade.gdshader" id="3_splrt"]
+
+[sub_resource type="Gradient" id="Gradient_1j37f"]
+offsets = PackedFloat32Array(0, 0.16666667, 0.8333333, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0.2509804, 0, 0, 0, 0.2509804, 0, 0, 0, 0)
+metadata/_snap_enabled = true
+metadata/_snap_count = 6
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_krdjn"]
+gradient = SubResource("Gradient_1j37f")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1j37f"]
+texture = SubResource("GradientTexture1D_krdjn")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ewqmk"]
+texture = SubResource("GradientTexture1D_krdjn")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbvxg"]
+shader = ExtResource("3_splrt")
+shader_parameter/progress = 0.0
+shader_parameter/softness = 3.0
+shader_parameter/angle_rad = 0.0
+shader_parameter/spatial_blend = 0.15
+shader_parameter/rect_size = Vector2(1720, 120)
+shader_parameter/line_count = 0
+shader_parameter/line_height = 20.0
+
+[node name="KonadoDialogue" unique_id=1487339260 instance=ExtResource("1_gbvxg")]
+theme = ExtResource("2_7f1ma")
+
+[node name="DialogueBackground" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox" parent_id_path=PackedInt32Array(1215106161) index="0" unique_id=2120586323]
+visible = false
+theme_override_styles/panel = SubResource("StyleBoxTexture_1j37f")
+
+[node name="InnerDialogueBackground" type="Panel" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox/DialogueContainer" parent_id_path=PackedInt32Array(1215106161, 1266611211) index="0" unique_id=1487632778]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ewqmk")
+
+[node name="CharacterNameLabel" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox/DialogueContainer/ContentContainer" parent_id_path=PackedInt32Array(1215106161, 148162569) index="0" unique_id=1294172107]
+size_flags_horizontal = 4
+
+[node name="DialogueSeparator" type="HSeparator" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox/DialogueContainer/ContentContainer" parent_id_path=PackedInt32Array(1215106161, 148162569) index="1" unique_id=477319170]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="DialogueLabel" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox/DialogueContainer/ContentContainer" parent_id_path=PackedInt32Array(1215106161, 148162569) index="2" unique_id=604101149]
+horizontal_alignment = 1
+
+[node name="KonadoTypewriterText" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox/DialogueContainer/ContentContainer" parent_id_path=PackedInt32Array(1215106161, 148162569) index="3" unique_id=1544237387]
+material = SubResource("ShaderMaterial_gbvxg")
+
+[node name="VoiceProgressDisplay" parent="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox" parent_id_path=PackedInt32Array(1215106161) index="2" unique_id=487654055]
+offset_top = -180.0
+offset_bottom = -172.0
+
+[editable path="KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox"]

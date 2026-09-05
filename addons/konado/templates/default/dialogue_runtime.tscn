@@ -1,0 +1,296 @@
+[gd_scene load_steps=16 format=3 uid="uid://buq324t8ugy0q"]
+
+[ext_resource type="Theme" uid="uid://6o5ku57ox1bu" path="res://addons/konado/templates/default/theme/default_theme.tres" id="1_cpdxb"]
+[ext_resource type="Script" uid="uid://dpo124xwpder5" path="res://addons/konado/runtime/dialogue/konado_dialogue_manager.gd" id="2_652dd"]
+[ext_resource type="Script" uid="uid://cyoedi0x84dxy" path="res://addons/konado/runtime/stage/konado_stage_controller.gd" id="3_sk6vk"]
+[ext_resource type="Script" uid="uid://cglr3pnhbntvk" path="res://addons/konado/runtime/stage/background/konado_background_transition_layer.gd" id="4_cu3qr"]
+[ext_resource type="Script" uid="uid://caa0f7vr4lmwx" path="res://addons/konado/runtime/camera/konado_camera_controller.gd" id="5_8r1t4"]
+[ext_resource type="PackedScene" uid="uid://b3wibk1ya0b6j" path="res://addons/konado/templates/default/dialogue_box.tscn" id="6_jo47d"]
+[ext_resource type="Script" uid="uid://b0kbsxqyedoml" path="res://addons/konado/runtime/dialogue/konado_choice_controller.gd" id="7_mrif6"]
+[ext_resource type="Script" uid="uid://b5sjg7ccwo37t" path="res://addons/konado/runtime/ui/screen_text/konado_screen_text.gd" id="8_nudtk"]
+[ext_resource type="Texture2D" uid="uid://d3u4s0bc2m7vq" path="res://addons/konado/templates/default/assets/next_line_indicator.png" id="9_13fku"]
+[ext_resource type="Script" uid="uid://cfbojxb1pdbrs" path="res://addons/konado/runtime/audio/konado_audio_controller.gd" id="9_oa1o7"]
+[ext_resource type="Script" uid="uid://dusoj8pkl7ecg" path="res://addons/konado/runtime/save/konado_save_system.gd" id="10_ra855"]
+[ext_resource type="Script" uid="uid://b3xcpatqnlrg" path="res://addons/konado/runtime/integrations/konado_settings_adapter.gd" id="11_cmq4a"]
+[ext_resource type="PackedScene" path="res://addons/konado/templates/default/save_panel.tscn" id="12_save_panel"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_b1osp"]
+
+[sub_resource type="Gradient" id="Gradient_6xj1n"]
+offsets = PackedFloat32Array(0, 0.4)
+colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0.5647059)
+metadata/_snap_enabled = true
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yt2oi"]
+gradient = SubResource("Gradient_6xj1n")
+
+[node name="KonadoDialogue" type="Control" unique_id=1487339260 node_paths=PackedStringArray("choice_controller", "dialogue_box", "screen_text", "stage_controller", "audio_controller", "quick_save_button", "quick_load_button", "save_panel_button", "auto_play_button", "achievement_button", "settings_button", "save_panel", "save_feedback_label", "error_tooltip_panel", "error_tooltip_label", "error_action_container", "save_system", "settings_adapter", "camera_controller")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_cpdxb")
+script = ExtResource("2_652dd")
+auto_show_dialogue_box = false
+choice_controller = NodePath("KonadoUI/DialogueLayer/DialogueInterface/ChoiceContainer")
+dialogue_box = NodePath("KonadoUI/DialogueLayer/DialogueInterface/KonadoDialogueBox")
+screen_text = NodePath("KonadoUI/DialogueLayer/DialogueInterface/ScreenText")
+stage_controller = NodePath("KonadoUI/StageLayer/StageController")
+audio_controller = NodePath("KonadoAudioController")
+quick_save_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/QuickSaveButton")
+quick_load_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/QuickLoadButton")
+save_panel_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/SaveButton")
+auto_play_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/AutoplayButton")
+achievement_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/AchievementButton")
+settings_button = NodePath("KonadoUI/DialogueLayer/FunctionBar/ButtonContainer/SettingsButton")
+save_panel = NodePath("KonadoUI/SaveLayer/KonadoSavePanel")
+save_feedback_label = NodePath("KonadoUI/DialogueLayer/FunctionBar/SaveFeedback")
+error_tooltip_panel = NodePath("KonadoUI/SystemLayer/KonadoErrorToolTip")
+error_tooltip_label = NodePath("KonadoUI/SystemLayer/KonadoErrorToolTip/MarginContainer/Content/ErrorText")
+error_action_container = NodePath("KonadoUI/SystemLayer/KonadoErrorToolTip/MarginContainer/Content/ErrorActions")
+save_system = NodePath("KonadoSaveSystem")
+settings_adapter = NodePath("KonadoSettingsAdapter")
+camera_controller = NodePath("KonadoUI/StageLayer/StageController/KonadoCameraController")
+
+[node name="KonadoUI" type="Node" parent="." unique_id=1314482304]
+
+[node name="StageLayer" type="CanvasLayer" parent="KonadoUI" unique_id=2059564566]
+layer = 1
+follow_viewport_enabled = true
+
+[node name="StageController" type="PanelContainer" parent="KonadoUI/StageLayer" unique_id=580713454]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_b1osp")
+script = ExtResource("3_sk6vk")
+
+[node name="BackgroundLayer" type="ColorRect" parent="KonadoUI/StageLayer/StageController" unique_id=1466239429]
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BackgroundContainer" type="Control" parent="KonadoUI/StageLayer/StageController/BackgroundLayer" unique_id=334104409]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CameraRoot" type="Node2D" parent="KonadoUI/StageLayer/StageController/BackgroundLayer" unique_id=1002488365]
+
+[node name="Camera2D" type="Camera2D" parent="KonadoUI/StageLayer/StageController/BackgroundLayer/CameraRoot" unique_id=1155153106]
+position = Vector2(1280, 675)
+
+[node name="BackgroundTransitionLayer" type="Control" parent="KonadoUI/StageLayer/StageController" unique_id=1924358963]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_cu3qr")
+
+[node name="ActorLayer" type="Control" parent="KonadoUI/StageLayer/StageController" unique_id=245679010]
+layout_mode = 2
+
+[node name="EffectLayer" type="ColorRect" parent="KonadoUI/StageLayer/StageController" unique_id=1654107269]
+layout_mode = 2
+color = Color(0, 0, 0, 0)
+
+[node name="KonadoCameraController" type="Node" parent="KonadoUI/StageLayer/StageController" unique_id=1180046033 node_paths=PackedStringArray("active_camera", "marker_root")]
+script = ExtResource("5_8r1t4")
+active_camera = NodePath("../BackgroundLayer/CameraRoot/Camera2D")
+marker_root = NodePath("../BackgroundLayer/BackgroundContainer")
+metadata/_custom_type_script = "uid://caa0f7vr4lmwx"
+
+[node name="DialogueLayer" type="CanvasLayer" parent="KonadoUI" unique_id=1650226115]
+layer = 10
+
+[node name="DialogueInterface" type="Control" parent="KonadoUI/DialogueLayer" unique_id=254950114]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="KonadoDialogueBox" parent="KonadoUI/DialogueLayer/DialogueInterface" unique_id=1215106161 instance=ExtResource("6_jo47d")]
+layout_mode = 1
+
+[node name="ChoiceContainer" type="VBoxContainer" parent="KonadoUI/DialogueLayer/DialogueInterface" unique_id=256738057 node_paths=PackedStringArray("_choice_container")]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+script = ExtResource("7_mrif6")
+_choice_container = NodePath(".")
+
+[node name="ScreenText" type="ColorRect" parent="KonadoUI/DialogueLayer/DialogueInterface" unique_id=1672794016 node_paths=PackedStringArray("next_line_indicator")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.11372549)
+script = ExtResource("8_nudtk")
+next_line_indicator = NodePath("NextLineIndicator")
+top_padding = 100.0
+line_fade_duration = 1.0
+
+[node name="NextLineIndicator" type="TextureRect" parent="KonadoUI/DialogueLayer/DialogueInterface/ScreenText" unique_id=1553101315]
+visible = false
+layout_mode = 0
+offset_right = 50.0
+offset_bottom = 50.0
+texture = ExtResource("9_13fku")
+expand_mode = 1
+
+[node name="FunctionBar" type="TextureRect" parent="KonadoUI/DialogueLayer" unique_id=408688081]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -820.0
+offset_bottom = 40.0
+grow_horizontal = 0
+texture = SubResource("GradientTexture1D_yt2oi")
+
+[node name="SaveFeedback" type="Label" parent="KonadoUI/DialogueLayer/FunctionBar"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -610.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="KonadoUI/DialogueLayer/FunctionBar" unique_id=1640410089]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+alignment = 2
+
+[node name="QuickSaveButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "KONADO_QUICK_SAVE"
+flat = true
+
+[node name="QuickLoadButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "KONADO_QUICK_LOAD"
+flat = true
+
+[node name="SaveButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "KONADO_SAVE_DATA"
+flat = true
+
+[node name="AutoplayButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer" unique_id=2120412483]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+toggle_mode = true
+text = "KONADO_AUTO_PLAY"
+flat = true
+
+[node name="AchievementButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer"]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "KONADO_ACHIEVEMENTS"
+flat = true
+
+[node name="SettingsButton" type="Button" parent="KonadoUI/DialogueLayer/FunctionBar/ButtonContainer" unique_id=160303829]
+layout_mode = 2
+theme_type_variation = &"FlatButton"
+text = "KONADO_SETTINGS"
+flat = true
+
+[node name="KonadoAudioController" type="Node2D" parent="." unique_id=1896821847 node_paths=PackedStringArray("background_music_player", "voice_player", "sound_effect_player", "settings_adapter")]
+script = ExtResource("9_oa1o7")
+background_music_player = NodePath("BackgroundMusicPlayer")
+voice_player = NodePath("VoicePlayer")
+sound_effect_player = NodePath("SoundEffectPlayer")
+settings_adapter = NodePath("../KonadoSettingsAdapter")
+
+[node name="BackgroundMusicPlayer" type="AudioStreamPlayer" parent="KonadoAudioController" unique_id=1295733151]
+
+[node name="VoicePlayer" type="AudioStreamPlayer" parent="KonadoAudioController" unique_id=704065821]
+
+[node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="KonadoAudioController" unique_id=743748580]
+
+[node name="SystemLayer" type="CanvasLayer" parent="KonadoUI" unique_id=2080642234]
+layer = 120
+
+[node name="SaveLayer" type="CanvasLayer" parent="KonadoUI"]
+layer = 50
+
+[node name="KonadoSavePanel" parent="KonadoUI/SaveLayer" instance=ExtResource("12_save_panel")]
+
+[node name="KonadoErrorToolTip" type="ColorRect" parent="KonadoUI/SystemLayer" unique_id=1152539807]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08627451, 0.08627451, 0.08627451, 0.9137255)
+
+[node name="MarginContainer" type="MarginContainer" parent="KonadoUI/SystemLayer/KonadoErrorToolTip" unique_id=531884272]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 66
+theme_override_constants/margin_top = 66
+theme_override_constants/margin_right = 66
+theme_override_constants/margin_bottom = 66
+
+[node name="Content" type="VBoxContainer" parent="KonadoUI/SystemLayer/KonadoErrorToolTip/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ErrorText" type="Label" parent="KonadoUI/SystemLayer/KonadoErrorToolTip/MarginContainer/Content" unique_id=735988474]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="ErrorActions" type="HFlowContainer" parent="KonadoUI/SystemLayer/KonadoErrorToolTip/MarginContainer/Content" unique_id=283867520]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 12
+alignment = 2
+
+[node name="KonadoSaveSystem" type="Node" parent="." unique_id=8383492]
+script = ExtResource("10_ra855")
+metadata/_custom_type_script = "uid://dusoj8pkl7ecg"
+
+[node name="KonadoSettingsAdapter" type="Node" parent="." unique_id=601812021]
+script = ExtResource("11_cmq4a")
+metadata/_custom_type_script = "uid://b3xcpatqnlrg"

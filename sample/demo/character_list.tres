@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="KonadoCharacterList" format=3 uid="uid://gi0knny11y78"]
+
+[ext_resource type="Script" uid="uid://5dxx84u6uyy0" path="res://addons/konado/runtime/stage/character/konado_character.gd" id="1_6oy8v"]
+[ext_resource type="Script" uid="uid://bl7m0mtuh2jqi" path="res://addons/konado/runtime/stage/character/konado_character_list.gd" id="2_vqfl5"]
+[ext_resource type="PackedScene" uid="uid://cyv0gn4lt8qv4" path="res://sample/demo/sample_character.tscn" id="3_0jc6l"]
+
+[sub_resource type="Resource" id="Resource_7mst4"]
+script = ExtResource("1_6oy8v")
+character_id = "Kona"
+character_scene = ExtResource("3_0jc6l")
+metadata/_custom_type_script = "uid://5dxx84u6uyy0"
+
+[resource]
+script = ExtResource("2_vqfl5")
+characters = Array[ExtResource("1_6oy8v")]([SubResource("Resource_7mst4")])
+metadata/_custom_type_script = "uid://bl7m0mtuh2jqi"

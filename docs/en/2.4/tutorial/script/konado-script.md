@@ -1,17 +1,17 @@
 ---
-title: Konado Script
+title: KonadoScript
 order: 1
 ---
 
-# Konado Scripts
+# KonadoScript
 
-Konado Scripts is an authoring language tailored for visual novels. Its file extension is `.ks`.
+KonadoScript is an authoring language tailored for visual novels. Its file extension is `.ks`.
 
 You can think of it as a more powerful and more structured "novel script": developers can control story dialogue, character portraits, background switching, music and sound effects, story branches, and choices without writing complex code.
 
 ## Design Philosophy
 
-The core design philosophy of Konado Script is to separate **story content** from **program logic**:
+The core design philosophy of KonadoScript is to separate **story content** from **program logic**:
 - Writers focus on narrative content without needing programming knowledge
 - Programmers focus on engine development without intervening in story creation
 - Resource management (images and audio) uses identifiers and is decoupled from scripts

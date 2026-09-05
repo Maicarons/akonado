@@ -6,17 +6,17 @@ hero:
   text: "Visual Novel Framework"
   tagline: "A visual novel and general-purpose dialogue solution based on Godot Engine"
   image:
-    src: "https://godothub.atomgit.net/web/icon/konado/kona/kona.png"
+    src: "https://legacy.godothub.com/kbgirl/kona/kona.png"
   actions:
     - theme: brand
       text: Quick Start
-      link: /en/2.4/tutorial/install
+      link: /en/latest/tutorial/install
     - theme: alt
       text: Sponsor Us ❤
       link: "https://ifdian.net/item/52230b2860a011f083ef52540025c377"
     - theme: alt
       text: Contribute
-      link: "/en/2.4/community/code-contribute"
+      link: "/en/latest/community/code-contribute"
 
 features:
   - title: Free Distribution

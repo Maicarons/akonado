@@ -18,20 +18,20 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="Akonado"
+config/name="Konado Project"
 config/description="Konado is a dialogue creation toolkit for the Godot Engine, with templates and a dialogue manager to help you quickly build Visual Novels, Gal Games, RPGs and other story‑driven projects."
-config/version="2.5"
-run/main_scene="res://main.tscn"
+config/version="2.8.0"
+run/main_scene="res://sample/demo/main.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
-boot_splash/image="res://ui/splash.png"
-config/icon="res://ui/icon.png"
+config/icon="res://addons/konado/icon.png"
 boot_splash/minimum_display_time=500
 
 [autoload]
 
-KND_AchievementManager="*uid://dlhxd0ixnuo6i"
-KND_WebTool="*uid://b4rup11rlc0uk"
-KND_Settings="*uid://crc32ueqs8u1w"
+KonadoStoryLocalization="*res://addons/konado/localization/konado_story_localization.gd"
+KonadoAchievements="*uid://dlhxd0ixnuo6i"
+KonadoWebTool="*uid://b4rup11rlc0uk"
+KonadoSettings="*uid://crc32ueqs8u1w"
 
 [display]
 
@@ -45,10 +45,11 @@ project/assembly_name="Konado Project"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/konado/plugin.cfg", "res://addons/konado_achievement/plugin.cfg", "res://addons/konado_settings/plugin.cfg", "res://addons/konado_webtool/plugin.cfg")
+enabled=PackedStringArray("res://addons/konado/plugin.cfg", "res://addons/konado_achievement/plugin.cfg", "res://addons/konado_settings/plugin.cfg", "res://addons/konado_web_tool/plugin.cfg")
 
 [internationalization]
 
+locale/translations=PackedStringArray("res://addons/konado/localization/translations/konado.zh_Hans.po", "res://addons/konado/localization/translations/konado.zh_Hant.po", "res://addons/konado/localization/translations/konado.en.po", "res://addons/konado/localization/translations/konado.ja.po", "res://addons/konado/localization/translations/konado.ko.po")
 locale/locale_filter_mode=1
 
 [rendering]

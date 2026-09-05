@@ -21,5 +21,5 @@ Kona는 Konado의 다양한 장면에 등장합니다. 시작 화면, 공식 웹
 > 공개일: 2025-09-15
 
 <p align="center">
-<img src="https://godothub.atomgit.net/web/icon/konado/kona/kona.png" alt="Kona 2.0 메인 이미지" width="300"/>
+<img src="https://legacy.godothub.com/kbgirl/kona/kona.png" alt="Kona 2.0 메인 이미지" width="300"/>
 </p>

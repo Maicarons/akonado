@@ -1,17 +1,14 @@
 {
-  "name": "docs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "konado-documentation",
+  "private": true,
+  "description": "Multilingual documentation site for Konado.",
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.19.19",
     "vitepress": "^1.6.3"

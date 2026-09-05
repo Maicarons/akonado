@@ -1,0 +1,11 @@
+{
+	"command.openDocumentation": "Konado：打开文档",
+	"command.switchLocalization": "Konado：切换剧本语言",
+	"command.reindexProject": "Konado：重新索引 Godot 项目",
+	"command.validateWorkspace": "Konado：检查工作区剧本",
+	"config.diagnostics.enable": "启用 KonadoScript 实时语法与语义诊断。",
+	"config.projectIndex.enable": "索引 Godot 文本资源，用于补全、诊断与跳转。",
+	"config.format.indentStyle": "KonadoScript 格式化程序使用的缩进样式。",
+	"config.format.indentSize": "使用空格缩进时，每级缩进的空格数。",
+	"config.documentation.language": "文档语言。自动模式会跟随 Visual Studio Code 的显示语言。"
+}

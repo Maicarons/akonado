@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://mainmenu01"]
+
+[ext_resource type="Script" uid="uid://n6hqxnpgkvf7" path="res://sample/demo/main.gd" id="1"]
+[ext_resource type="Theme" uid="uid://6o5ku57ox1bu" path="res://addons/konado/templates/default/theme/default_theme.tres" id="1_x17dk"]
+[ext_resource type="Texture2D" uid="uid://obinhywgvblv" path="res://sample/demo/artwork/spring_background.jpg" id="3_2exyp"]
+[ext_resource type="FontFile" uid="uid://dihv3p6n7pp2e" path="res://addons/konado/assets/fonts/resource_han_rounded_cn_medium.ttf" id="4_x17dk"]
+
+[node name="MainMenu" type="Control" unique_id=55242011 node_paths=PackedStringArray("quit_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_x17dk")
+script = ExtResource("1")
+quit_button = NodePath("VBoxContainer/QuitButton")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1665307284]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_2exyp")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=976220001]
+layout_mode = 1
+offset_left = 984.0
+offset_top = 138.0
+offset_right = 1849.0
+offset_bottom = 418.0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Title" type="Label" parent="VBox" unique_id=1395430499]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(0.9635479, 0.7666049, 0.40395322, 1)
+theme_override_colors/font_shadow_color = Color(0.68006146, 0.50127906, 0.16676095, 1)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 4
+theme_override_fonts/font = ExtResource("4_x17dk")
+theme_override_font_sizes/font_size = 128
+text = "Konado Demo"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="VBox" unique_id=1324308867]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.68006146, 0.50127906, 0.16676095, 1)
+theme_override_font_sizes/font_size = 32
+text = "KONADO_DEMO_QUICK_START_BANNER"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=149376007]
+layout_mode = 0
+offset_left = 1123.0
+offset_top = 511.0
+offset_right = 1703.0
+offset_bottom = 867.0
+theme_override_constants/separation = 32
+
+[node name="StartButton" type="Button" parent="VBoxContainer" unique_id=13919602]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "KONADO_DEMO_START"
+
+[node name="SaveButton" type="Button" parent="VBoxContainer" unique_id=1307811728]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "KONADO_SAVE_LOAD"
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer" unique_id=1170830643]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "KONADO_SETTINGS"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=1923210344]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+size_flags_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "KONADO_DEMO_QUIT"
+
+[connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]

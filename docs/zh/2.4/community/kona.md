@@ -21,5 +21,5 @@ Kona的身影贯穿于Konado的全场景中，无论是启动界面、官网首�
 > 发布时间：2025-09-15  
 
 <p align="center">
-<img src="https://godothub.atomgit.net/web/icon/konado/kona/kona.png" alt="Kona 2.0 主形象图" width="300"/>
+<img src="https://legacy.godothub.com/kbgirl/kona/kona.png" alt="Kona 2.0 主形象图" width="300"/>
 </p>

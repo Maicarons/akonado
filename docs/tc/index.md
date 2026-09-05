@@ -6,17 +6,17 @@ hero:
   text: "Visual Novel Framework"
   tagline: "基於 Godot Engine 的視覺小說與通用對話解決方案"
   image:
-    src: "https://godothub.atomgit.net/web/icon/konado/kona/kona.png"
+    src: "https://legacy.godothub.com/kbgirl/kona/kona.png"
   actions:
     - theme: brand
       text: 快速開始
-      link: /tc/2.4/tutorial/install
+      link: /tc/latest/tutorial/install
     - theme: alt
       text: 贊助我們❤
       link: "https://ifdian.net/item/52230b2860a011f083ef52540025c377"
     - theme: alt
       text: 參與貢獻
-      link: "/tc/2.4/community/code-contribute"
+      link: "/tc/latest/community/code-contribute"
 
 features:
   - title: 自由散佈

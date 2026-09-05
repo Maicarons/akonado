@@ -21,5 +21,5 @@ Kona 的身影貫穿 Konado 的各個場景。無論是啟動畫面、官方網�
 > 發布時間：2025-09-15
 
 <p align="center">
-<img src="https://godothub.atomgit.net/web/icon/konado/kona/kona.png" alt="Kona 2.0 主形象圖" width="300"/>
+<img src="https://legacy.godothub.com/kbgirl/kona/kona.png" alt="Kona 2.0 主形象圖" width="300"/>
 </p>

@@ -1,0 +1,35 @@
+name: Export Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "addons/**"
+      - "assets/**"
+      - "sample/**"
+      - "tests/dialogue/test_exported_script_protection.gd"
+      - "export_presets.cfg"
+      - "project.godot"
+      - ".github/workflows/project-export.yml"
+      - ".github/workflows/export-check.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "addons/**"
+      - "assets/**"
+      - "sample/**"
+      - "tests/dialogue/test_exported_script_protection.gd"
+      - "export_presets.cfg"
+      - "project.godot"
+      - ".github/workflows/project-export.yml"
+      - ".github/workflows/export-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/project-export.yml
+    with:
+      artifact_prefix: ci

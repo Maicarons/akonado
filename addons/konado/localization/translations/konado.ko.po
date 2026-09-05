@@ -1,0 +1,217 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Konado 2.8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
+
+msgid "KONADO_ACHIEVEMENT_HIDDEN"
+msgstr "숨겨진 도전 과제입니다."
+
+msgid "KONADO_ACHIEVEMENT_LOCKED"
+msgstr "미달성"
+
+msgid "KONADO_ACHIEVEMENT_POINTS"
+msgstr "%d점"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED"
+msgstr "달성"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED_TITLE"
+msgstr "도전 과제 달성"
+
+msgid "KONADO_ACHIEVEMENTS"
+msgstr "도전 과제"
+
+msgid "KONADO_ACHIEVEMENTS_RESET"
+msgstr "모든 도전 과제 초기화"
+
+msgid "KONADO_AUTO_PLAY"
+msgstr "자동 재생"
+
+msgid "KONADO_AUTO_PLAY_STOP"
+msgstr "자동 재생 중지"
+
+msgid "KONADO_CLOSE"
+msgstr "닫기"
+
+msgid "KONADO_CLOSE_INTERFACE"
+msgstr "닫기"
+
+msgid "KONADO_DEMO_QUICK_START"
+msgstr "Konado 비주얼 노벨 플러그인 빠른 안내"
+
+msgid "KONADO_DEMO_QUICK_START_BANNER"
+msgstr "—— · Konado 비주얼 노벨 플러그인 빠른 안내 · ——"
+
+msgid "KONADO_DEMO_QUIT"
+msgstr "게임 종료"
+
+msgid "KONADO_DEMO_START"
+msgstr "게임 시작"
+
+msgid "KONADO_RUNTIME_ERROR_TITLE"
+msgstr "KonadoScript 런타임 오류"
+
+msgid "KONADO_RUNTIME_ERROR_UNKNOWN"
+msgstr "알 수 없는 런타임 오류"
+
+msgid "KONADO_ERROR_RETRY"
+msgstr "다시 시도"
+
+msgid "KONADO_ERROR_SKIP_INSTRUCTION"
+msgstr "현재 명령 건너뛰기"
+
+msgid "KONADO_ERROR_CONTINUE_TRUE"
+msgstr "true 분기로 계속"
+
+msgid "KONADO_ERROR_CONTINUE_FALSE"
+msgstr "false 분기로 계속"
+
+msgid "KONADO_ERROR_STOP"
+msgstr "대화 중지"
+
+msgid "KONADO_ERROR_CLOSE"
+msgstr "닫기"
+
+msgid "KONADO_LOAD_CONFIRM"
+msgstr "불러오면 저장하지 않은 진행 상황이 사라집니다.\n\n계속할까요?"
+
+msgid "KONADO_LOCALE_ENGLISH"
+msgstr "영어"
+
+msgid "KONADO_LOCALE_JAPANESE"
+msgstr "일본어"
+
+msgid "KONADO_LOCALE_KOREAN"
+msgstr "한국어"
+
+msgid "KONADO_LOCALE_SIMPLIFIED_CHINESE"
+msgstr "중국어 간체"
+
+msgid "KONADO_LOCALE_TRADITIONAL_CHINESE"
+msgstr "중국어 번체"
+
+msgid "KONADO_MAIN_MENU"
+msgstr "메인 메뉴"
+
+msgid "KONADO_QUICK_LOAD"
+msgstr "빠른 불러오기"
+
+msgid "KONADO_QUICK_LOAD_FAILED"
+msgstr "빠른 불러오기 실패"
+
+msgid "KONADO_QUICK_SAVE"
+msgstr "빠른 저장"
+
+msgid "KONADO_QUICK_SAVE_FAILED"
+msgstr "빠른 저장 실패"
+
+msgid "KONADO_QUICK_SAVE_MISSING"
+msgstr "불러올 빠른 저장이 없습니다"
+
+msgid "KONADO_QUICK_SAVE_SUCCEEDED"
+msgstr "빠른 저장 완료"
+
+msgid "KONADO_SAVE_ACTION"
+msgstr "저장"
+
+msgid "KONADO_SAVE_DATA"
+msgstr "저장 데이터"
+
+msgid "KONADO_SAVE_DELETE"
+msgstr "삭제"
+
+msgid "KONADO_SAVE_DELETE_CONFIRM"
+msgstr "이 저장 데이터를 삭제할까요?"
+
+msgid "KONADO_SAVE_DELETE_FAILED"
+msgstr "저장 데이터를 삭제하지 못했습니다"
+
+msgid "KONADO_SAVE_DELETE_SUCCEEDED"
+msgstr "저장 데이터를 삭제했습니다"
+
+msgid "KONADO_SAVE_EMPTY_SLOT"
+msgstr "빈 슬롯"
+
+msgid "KONADO_SAVE_LOAD"
+msgstr "불러오기"
+
+msgid "KONADO_SAVE_LOAD_FAILED"
+msgstr "저장 데이터를 불러오지 못했습니다"
+
+msgid "KONADO_SAVE_FAILED"
+msgstr "게임을 저장하지 못했습니다"
+
+msgid "KONADO_SAVE_SUCCEEDED"
+msgstr "게임을 저장했습니다"
+
+msgid "KONADO_SAVE_SLOT"
+msgstr "저장 %02d"
+
+msgid "KONADO_SETTINGS"
+msgstr "설정"
+
+msgid "KONADO_SETTINGS_AUDIO"
+msgstr "오디오"
+
+msgid "KONADO_SETTINGS_AUTO_DELAY"
+msgstr "자동 진행 대기 시간"
+
+msgid "KONADO_SETTINGS_AUTO_MODE"
+msgstr "자동 모드"
+
+msgid "KONADO_SETTINGS_DEBUG_MODE"
+msgstr "디버그 모드"
+
+msgid "KONADO_SETTINGS_DISPLAY"
+msgstr "화면"
+
+msgid "KONADO_SETTINGS_FULLSCREEN"
+msgstr "전체 화면"
+
+msgid "KONADO_SETTINGS_LANGUAGE"
+msgstr "언어"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME"
+msgstr "전체 음량"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME_TOOLTIP"
+msgstr "게임 전체 음량을 조절합니다"
+
+msgid "KONADO_SETTINGS_MUSIC_VOLUME"
+msgstr "음악 음량"
+
+msgid "KONADO_SETTINGS_RESET"
+msgstr "기본값 복원"
+
+msgid "KONADO_SETTINGS_RESET_CONFIRM"
+msgstr "현재 항목을 기본 설정으로 복원할까요?"
+
+msgid "KONADO_SETTINGS_SFX_VOLUME"
+msgstr "효과음 음량"
+
+msgid "KONADO_SETTINGS_SKIP_ALL"
+msgstr "모두 건너뛰기"
+
+msgid "KONADO_SETTINGS_SKIP_READ"
+msgstr "읽은 내용 건너뛰기"
+
+msgid "KONADO_SETTINGS_TEXT"
+msgstr "텍스트"
+
+msgid "KONADO_SETTINGS_TEXT_SPEED"
+msgstr "텍스트 속도"
+
+msgid "KONADO_SETTINGS_TITLE"
+msgstr "게임 설정"
+
+msgid "KONADO_SETTINGS_VOICE_VOLUME"
+msgstr "음성 음량"
+
+msgid "KONADO_UNKNOWN"
+msgstr "알 수 없음"
+
+msgid "KONADO_UNKNOWN_TIME"
+msgstr "알 수 없는 시간"

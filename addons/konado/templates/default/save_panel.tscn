@@ -1,0 +1,91 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/konado/runtime/ui/save/konado_save_panel.gd" id="1_save_panel"]
+
+[node name="KonadoSavePanel" type="Control" node_paths=PackedStringArray("slot_container", "status_label", "close_button", "load_confirmation", "delete_confirmation")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_save_panel")
+slot_container = NodePath("Backdrop/SavePanelContainer/Margin/VBox/Scroll/Slots")
+status_label = NodePath("Backdrop/SavePanelContainer/Margin/VBox/Footer/Status")
+close_button = NodePath("Backdrop/SavePanelContainer/Margin/VBox/Header/Close")
+load_confirmation = NodePath("LoadConfirmation")
+delete_confirmation = NodePath("DeleteConfirmation")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.64)
+
+[node name="SavePanelContainer" type="PanelContainer" parent="Backdrop"]
+custom_minimum_size = Vector2(920, 620)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -310.0
+offset_right = 460.0
+offset_bottom = 310.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Backdrop/SavePanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Backdrop/SavePanelContainer/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Backdrop/SavePanelContainer/Margin/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Backdrop/SavePanelContainer/Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "KONADO_SAVE_DATA"
+
+[node name="Close" type="Button" parent="Backdrop/SavePanelContainer/Margin/VBox/Header"]
+layout_mode = 2
+text = "KONADO_CLOSE"
+
+[node name="Separator" type="HSeparator" parent="Backdrop/SavePanelContainer/Margin/VBox"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Backdrop/SavePanelContainer/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Slots" type="VBoxContainer" parent="Backdrop/SavePanelContainer/Margin/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Footer" type="HBoxContainer" parent="Backdrop/SavePanelContainer/Margin/VBox"]
+layout_mode = 2
+
+[node name="Status" type="Label" parent="Backdrop/SavePanelContainer/Margin/VBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LoadConfirmation" type="ConfirmationDialog" parent="."]
+title = "KONADO_SAVE_LOAD"
+
+[node name="DeleteConfirmation" type="ConfirmationDialog" parent="."]
+title = "KONADO_SAVE_DELETE"

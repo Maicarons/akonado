@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://cyv0gn4lt8qv4"]
+
+[ext_resource type="Script" uid="uid://cjs8n7ydq4air" path="res://sample/demo/sample_character.gd" id="1_ggs4o"]
+[ext_resource type="Texture2D" uid="uid://d86es3yopbu2" path="res://assets/kona_portrait/kona_portrait_01.png" id="2_87box"]
+[ext_resource type="Script" uid="uid://bqsv661nala3r" path="res://addons/konado/runtime/stage/character/konado_character_status_alias.gd" id="2_mvmx5"]
+[ext_resource type="Texture2D" uid="uid://k3bandjoiw3r" path="res://assets/kona_portrait/kona_portrait_05.png" id="3_h37b2"]
+[ext_resource type="Texture2D" uid="uid://bayxwhw3shs2o" path="res://assets/kona_portrait/kona_portrait_06.png" id="4_2ps44"]
+[ext_resource type="Texture2D" uid="uid://dadand7snjrvn" path="res://assets/kona_portrait/kona_portrait_03.png" id="5_10uvl"]
+[ext_resource type="Texture2D" uid="uid://0388u2vtxu8" path="res://assets/kona_portrait/kona_portrait_02.png" id="6_0ufxu"]
+[ext_resource type="Texture2D" uid="uid://b206jn8b45oaq" path="res://assets/kona_portrait/kona_portrait_04.png" id="7_b8m3x"]
+
+[sub_resource type="Resource" id="Resource_status_alias_normal"]
+script = ExtResource("2_mvmx5")
+status_name = "正常"
+resolved_status_name = "default"
+metadata/_custom_type_script = "uid://bqsv661nala3r"
+
+[sub_resource type="Resource" id="Resource_87box"]
+script = ExtResource("2_mvmx5")
+status_name = "介绍正常"
+resolved_status_name = "介绍"
+metadata/_custom_type_script = "uid://bqsv661nala3r"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_d5n6n"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_87box")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_h37b2")
+}],
+"loop": true,
+"name": &"介绍",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_2ps44")
+}],
+"loop": true,
+"name": &"介绍说话",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_10uvl")
+}],
+"loop": true,
+"name": &"害羞",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_0ufxu")
+}],
+"loop": true,
+"name": &"惊讶",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_b8m3x")
+}],
+"loop": true,
+"name": &"闭眼",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D" unique_id=1078305816]
+script = ExtResource("1_ggs4o")
+status_aliases = Array[ExtResource("2_mvmx5")]([SubResource("Resource_status_alias_normal"), SubResource("Resource_87box")])
+metadata/_edit_vertical_guides_ = [960.0]
+metadata/_edit_horizontal_guides_ = [640.0]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=92475700]
+position = Vector2(-8, 87.999985)
+scale = Vector2(0.30456302, 0.30456296)
+sprite_frames = SubResource("SpriteFrames_d5n6n")
+animation = &"介绍"

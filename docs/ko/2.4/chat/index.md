@@ -6,7 +6,7 @@ hero:
   name: "Konado"
   text: "Visual Novel Framework"
   image:
-    src: "https://godothub.atomgit.net/web/icon/konado.png"
+    src: "https://legacy.godothub.com/kbgirl/kona/kona.png"
 ---
 
 <script setup>

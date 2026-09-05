@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="592" height="204" viewBox="0 0 592 204" role="img" aria-labelledby="card-title card-description">
+<title id="card-title">旧世巡航</title>
+<desc id="card-description">作者：山工程-official · 人気度：457</desc>
+<defs>
+<clipPath id="card-clip"><rect width="592" height="204" rx="28"/></clipPath>
+<clipPath id="icon-clip"><rect x="20" y="20" width="80" height="80" rx="16"/></clipPath>
+<filter id="icon-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity=".16"/></filter>
+<linearGradient id="light-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".76"/><stop offset=".54" stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#f8fafc" stop-opacity=".98"/></linearGradient>
+<linearGradient id="dark-overlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f172a" stop-opacity=".76"/><stop offset=".54" stop-color="#020617" stop-opacity=".9"/><stop offset="1" stop-color="#020617" stop-opacity=".98"/></linearGradient>
+<style>
+.card-base{fill:#020617}.card-overlay{fill:url("#dark-overlay")}.card-border{fill:none;stroke:#263244}.panel{fill:#0f172a;fill-opacity:.9}.badge{fill:#10324a}.badge-text{fill:#75c7f5}.online-badge{fill:#172033}.online-text{fill:#b8c3d4}.title,.heat-text{fill:#f8fafc}.summary,.meta{fill:#9aa7ba}.heat-pill{fill:#111c2e;fill-opacity:.94}.icon-ring{fill:#111827;stroke:#fff;stroke-opacity:.14;stroke-width:2}
+</style>
+</defs>
+<g clip-path="url(#card-clip)">
+<rect width="592" height="204" class="card-base"/>
+<rect width="592" height="204" class="card-overlay"/>
+</g>
+<rect x=".5" y=".5" width="591" height="203" rx="27.5" class="card-border"/>
+<g filter="url(#icon-shadow)"><rect x="20" y="20" width="80" height="80" rx="16" class="icon-ring"/></g>
+<image href="data:image/webp;base64,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" x="20" y="20" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#icon-clip)"/>
+<rect x="116" y="22" width="56" height="25" rx="12.5" class="badge"/>
+<text x="144" y="39" text-anchor="middle" class="badge-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">ゲーム</text>
+<rect x="180" y="22" width="80" height="25" rx="12.5" class="online-badge"/>
+<text x="220" y="39" text-anchor="middle" class="online-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="12" font-weight="600">オンライン</text>
+<text x="118" y="87" class="meta" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14">作者：山工程-official</text>
+<rect x="484" y="68" width="88" height="30" rx="15" class="heat-pill"/>
+<path d="M502 90c-4 0-7-2.8-7-6.7 0-2.7 1.4-5.2 4.1-7.6-.1 2.5 1.2 3.8 2.6 4.8-.2-3.4 1.8-6.2 4.3-8.5 0 3.7 3 5.3 3 9.7 0 4.7-3 8.3-7 8.3Z" fill="#f97316"/>
+<text x="515" y="88" class="heat-text" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="14" font-weight="600">457</text>
+<rect x="20" y="116" width="552" height="68" rx="16" class="panel"/>
+<text x="36" y="143" class="title" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="20" font-weight="700">旧世巡航</text>
+<text x="36" y="169" class="summary" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans SC,sans-serif" font-size="13">架空世界的类冷战题材视觉小说</text>
+</svg>

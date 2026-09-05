@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://d3ukxg25lmwx8"]
+
+[ext_resource type="Script" uid="uid://bqwm4xqor7m1p" path="res://addons/konado/runtime/ui/dialogue_box/konado_voice_progress_display.gd" id="1_l57ji"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_voice_bg"]
+bg_color = Color(0, 0, 0, 0.45)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_voice_fill"]
+bg_color = Color(0.9635479, 0.7666049, 0.40395322, 0.95)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="VoiceProgressDisplay" type="Control" unique_id=1857381072]
+custom_minimum_size = Vector2(320, 8)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_l57ji")
+
+[node name="VoiceProgressBar" type="ProgressBar" parent="." unique_id=1448128995]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_voice_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_voice_fill")
+max_value = 1.0
+show_percentage = false

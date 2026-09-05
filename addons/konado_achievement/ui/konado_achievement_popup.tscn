@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://btqy61ex72lfj"]
+
+[ext_resource type="Script" uid="uid://d4j7jvu0noh52" path="res://addons/konado_achievement/ui/konado_achievement_popup.gd" id="1"]
+
+[node name="AchievementPopup" type="PanelContainer" unique_id=551919462]
+z_index = 100
+script = ExtResource("1")

@@ -5,7 +5,7 @@
 基于 Godot + Konado 的全流程 AI 视觉小说生成管线。
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Konado-2.5-blueviolet.svg?style=flat-square&logoSize=14" alt="Konado" height="20">
+  <img src="https://img.shields.io/badge/Konado-2.8-blueviolet.svg?style=flat-square&logoSize=14" alt="Konado" height="20">
   <img src="https://img.shields.io/badge/Godot-4.7+-blue.svg?style=flat-square&logo=godotengine&logoSize=14" alt="Godot" height="20">
   <img src="https://img.shields.io/badge/Python-3.10+-green.svg?style=flat-square&logo=python&logoSize=14" alt="Python" height="20">
   <img src="https://img.shields.io/badge/License-AGPL_3.0-purple.svg?style=flat-square&logoSize=14" alt="License" height="20">
@@ -45,7 +45,7 @@ Akonado 是一个 AI 驱动的视觉小说资产生成管线。从一句话概�
 
 ### 运行视觉小说（Godot）
 
-> 完整指南、API 参考和进阶教程，请访问 Konado 官方网站：https://godothub.com/oss/konado/en/2.5/
+> 完整指南、API 参考和进阶教程，请访问 Konado 官方网站：https://godothub.com/oss/konado/en/2.8/
 
 1. 克隆本仓库
 2. 用 Godot 4.7+ 打开项目
@@ -122,19 +122,7 @@ akonado/                  # 本项目根目录（Godot 项目）
 
 ## Konado 上游项目
 
-本项目基于 [Konado](https://github.com/godothub/konado) 对话框架（v2.5）。
-
-### Konado 2.5 新特性
-
-Konado 2.5 带来了多项重要更新：
-
-- **快速存档/读档** — 内置 quick save/load 系统，支持对话模板和演示场景
-- **主菜单屏幕** — 新增游戏启动主菜单
-- **背景过渡特效** — 新增"眨眼"等视觉过渡效果，背景全面场景化
-- **角色动作层 (Motion Layer)** — `motion` 命令支持舞台动作和自定义动画
-- **角色场景化** — 角色立绘改为场景节点形式，支持更灵活的扩展
-- **VSCode 语法高亮** — 新增 Konado 脚本语法高亮扩展 (`konado-script-syntax/`)
-- **成就系统修复** — 修复成就关闭异常的 bug
+本项目基于 [Konado](https://github.com/godothub/konado) 对话框架（v2.8+）。
 
 ### Konado Project Team
 

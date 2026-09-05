@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://dwty5qfxsqcyo"]
+
+[ext_resource type="Script" uid="uid://ca0g17r6mh3hi" path="res://addons/konado/runtime/stage/background/konado_background_scene_base.gd" id="1_0ki5s"]
+[ext_resource type="Texture2D" uid="uid://bb7nhjioefh8a" path="res://sample/demo/artwork/cafe_background.png" id="2_0ki5s"]
+[ext_resource type="Script" uid="uid://dbvsg63rj1tnx" path="res://addons/konado/runtime/camera/konado_camera_marker.gd" id="3_fr4rs"]
+
+[node name="BgPara" type="Control" unique_id=2109119121]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_0ki5s")
+
+[node name="Node2D" type="Node2D" parent="." unique_id=518909241]
+position = Vector2(960, 540)
+
+[node name="Parallax2D" type="Parallax2D" parent="Node2D" unique_id=1026175620]
+scroll_scale = Vector2(0.1, 0.1)
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Parallax2D" unique_id=1064567944]
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("2_0ki5s")
+
+[node name="CameraMarkerCam1" type="Camera2D" parent="." unique_id=665198934]
+position = Vector2(650, 397)
+zoom = Vector2(1.5, 1.5)
+enabled = false
+script = ExtResource("3_fr4rs")
+metadata/_custom_type_script = "uid://dbvsg63rj1tnx"
+
+[node name="CameraMarkerCam2" type="Camera2D" parent="." unique_id=326912723]
+position = Vector2(924, 476)
+zoom = Vector2(1.2, 1.2)
+enabled = false
+script = ExtResource("3_fr4rs")
+marker_id = "cam2"
+metadata/_custom_type_script = "uid://dbvsg63rj1tnx"

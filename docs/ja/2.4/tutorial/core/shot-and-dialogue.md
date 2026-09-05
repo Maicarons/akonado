@@ -23,19 +23,19 @@ KND_Shot は、散らばった KND_Dialogue データオブジェクトを整理
 
 ただし映画のショットとは異なり、KND_Shot は必ずしも連続した線形ストーリーを表すわけではありません。複数の branch 分岐で構成される場合があり、それぞれの分岐が一連の会話を含み、choice と組み合わせることで複数選択の分岐を実現し、ユーザーに異なる会話経路を選ばせることができます。
 
-### KND_Shot と Konado Script の関係
+### KND_Shot と KonadoScript の関係
 
-使用していると分かるように、通常 KND_Shot を手動で作成する必要はありません。Konado Script によって自動的に作成され、データも自動更新されます。これは、独自の Konado Script 構文と Konado Script パーサーを使用してスクリプトファイルを解析し、ソースファイルの各行を KND_Dialogue オブジェクトに変換し、一定の規則に従って KND_Shot オブジェクトへ整理するためです。
+使用していると分かるように、通常 KND_Shot を手動で作成する必要はありません。KonadoScript によって自動的に作成され、データも自動更新されます。これは、独自の KonadoScript 構文と KonadoScript パーサーを使用してスクリプトファイルを解析し、ソースファイルの各行を KND_Dialogue オブジェクトに変換し、一定の規則に従って KND_Shot オブジェクトへ整理するためです。
 
-フローチャートで表すと、Konado Script から複数の KND_Dialogue を経て KND_Shot へ至る流れはおおよそ次のようになります。
+フローチャートで表すと、KonadoScript から複数の KND_Dialogue を経て KND_Shot へ至る流れはおおよそ次のようになります。
 
 ```mermaid
 graph TD
-    A["Konado Scriptソースファイル"] --> B["パーサー"]
+    A["KonadoScriptソースファイル"] --> B["パーサー"]
     B --> C["KND_Dialogueオブジェクトを生成"]
     C --> D["規則に従って整理"]
     D --> E["KND_Shotを自動作成/更新"]
 
 ```
 
-Konado Script の解析過程について詳しく知りたい場合は、Konado Script の関連ドキュメントとパーサーのソースコードを参照してください。
+KonadoScript の解析過程について詳しく知りたい場合は、KonadoScript の関連ドキュメントとパーサーのソースコードを参照してください。

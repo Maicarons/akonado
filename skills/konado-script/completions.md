@@ -9,9 +9,14 @@
 | `actor exit` | 移除演员 |
 | `actor change` | 切换演员状态/表情 |
 | `actor move` | 移动演员到指定位置 |
+| `actor motion` | 播放演员动作 |
 | `play bgm` | 播放背景音乐 |
 | `play sfx` | 播放音效 |
 | `stop bgm` | 停止背景音乐 |
+| `screentext` | 显示全屏文本块 |
+| `showtextbox` | 显示对话框 |
+| `hidetextbox` | 隐藏对话框 |
+| `waitsignal` | 等待外部信号 |
 | `choice` | 创建选项（需配合 `branch`） |
 | `branch` | 定义分支/标签块 |
 | `if` | 条件判断开始 |
@@ -22,6 +27,8 @@
 | `achievement` | 成就系统操作 |
 | `jump_branch` | 跳转到指定分支 |
 | `jump` | 跳转到另一个脚本文件 |
+| `cam` | 执行并等待镜头移动、复位或晃动 |
+| `asyncam` | 启动、停止非阻塞镜头操作 |
 
 ## 变量操作关键字
 
@@ -47,7 +54,9 @@
 | `unlock` | `achievement unlock` |
 | `increment` | `achievement increment` |
 | `set_flag` | `achievement set_flag` |
-| `scale` | 演员缩放修饰符 |
+| `motion` | `actor motion` 的子命令 |
+| `reset` | `cam reset` / `asyncam reset` |
+| `shake` | `cam shake` / `asyncam shake` |
 
 ## 内置效果值（background 效果）
 
@@ -61,6 +70,21 @@
 | `vortex` | 旋涡 |
 | `windmill` | 风车 |
 | `cyberglitch` | 赛博故障 |
+| `blink` | 闪烁 |
+
+## 镜头过渡值
+
+| 触发词 | 说明 |
+|--------|------|
+| `none` | 立即完成 |
+| `linear` | 线性过渡 |
+| `ease_in_out` | 缓入缓出 |
+
+## 行级命名参数
+
+命名参数统一写在指令末尾的方括号内。所有可执行指令均可使用
+`[id=step_id]` 声明稳定指令 ID；支持动画的指令可使用
+`[duration=0.3]`。对话还支持 `[speed=1.5]` 或 `[interval=0.03]`，二者不能同时设置。
 
 ## 比较运算符（if 条件中）
 
@@ -87,13 +111,13 @@
 ### 1. 普通对话（`conv`）
 **触发词**：`conv`
 ```
-"${1:角色ID}" "${2:对话文本}"
+${1:角色ID} "${2:对话文本}"
 ```
 
 ### 2. 带配音对话（`convv`）
 **触发词**：`convv`
 ```
-"${1:角色ID}" "${2:对话文本}" ${3:voice_tag}
+${1:角色ID} "${2:对话文本}" ${3:voice_tag}
 ```
 
 ### 3. 旁白（`narr`）
@@ -113,16 +137,16 @@ choice "${3:选项二}" -> ${4:branch_name_2}
 **触发词**：`br`
 ```
 branch ${1:label_id}
-    ${2}
+	${2}
 ```
 
 ### 6. 条件分支（`ifblock`）
 **触发词**：`ifblock`
 ```
 if %${1:变量名} == ${2:值}:
-    ${3}
+	${3}
 else:
-    ${4}
+	${4}
 endif
 ```
 
@@ -166,3 +190,11 @@ actor exit ${1:角色ID}
 background ${2:bg_end} fade
 end
 ```
+
+### 13. 带行级参数的对话（`conv-speed`）
+**触发词**：`conv-speed`
+```
+${1:角色ID} "${2:对话文本}" [speed=${3:1.5}]
+```
+
+演员 ID 使用裸标识符；`$speaker` 和 `%speaker` 表示从变量读取演员 ID；只有纯文本署名才使用双引号，例如 `"旁白" "..."`。

@@ -23,18 +23,18 @@ KND_Shot 将负责组织零散的 KND_Dialogue 数据对象，并按照一定的
 
 当然，与电影镜头不同，KND_Shot 并不一定表示连续的，线性的故事，而是可能由多个 branch 分支组成，每个分支都包含一系列的对话，搭配 choice 来实现多选分支，让用户选择不同的对话路径。
 
-### KND_Shot与Konado Script的关系
+### KND_Shot与KonadoScript的关系
 
-在使用过程中你不难发现，默认情况下，KND_Shot 并不需要手动创建，而是由 Konado Script 自动创建，并且自动更新数据的。这是由于我们采用了自定义的 Konado Script 语法，并使用了 Konado Script 的解析器来解析脚本文件，通过将源文件的行解析成 KND_Dialogue 对象，然后根据一定的规则将它们组织成 KND_Shot 对象。
+在使用过程中你不难发现，默认情况下，KND_Shot 并不需要手动创建，而是由 KonadoScript 自动创建，并且自动更新数据的。这是由于我们采用了自定义的 KonadoScript 语法，并使用了 KonadoScript 的解析器来解析脚本文件，通过将源文件的行解析成 KND_Dialogue 对象，然后根据一定的规则将它们组织成 KND_Shot 对象。
 
-如果用流程图来表示，那么从Konado Script 到多个 KND_Dialogue 到 KND_Shot 的过程大致如下：
+如果用流程图来表示，那么从KonadoScript 到多个 KND_Dialogue 到 KND_Shot 的过程大致如下：
 
 ```mermaid
 graph TD
-    A["Konado Script源文件"] --> B["解析器"]
+    A["KonadoScript源文件"] --> B["解析器"]
     B --> C["生成KND_Dialogue对象"]
     C --> D["按规则组织"]
     D --> E["自动创建/更新KND_Shot"]
 
 ```
-如果你想详细了解 Konado Script 的解析过程，可以参考 Konado Script 的相关文档以及解析器的源代码。
+如果你想详细了解 KonadoScript 的解析过程，可以参考 KonadoScript 的相关文档以及解析器的源代码。

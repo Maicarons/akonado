@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cf1lod8rjewbg"]
+
+[ext_resource type="Script" uid="uid://cwkfuhsp2rxr1" path="res://addons/konado_achievement/ui/konado_achievement_panel.gd" id="1"]
+
+[node name="AchievementPanel" type="PanelContainer" unique_id=1526011578]
+z_index = 90
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")

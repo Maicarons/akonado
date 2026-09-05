@@ -9,11 +9,19 @@ PROJECT_OVERVIEW.md
 .vscode/settings.json
 .VSCodeCounter
 *.tmp
+*~
+extension_api.json
 docs/**/*.import
 docs/**/*.uid
 
 # Jetbrain IDE specific ignores
 .idea/
+
+# AI IDE / AI Code Tool configuration directories
+.codex/
+.claude/
+.cursor/
+.codebuddy/
 
 # Python
 __pycache__/
@@ -50,6 +58,9 @@ ui/app_icon.png
 
 # Generated story scripts
 story/
+
+# Demo games (batch generated)
+demo/
 
 # Test/temp
 *.bak

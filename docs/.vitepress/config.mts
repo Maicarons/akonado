@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { genZhSidebar, genEnSidebar, genTcSidebar, genJaSidebar, genKoSidebar } from './genSidebar'
 import { bbcodeLanguage } from './bbcodeLanguage'
+import { generateLegacyRedirects } from './legacyRedirects'
 import { DEFAULT_DOC_VERSION, DOC_VERSIONS } from './versions'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -63,6 +64,9 @@ function redirectBaseWithoutSlash() {
 export default defineConfig({
 
   lastUpdated: true,
+  async buildEnd(siteConfig) {
+    await generateLegacyRedirects(siteConfig.outDir, docsBase, DEFAULT_DOC_VERSION)
+  },
   appearance: {
     initialValue: 'dark'
   },
@@ -92,7 +96,7 @@ export default defineConfig({
   head: [
     [
       'link',
-      { rel: 'icon', href: 'https://godothub.atomgit.net/web/icon/konado/kona/icon.png' }
+      { rel: 'icon', href: 'https://legacy.godothub.com/kbgirl/kona/icon.png' }
     ],
     [
       'script',
@@ -102,6 +106,26 @@ export default defineConfig({
         const defaultVersion = ${JSON.stringify(DEFAULT_DOC_VERSION)};
         const path = window.location.pathname.replace(/\\/index\\.html$/, '/');
         const base = ${JSON.stringify(docsBase)};
+        const deployedLegacyVersion = path.match(
+          /^\\/oss\\/konado\\/(zh|tc|en|ja|ko)\\/(?:2\\.5|2\\.6)(\\/.*)?$/,
+        );
+        const localLegacyVersion = path.match(
+          /^\\/(zh|tc|en|ja|ko)\\/(?:2\\.5|2\\.6)(\\/.*)?$/,
+        );
+        const legacyVersion = deployedLegacyVersion || localLegacyVersion;
+        if (legacyVersion) {
+          const targetBase = deployedLegacyVersion ? base : '/';
+          window.location.replace(
+            targetBase
+              + legacyVersion[1]
+              + '/'
+              + defaultVersion
+              + (legacyVersion[2] || '/')
+              + window.location.search
+              + window.location.hash,
+          );
+          return;
+        }
         const isRoot = path === '/' || path === base || path === base.slice(0, -1);
         const deployedLocaleRoot = path.match(/^\\/oss\\/konado\\/(zh|tc|en|ja|ko)\\/?$/);
         const localLocaleRoot = path.match(/^\\/(zh|tc|en|ja|ko)\\/?$/);
@@ -128,7 +152,7 @@ export default defineConfig({
   ],
   themeConfig: {
     outline: [2, 3],
-    logo: 'https://godothub.atomgit.net/web/icon/konado/kona/icon.png',
+    logo: 'https://legacy.godothub.com/kbgirl/kona/icon.png',
     search: {
       provider: 'local'
     },

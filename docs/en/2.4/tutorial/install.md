@@ -47,10 +47,4 @@ You have successfully installed the Konado plugin. Before you officially start c
 > -- Philip K. Dick  
 > *Minority Report* (1956)
 
-Konado is still in an early iteration stage, and its features do not yet cover every use case. We understand that the tool's current limitations may cause inconvenience, and we sincerely apologize for that. We also hope this will not overly affect your first steps in creation. Bringing ideas to life should not be held back by temporary tool limitations.
-
-If you are working on an important commercial game project, we recommend first running small-scale tests to confirm whether Konado fits your core needs. If it does not yet satisfy your use case, you can also prioritize more mature tools to protect project progress.
-
-If you are willing to continue using Konado, we sincerely appreciate your support. It is what drives our continued optimization.
-
 May you always keep your imagination and commitment to refinement, and explore more possibilities on your creative journey.

@@ -1,0 +1,217 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Konado 2.8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "KONADO_ACHIEVEMENT_HIDDEN"
+msgstr "This achievement is hidden."
+
+msgid "KONADO_ACHIEVEMENT_LOCKED"
+msgstr "Locked"
+
+msgid "KONADO_ACHIEVEMENT_POINTS"
+msgstr "%d pts"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED"
+msgstr "Unlocked"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED_TITLE"
+msgstr "Achievement Unlocked"
+
+msgid "KONADO_ACHIEVEMENTS"
+msgstr "Achievements"
+
+msgid "KONADO_ACHIEVEMENTS_RESET"
+msgstr "Reset All Achievements"
+
+msgid "KONADO_AUTO_PLAY"
+msgstr "Auto Play"
+
+msgid "KONADO_AUTO_PLAY_STOP"
+msgstr "Stop Auto Play"
+
+msgid "KONADO_CLOSE"
+msgstr "Close"
+
+msgid "KONADO_CLOSE_INTERFACE"
+msgstr "Close"
+
+msgid "KONADO_DEMO_QUICK_START"
+msgstr "Konado Visual Novel Plugin Quick Start"
+
+msgid "KONADO_DEMO_QUICK_START_BANNER"
+msgstr "—— · Konado Visual Novel Plugin Quick Start · ——"
+
+msgid "KONADO_DEMO_QUIT"
+msgstr "Quit Game"
+
+msgid "KONADO_DEMO_START"
+msgstr "Start Game"
+
+msgid "KONADO_RUNTIME_ERROR_TITLE"
+msgstr "KonadoScript Runtime Error"
+
+msgid "KONADO_RUNTIME_ERROR_UNKNOWN"
+msgstr "Unknown runtime error"
+
+msgid "KONADO_ERROR_RETRY"
+msgstr "Retry"
+
+msgid "KONADO_ERROR_SKIP_INSTRUCTION"
+msgstr "Skip Instruction"
+
+msgid "KONADO_ERROR_CONTINUE_TRUE"
+msgstr "Continue on True Branch"
+
+msgid "KONADO_ERROR_CONTINUE_FALSE"
+msgstr "Continue on False Branch"
+
+msgid "KONADO_ERROR_STOP"
+msgstr "Stop Dialogue"
+
+msgid "KONADO_ERROR_CLOSE"
+msgstr "Close"
+
+msgid "KONADO_LOAD_CONFIRM"
+msgstr "Loading will discard unsaved progress.\n\nContinue?"
+
+msgid "KONADO_LOCALE_ENGLISH"
+msgstr "English"
+
+msgid "KONADO_LOCALE_JAPANESE"
+msgstr "Japanese"
+
+msgid "KONADO_LOCALE_KOREAN"
+msgstr "Korean"
+
+msgid "KONADO_LOCALE_SIMPLIFIED_CHINESE"
+msgstr "Simplified Chinese"
+
+msgid "KONADO_LOCALE_TRADITIONAL_CHINESE"
+msgstr "Traditional Chinese"
+
+msgid "KONADO_MAIN_MENU"
+msgstr "Main Menu"
+
+msgid "KONADO_QUICK_LOAD"
+msgstr "Quick Load"
+
+msgid "KONADO_QUICK_LOAD_FAILED"
+msgstr "Quick load failed"
+
+msgid "KONADO_QUICK_SAVE"
+msgstr "Quick Save"
+
+msgid "KONADO_QUICK_SAVE_FAILED"
+msgstr "Quick save failed"
+
+msgid "KONADO_QUICK_SAVE_MISSING"
+msgstr "No quick save is available"
+
+msgid "KONADO_QUICK_SAVE_SUCCEEDED"
+msgstr "Quick save complete"
+
+msgid "KONADO_SAVE_ACTION"
+msgstr "Save"
+
+msgid "KONADO_SAVE_DATA"
+msgstr "Save Data"
+
+msgid "KONADO_SAVE_DELETE"
+msgstr "Delete"
+
+msgid "KONADO_SAVE_DELETE_CONFIRM"
+msgstr "Delete this save?"
+
+msgid "KONADO_SAVE_DELETE_FAILED"
+msgstr "Could not delete the save"
+
+msgid "KONADO_SAVE_DELETE_SUCCEEDED"
+msgstr "Save deleted"
+
+msgid "KONADO_SAVE_EMPTY_SLOT"
+msgstr "Empty Slot"
+
+msgid "KONADO_SAVE_LOAD"
+msgstr "Load"
+
+msgid "KONADO_SAVE_LOAD_FAILED"
+msgstr "Could not load the save"
+
+msgid "KONADO_SAVE_FAILED"
+msgstr "Could not save the game"
+
+msgid "KONADO_SAVE_SUCCEEDED"
+msgstr "Game saved"
+
+msgid "KONADO_SAVE_SLOT"
+msgstr "Save %02d"
+
+msgid "KONADO_SETTINGS"
+msgstr "Settings"
+
+msgid "KONADO_SETTINGS_AUDIO"
+msgstr "Audio"
+
+msgid "KONADO_SETTINGS_AUTO_DELAY"
+msgstr "Auto Advance Delay"
+
+msgid "KONADO_SETTINGS_AUTO_MODE"
+msgstr "Auto Mode"
+
+msgid "KONADO_SETTINGS_DEBUG_MODE"
+msgstr "Debug Mode"
+
+msgid "KONADO_SETTINGS_DISPLAY"
+msgstr "Display"
+
+msgid "KONADO_SETTINGS_FULLSCREEN"
+msgstr "Fullscreen"
+
+msgid "KONADO_SETTINGS_LANGUAGE"
+msgstr "Language"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME"
+msgstr "Master Volume"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME_TOOLTIP"
+msgstr "Adjust the overall game volume"
+
+msgid "KONADO_SETTINGS_MUSIC_VOLUME"
+msgstr "Music Volume"
+
+msgid "KONADO_SETTINGS_RESET"
+msgstr "Restore Defaults"
+
+msgid "KONADO_SETTINGS_RESET_CONFIRM"
+msgstr "Restore the current category to its defaults?"
+
+msgid "KONADO_SETTINGS_SFX_VOLUME"
+msgstr "Sound Effects Volume"
+
+msgid "KONADO_SETTINGS_SKIP_ALL"
+msgstr "Skip All Text"
+
+msgid "KONADO_SETTINGS_SKIP_READ"
+msgstr "Skip Read Text"
+
+msgid "KONADO_SETTINGS_TEXT"
+msgstr "Text"
+
+msgid "KONADO_SETTINGS_TEXT_SPEED"
+msgstr "Text Speed"
+
+msgid "KONADO_SETTINGS_TITLE"
+msgstr "Game Settings"
+
+msgid "KONADO_SETTINGS_VOICE_VOLUME"
+msgstr "Voice Volume"
+
+msgid "KONADO_UNKNOWN"
+msgstr "Unknown"
+
+msgid "KONADO_UNKNOWN_TIME"
+msgstr "Unknown Time"

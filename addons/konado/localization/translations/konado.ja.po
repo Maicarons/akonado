@@ -1,0 +1,217 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Konado 2.8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+
+msgid "KONADO_ACHIEVEMENT_HIDDEN"
+msgstr "この実績は非表示です。"
+
+msgid "KONADO_ACHIEVEMENT_LOCKED"
+msgstr "未解除"
+
+msgid "KONADO_ACHIEVEMENT_POINTS"
+msgstr "%d ポイント"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED"
+msgstr "解除済み"
+
+msgid "KONADO_ACHIEVEMENT_UNLOCKED_TITLE"
+msgstr "実績解除"
+
+msgid "KONADO_ACHIEVEMENTS"
+msgstr "実績"
+
+msgid "KONADO_ACHIEVEMENTS_RESET"
+msgstr "すべての実績をリセット"
+
+msgid "KONADO_AUTO_PLAY"
+msgstr "オート再生"
+
+msgid "KONADO_AUTO_PLAY_STOP"
+msgstr "オート再生を停止"
+
+msgid "KONADO_CLOSE"
+msgstr "閉じる"
+
+msgid "KONADO_CLOSE_INTERFACE"
+msgstr "閉じる"
+
+msgid "KONADO_DEMO_QUICK_START"
+msgstr "Konado ビジュアルノベルプラグイン クイックガイド"
+
+msgid "KONADO_DEMO_QUICK_START_BANNER"
+msgstr "—— · Konado ビジュアルノベルプラグイン クイックガイド · ——"
+
+msgid "KONADO_DEMO_QUIT"
+msgstr "ゲーム終了"
+
+msgid "KONADO_DEMO_START"
+msgstr "ゲーム開始"
+
+msgid "KONADO_RUNTIME_ERROR_TITLE"
+msgstr "KonadoScript 実行時エラー"
+
+msgid "KONADO_RUNTIME_ERROR_UNKNOWN"
+msgstr "不明な実行時エラー"
+
+msgid "KONADO_ERROR_RETRY"
+msgstr "再試行"
+
+msgid "KONADO_ERROR_SKIP_INSTRUCTION"
+msgstr "現在の命令をスキップ"
+
+msgid "KONADO_ERROR_CONTINUE_TRUE"
+msgstr "true 分岐で続行"
+
+msgid "KONADO_ERROR_CONTINUE_FALSE"
+msgstr "false 分岐で続行"
+
+msgid "KONADO_ERROR_STOP"
+msgstr "会話を停止"
+
+msgid "KONADO_ERROR_CLOSE"
+msgstr "閉じる"
+
+msgid "KONADO_LOAD_CONFIRM"
+msgstr "ロードすると未保存の進行状況は失われます。\n\n続行しますか？"
+
+msgid "KONADO_LOCALE_ENGLISH"
+msgstr "英語"
+
+msgid "KONADO_LOCALE_JAPANESE"
+msgstr "日本語"
+
+msgid "KONADO_LOCALE_KOREAN"
+msgstr "韓国語"
+
+msgid "KONADO_LOCALE_SIMPLIFIED_CHINESE"
+msgstr "簡体字中国語"
+
+msgid "KONADO_LOCALE_TRADITIONAL_CHINESE"
+msgstr "繁体字中国語"
+
+msgid "KONADO_MAIN_MENU"
+msgstr "メインメニュー"
+
+msgid "KONADO_QUICK_LOAD"
+msgstr "クイックロード"
+
+msgid "KONADO_QUICK_LOAD_FAILED"
+msgstr "クイックロードに失敗しました"
+
+msgid "KONADO_QUICK_SAVE"
+msgstr "クイックセーブ"
+
+msgid "KONADO_QUICK_SAVE_FAILED"
+msgstr "クイックセーブに失敗しました"
+
+msgid "KONADO_QUICK_SAVE_MISSING"
+msgstr "クイックセーブがありません"
+
+msgid "KONADO_QUICK_SAVE_SUCCEEDED"
+msgstr "クイックセーブしました"
+
+msgid "KONADO_SAVE_ACTION"
+msgstr "セーブ"
+
+msgid "KONADO_SAVE_DATA"
+msgstr "セーブデータ"
+
+msgid "KONADO_SAVE_DELETE"
+msgstr "削除"
+
+msgid "KONADO_SAVE_DELETE_CONFIRM"
+msgstr "このセーブデータを削除しますか？"
+
+msgid "KONADO_SAVE_DELETE_FAILED"
+msgstr "セーブデータを削除できませんでした"
+
+msgid "KONADO_SAVE_DELETE_SUCCEEDED"
+msgstr "セーブデータを削除しました"
+
+msgid "KONADO_SAVE_EMPTY_SLOT"
+msgstr "空きスロット"
+
+msgid "KONADO_SAVE_LOAD"
+msgstr "ロード"
+
+msgid "KONADO_SAVE_LOAD_FAILED"
+msgstr "セーブデータをロードできませんでした"
+
+msgid "KONADO_SAVE_FAILED"
+msgstr "ゲームをセーブできませんでした"
+
+msgid "KONADO_SAVE_SUCCEEDED"
+msgstr "ゲームをセーブしました"
+
+msgid "KONADO_SAVE_SLOT"
+msgstr "セーブ%02d"
+
+msgid "KONADO_SETTINGS"
+msgstr "設定"
+
+msgid "KONADO_SETTINGS_AUDIO"
+msgstr "オーディオ"
+
+msgid "KONADO_SETTINGS_AUTO_DELAY"
+msgstr "自動送り待ち時間"
+
+msgid "KONADO_SETTINGS_AUTO_MODE"
+msgstr "オートモード"
+
+msgid "KONADO_SETTINGS_DEBUG_MODE"
+msgstr "デバッグモード"
+
+msgid "KONADO_SETTINGS_DISPLAY"
+msgstr "画面"
+
+msgid "KONADO_SETTINGS_FULLSCREEN"
+msgstr "フルスクリーン"
+
+msgid "KONADO_SETTINGS_LANGUAGE"
+msgstr "言語"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME"
+msgstr "マスター音量"
+
+msgid "KONADO_SETTINGS_MASTER_VOLUME_TOOLTIP"
+msgstr "ゲーム全体の音量を調整します"
+
+msgid "KONADO_SETTINGS_MUSIC_VOLUME"
+msgstr "音楽音量"
+
+msgid "KONADO_SETTINGS_RESET"
+msgstr "初期設定に戻す"
+
+msgid "KONADO_SETTINGS_RESET_CONFIRM"
+msgstr "現在の項目を初期設定に戻しますか？"
+
+msgid "KONADO_SETTINGS_SFX_VOLUME"
+msgstr "効果音音量"
+
+msgid "KONADO_SETTINGS_SKIP_ALL"
+msgstr "すべてスキップ"
+
+msgid "KONADO_SETTINGS_SKIP_READ"
+msgstr "既読をスキップ"
+
+msgid "KONADO_SETTINGS_TEXT"
+msgstr "テキスト"
+
+msgid "KONADO_SETTINGS_TEXT_SPEED"
+msgstr "文字速度"
+
+msgid "KONADO_SETTINGS_TITLE"
+msgstr "ゲーム設定"
+
+msgid "KONADO_SETTINGS_VOICE_VOLUME"
+msgstr "ボイス音量"
+
+msgid "KONADO_UNKNOWN"
+msgstr "不明"
+
+msgid "KONADO_UNKNOWN_TIME"
+msgstr "時刻不明"
