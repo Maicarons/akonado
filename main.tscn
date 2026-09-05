@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dgmn5gwt4kuwg"]
 
-[ext_resource type="PackedScene" uid="uid://bj8ynu8013j4j" path="res://addons/konado/template/konado_dialogue.tscn" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://buq324t8ugy0q" path="res://addons/konado/templates/default/dialogue_runtime.tscn" id="1_dialogue"]
 [ext_resource type="Resource" uid="uid://cgd2js4jqj8vh" path="res://assets/characters/characters.tres" id="2_chars"]
 [ext_resource type="Resource" uid="uid://db84j21u416dd" path="res://assets/backgrounds/backgrounds.tres" id="3_bgs"]
 [ext_resource type="Resource" uid="uid://8rbyuotvkyh1" path="res://assets/audio/bgm/bgm.tres" id="4_bgm"]
@@ -8,7 +8,7 @@
 [ext_resource type="Resource" uid="uid://b2a1pap853y64" path="res://assets/audio/se/se.tres" id="6_se"]
 [ext_resource type="Script" uid="uid://0i1byno15c3" path="res://main.gd" id="7_main_script"]
 
-[node name="Main" type="Control" unique_id=1813807549]
+[node name="Main" type="Control" node_paths=PackedStringArray("dialogue_manager")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,12 +16,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_main_script")
+dialogue_manager = NodePath("KonadoDialogue")
 
-[node name="KonadoDialogueManager" parent="." unique_id=1099276605 instance=ExtResource("1_main")]
+[node name="KonadoDialogue" parent="." instance=ExtResource("1_dialogue")]
 layout_mode = 1
-init_onstart = false
-chara_list = ExtResource("2_chars")
+character_list = ExtResource("2_chars")
 background_list = ExtResource("3_bgs")
-bgm_list = ExtResource("4_bgm")
+background_music_list = ExtResource("4_bgm")
 voice_list = ExtResource("5_voice")
-soundeffect_list = ExtResource("6_se")
+sound_effect_list = ExtResource("6_se")
+start_dialogue_shot = null

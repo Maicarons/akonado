@@ -1,62 +1,56 @@
 using Godot;
-using Konado.Runtime.Api;
-using Konado.Runtime.Resources;
-
-namespace Konado.Sample;
+using Godot.Collections;
+using Konado.Runtime.API;
+using Konado.Wrapper;
+using static Konado.Runtime.API.KonadoAPI;
 
 /// <summary>
-/// 这个是DialogueManagerApi的使用示例
+/// 这个是DialogueManagerAPI的使用示例
 /// </summary>
-public partial class DialogueManagerApiSample : Node
+public partial class DialogueManagerAPISample : Node
 {
 	public override void _Ready()
 	{
-		var compiler = new KonadoScriptCompiler();
-		var shot = compiler.CompileFile("res://sample/demo/demo_01.ks");
-		if (shot == null)
+		var interpreter = new KonadoScriptsInterpreter(new Dictionary<string, Variant>());
+		var shot = interpreter.ProcessScriptsToData("res://sample/demo/demo_01.ks");
+		GD.Print(shot.Dialogues.Count);
+		
+		if (DialogueManagerApi.IsReady)
 		{
-			GD.PushError("解析示例脚本失败。");
-			return;
+			GD.Print("Ready");
+			
+			_StartDialogue();
 		}
-
-		GD.Print($"Compiled {shot.InstructionCount} KonadoScript instructions.");
-
-		var dialogueManagerApi = KonadoApi.DialogueManagerApi;
-		if (dialogueManagerApi == null)
-			return;
-		if (!dialogueManagerApi.IsReady && !dialogueManagerApi.BindDialogueManager())
-			return;
-
-		GD.Print("Ready");
-		StartDialogue(dialogueManagerApi, shot);
 	}
-
-	private static void StartDialogue(DialogueManagerApi dialogueManagerApi, KonadoShot shot)
+	
+	private void _StartDialogue()
 	{
-		dialogueManagerApi.ShotStart += () =>
+		DialogueManagerApi.ShotStart += () =>
 		{
 			GD.Print("Shot Start");
 		};
 
-		dialogueManagerApi.ShotEnd += () =>
+		DialogueManagerApi.ShotEnd += () =>
 		{
 			GD.Print("Shot End");
 		};
-		dialogueManagerApi.DialogueLineStart += (string instructionId) =>
+		DialogueManagerApi.DialogueLineStart += (string nodeId) =>
 		{
-			GD.Print(instructionId);
+			GD.Print(nodeId);
 		};
-		dialogueManagerApi.DialogueLineEnd += (string instructionId) =>
+		DialogueManagerApi.DialogueLineEnd += (string nodeId) =>
 		{
-			GD.Print(instructionId);
+			GD.Print(nodeId);
 		};
+		
+		if (API.IsApiReady)
+		{
+			GD.Print("API Ready");
 
-		if (KonadoApi.Instance?.IsApiReady != true)
-			return;
-
-		GD.Print("API Ready");
-		dialogueManagerApi.SetShot(shot);
-		dialogueManagerApi.InitDialogue();
-		dialogueManagerApi.StartDialogue();
+			DialogueManagerApi.InitDialogue();
+			DialogueManagerApi.StartDialogue();
+			//DialogueManagerAPI.Instance.LoadDialogueShot("res://sample/sample_lists/storys/test.ks");
+		}
 	}
+
 }

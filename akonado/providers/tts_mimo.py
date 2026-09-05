@@ -12,7 +12,7 @@ import base64
 import json
 from pathlib import Path
 
-from ..config import MIMO_API_KEY, MIMO_BASE_URL, MIMO_TTS_MODEL, MANIFESTS_DIR
+from ..config import MANIFESTS_DIR, MIMO_API_KEY, MIMO_BASE_URL, MIMO_TTS_MODEL
 from .base import TTSProvider
 
 

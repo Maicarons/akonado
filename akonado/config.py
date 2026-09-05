@@ -21,8 +21,11 @@ AKONADO_ROOT = _AKONADO_ROOT
 PROJECT_ROOT = _PROJECT_ROOT
 ASSETS_DIR = PROJECT_ROOT / "assets"
 CHARACTERS_DIR = ASSETS_DIR / "characters"
+CHARACTER_SCENES_DIR = ASSETS_DIR / "characters"  # .tscn files live alongside .png
 BACKGROUNDS_DIR = ASSETS_DIR / "backgrounds"
+BACKGROUND_SCENES_DIR = ASSETS_DIR / "backgrounds"  # .tscn files live alongside .png
 CGS_DIR = ASSETS_DIR / "cgs"
+CG_SCENES_DIR = ASSETS_DIR / "cgs"  # .tscn files live alongside .png
 AUDIO_DIR = ASSETS_DIR / "audio"
 BGM_DIR = AUDIO_DIR / "bgm"
 SE_DIR = AUDIO_DIR / "se"
@@ -55,15 +58,50 @@ QWEN_TTS_DTYPE = os.getenv("QWEN_TTS_DTYPE", "bfloat16")
 COMFYUI_URL = os.getenv("COMFYUI_URL", "http://127.0.0.1:8188")
 
 # ── Godot Engine ──────────────────────────────────────────────
-GODOT_DIR = Path(os.getenv(
-    "GODOT_DIR",
-    r"G:\SteamLibrary\steamapps\common\Godot Engine",
-))
+GODOT_DIR = Path(
+    os.getenv(
+        "GODOT_DIR",
+        r"G:\SteamLibrary\steamapps\common\Godot Engine",
+    )
+)
 
 # ── Web GUI ───────────────────────────────────────────────────
 WEB_HOST = os.getenv("WEB_HOST", "127.0.0.1")
 WEB_PORT = int(os.getenv("WEB_PORT", "5000"))
 WEB_DEBUG = os.getenv("WEB_DEBUG", "false").lower() == "true"
+
+# ── Konado 2.8+ resource paths ────────────────────────────────
+KONADO_CHARACTER_LIST_SCRIPT = (
+    "res://addons/konado/runtime/stage/character/konado_character_list.gd"
+)
+KONADO_CHARACTER_SCRIPT = "res://addons/konado/runtime/stage/character/konado_character.gd"
+KONADO_BACKGROUND_LIST_SCRIPT = (
+    "res://addons/konado/runtime/stage/background/konado_background_list.gd"
+)
+KONADO_BACKGROUND_SCRIPT = "res://addons/konado/runtime/stage/background/konado_background.gd"
+KONADO_BGM_LIST_SCRIPT = (
+    "res://addons/konado/runtime/audio/background_music/konado_background_music_list.gd"
+)
+KONADO_BGM_SCRIPT = "res://addons/konado/runtime/audio/background_music/konado_background_music.gd"
+KONADO_SE_LIST_SCRIPT = "res://addons/konado/runtime/audio/sound_effect/konado_sound_effect_list.gd"
+KONADO_SE_SCRIPT = "res://addons/konado/runtime/audio/sound_effect/konado_sound_effect.gd"
+KONADO_VOICE_LIST_SCRIPT = "res://addons/konado/runtime/audio/voice/konado_voice_list.gd"
+KONADO_VOICE_SCRIPT = "res://addons/konado/runtime/audio/voice/konado_voice.gd"
+
+KONADO_BACKGROUND_SCENE_BASE = (
+    "res://addons/konado/runtime/stage/background/konado_background_scene_base.gd"
+)
+KONADO_CHARACTER_SCENE_BASE = (
+    "res://addons/konado/runtime/stage/character/konado_character_scene_base.gd"
+)
+KONADO_CHARACTER_STATUS_ALIAS = (
+    "res://addons/konado/runtime/stage/character/konado_character_status_alias.gd"
+)
+
+# Template for akonado-generated character scenes
+AKONADO_CHARACTER_SCENE_SCRIPT = "res://resources/akonado_character_scene.gd"
+AKONADO_CHARACTER_SCENE_TEMPLATE = "res://resources/akonado_character_scene.tscn"
+
 
 # ── Voice Characters (lazy-loaded from manifest) ──────────────
 def get_voice_characters() -> dict[str, dict]:
@@ -86,8 +124,16 @@ def get_voice_character_names() -> set[str]:
 def ensure_dirs() -> None:
     """Create all required directories if they don't exist."""
     for d in [
-        CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR,
-        VOICE_DIR, UI_DIR, STORY_DIR, RESOURCES_DIR,
-        OUTPUT_DIR, COMFYUI_DIR,
+        CHARACTERS_DIR,
+        BACKGROUNDS_DIR,
+        CGS_DIR,
+        BGM_DIR,
+        SE_DIR,
+        VOICE_DIR,
+        UI_DIR,
+        STORY_DIR,
+        RESOURCES_DIR,
+        OUTPUT_DIR,
+        COMFYUI_DIR,
     ]:
         d.mkdir(parents=True, exist_ok=True)

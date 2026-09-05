@@ -180,6 +180,22 @@ python -m akonado list characters   # 查看角色清单
 python -m akonado clean characters
 python -m akonado clean all
 
+# 生成场景文件（Konado 2.8+ 需要）
+python -m akonado generate character_scenes   # 角色场景 .tscn
+python -m akonado generate background_scenes  # 背景场景 .tscn
+python -m akonado generate cg_scenes          # CG 场景 .tscn
+python -m akonado generate tres               # 资源清单 .tres
+
 # 在 Web GUI 中编辑
 python -m akonado web
 ```
+
+## 关于 Konado 2.8 场景文件
+
+Konado 2.8 要求角色和背景使用场景文件（`.tscn`）而非直接引用纹理。Akonado 会在 `generate all` 或 `pipeline` 命令中自动生成场景文件：
+
+- **角色场景**：`assets/characters/<id>/<id>.tscn` — 继承 `KonadoCharacterSceneBase`，引用各表情 PNG
+- **背景场景**：`assets/backgrounds/<id>.tscn` — 继承 `KonadoBackgroundSceneBase`，引用背景 PNG
+- **CG 场景**：`assets/cgs/<id>.tscn` — 同样作为背景注册
+
+生成的 `.tres` 文件引用的是这些场景文件，而非直接引用纹理。

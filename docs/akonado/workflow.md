@@ -61,6 +61,10 @@ python -m akonado generate se           # 生成音效
 python -m akonado generate ui           # 生成 UI
 python -m akonado generate voice        # 生成配音
 python -m akonado generate dialogue     # 提取台词
+python -m akonado generate character_scenes   # 生成角色场景 .tscn
+python -m akonado generate background_scenes  # 生成背景场景 .tscn
+python -m akonado generate cg_scenes          # 生成 CG 场景 .tscn
+python -m akonado generate tres               # 生成资源清单 .tres
 ```
 
 ---

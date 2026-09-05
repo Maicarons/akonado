@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -91,7 +91,7 @@ Key Konado 2.8+ concepts:
 ### Known Pitfalls (踩坑记录)
 
 **1. .ks 脚本必须使用 ASCII 直引号**
-Konado 解析器的正则只认 ASCII `"` (0x22)。编辑时如果引入 Unicode 弯引号 `"` `"` (U+201C/U+201D)，解析器会报"无法识别的语法"。Claude Code 的 Edit 工具偶尔会引入弯引号，修改 .ks 文件后务必用 `python3` 检查：
+Konado 解析器的正则只认 ASCII `"` (0x22)。编辑时如果引入 Unicode 弯引号 `"` `"` (U+201C/U+201D)，解析器会报"无法识别的语法"。Codex 的 Edit 工具偶尔会引入弯引号，修改 .ks 文件后务必用 `python3` 检查：
 ```bash
 python3 -c "
 with open('story/xxx.ks','rb') as f:
@@ -131,7 +131,7 @@ Konado 2.8 不再使用 `KND_Background` 纹理引用，而是使用继承 `Kona
 CG是完整插画（角色+背景在同一张图中），显示CG时如果角色立绘还在屏幕上会导致重叠。正确流程：先 `actor exit` 所有在场角色，再 `background cg_id fade`。CG显示完毕后如需继续对话，可重新 `actor show` 角色。
 
 **10. actor move 不能移动到当前位置**
-`actor_moved` 信号只在位置实际改变时触发。移动到同一位置会导致信号永不触发，状态机卡死。
+`character_moved` 信号只在位置实际改变时触发。移动到同一位置会导致信号永不触发，状态机卡死。
 
 ### GDScript Style (for any Godot-side changes)
 - Tabs for indentation, LF line endings, UTF-8

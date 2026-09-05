@@ -22,7 +22,7 @@ from pathlib import Path
 import requests
 from PIL import Image
 
-from ..config import COMFYUI_URL, COMFYUI_DIR
+from ..config import COMFYUI_DIR, COMFYUI_URL
 from .base import ImageProvider
 
 # Fixed workflow filenames — the pipeline expects these exact names
@@ -115,9 +115,7 @@ class WorkflowTemplate:
                 # Fallback: replace placeholders in value
                 for placeholder, param_name in self._PLACEHOLDER_MAP.items():
                     if placeholder in val and param_name in kwargs:
-                        inputs["value"] = val.replace(
-                            placeholder, str(kwargs[param_name])
-                        )
+                        inputs["value"] = val.replace(placeholder, str(kwargs[param_name]))
                         break
 
         # --- 2. Update PrimitiveFloat nodes (e.g. audio duration) ---
@@ -126,7 +124,9 @@ class WorkflowTemplate:
                 continue
             inputs = node.get("inputs", {})
             title = node.get("_meta", {}).get("title", "").lower()
-            if "duration" in kwargs and ("duration" in title or "audio" in title or "length" in title):
+            if "duration" in kwargs and (
+                "duration" in title or "audio" in title or "length" in title
+            ):
                 inputs["value"] = float(kwargs["duration"])
 
         # --- 3. Update width/height in EmptyLatentImage nodes ---
@@ -297,9 +297,7 @@ class ComfyUIClient(ImageProvider):
             return False
 
     def _queue_prompt(self, workflow: dict) -> str:
-        resp = requests.post(
-            f"{self._base_url}/prompt", json={"prompt": workflow}
-        )
+        resp = requests.post(f"{self._base_url}/prompt", json={"prompt": workflow})
         resp.raise_for_status()
         return resp.json()["prompt_id"]
 
@@ -314,7 +312,9 @@ class ComfyUIClient(ImageProvider):
             time.sleep(2)
         raise TimeoutError(f"ComfyUI prompt {prompt_id} timed out after {timeout}s")
 
-    def _download_file(self, filename: str, subfolder: str = "", file_type: str = "output") -> bytes:
+    def _download_file(
+        self, filename: str, subfolder: str = "", file_type: str = "output"
+    ) -> bytes:
         url = f"{self._base_url}/view?filename={filename}&subfolder={subfolder}&type={file_type}"
         resp = requests.get(url)
         resp.raise_for_status()
@@ -370,7 +370,7 @@ class ComfyUIClient(ImageProvider):
     def remove_background(self, input_path: Path, output_path: Path) -> None:
         tpl = self._workflows.get("utility:remove_bg")
         if tpl is None:
-            print(f"  warning: no remove_background workflow found in comfyui/")
+            print("  warning: no remove_background workflow found in comfyui/")
             print(f"  Expected: {WORKFLOW_REMOVE_BG}")
             return
 
@@ -392,10 +392,14 @@ class ComfyUIClient(ImageProvider):
         if len(images) >= 2:
             # First output = composite with alpha, second = mask
             composite_data = self._download_file(
-                images[0]["filename"], images[0].get("subfolder", ""), images[0].get("type", "output")
+                images[0]["filename"],
+                images[0].get("subfolder", ""),
+                images[0].get("type", "output"),
             )
             mask_data = self._download_file(
-                images[1]["filename"], images[1].get("subfolder", ""), images[1].get("type", "output")
+                images[1]["filename"],
+                images[1].get("subfolder", ""),
+                images[1].get("type", "output"),
             )
             base_img = Image.open(io.BytesIO(composite_data)).convert("RGB")
             mask_img = Image.open(io.BytesIO(mask_data)).convert("L")
@@ -408,7 +412,9 @@ class ComfyUIClient(ImageProvider):
 
         if images:
             content = self._download_file(
-                images[0]["filename"], images[0].get("subfolder", ""), images[0].get("type", "output")
+                images[0]["filename"],
+                images[0].get("subfolder", ""),
+                images[0].get("type", "output"),
             )
             self._save_bytes(content, output_path)
             print(f"  saved: {output_path}")

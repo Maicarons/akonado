@@ -13,9 +13,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from pathlib import Path
 
-from ..config import MANIFESTS_DIR, VOICE_DIR, STORY_DIR, get_voice_character_names
+from ..config import MANIFESTS_DIR, STORY_DIR, VOICE_DIR, get_voice_character_names
 from ..providers.base import TTSProvider
 
 
@@ -67,13 +66,15 @@ def extract_voice() -> list[dict]:
                 continue
 
             voice_id = _content_hash(character, text)
-            lines.append({
-                "id": voice_id,
-                "file": str(ks_path.relative_to(STORY_DIR.parent)),
-                "character": character,
-                "character_name": id_to_name.get(character, character),
-                "text": text,
-            })
+            lines.append(
+                {
+                    "id": voice_id,
+                    "file": str(ks_path.relative_to(STORY_DIR.parent)),
+                    "character": character,
+                    "character_name": id_to_name.get(character, character),
+                    "text": text,
+                }
+            )
 
     manifest = {
         "type": "voice",
@@ -112,7 +113,7 @@ def generate_voice_audio(tts: TTSProvider, *, skip_existing: bool = True) -> Non
             continue
 
         char_name = entry.get("character_name", entry["character"])
-        print(f"[voice] ({i+1}/{total}) {char_name}: {entry['text'][:30]}...")
+        print(f"[voice] ({i + 1}/{total}) {char_name}: {entry['text'][:30]}...")
         ok = tts.synthesize(entry["text"], char_name, out_path)
         if ok:
             generated += 1
@@ -158,7 +159,7 @@ def insert_voice_labels() -> None:
 
             if match:
                 old_line = match.group(0)
-                new_line = f'{match.group(1)} {voice_id}'
+                new_line = f"{match.group(1)} {voice_id}"
                 if old_line.strip() != new_line.strip():
                     content = content.replace(old_line, new_line)
                     modified_count += 1

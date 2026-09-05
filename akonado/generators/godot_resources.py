@@ -1,11 +1,11 @@
-"""Godot .tres resource generator.
+"""Godot .tres resource generator for Konado 2.8+.
 
-Generates Konado-compatible .tres files from manifests and generated assets:
-- characters.tres (KND_CharacterList)
-- backgrounds.tres (KND_BackgroundList)
-- bgm.tres (KND_BgmList)
-- se.tres (KND_SoundEffectList)
-- voice.tres (DialogVoiceList)
+Generates Konado 2.8-compatible .tres files from manifests and generated assets:
+- characters.tres (KonadoCharacterList)
+- backgrounds.tres (KonadoBackgroundList)
+- bgm.tres (KonadoBackgroundMusicList)
+- se.tres (KonadoSoundEffectList)
+- voice.tres (KonadoVoiceList)
 """
 
 from __future__ import annotations
@@ -14,11 +14,21 @@ import json
 from pathlib import Path
 
 from ..config import (
-    MANIFESTS_DIR,
-    CHARACTERS_DIR,
     BACKGROUNDS_DIR,
-    CGS_DIR,
     BGM_DIR,
+    CGS_DIR,
+    CHARACTERS_DIR,
+    KONADO_BACKGROUND_LIST_SCRIPT,
+    KONADO_BACKGROUND_SCRIPT,
+    KONADO_BGM_LIST_SCRIPT,
+    KONADO_BGM_SCRIPT,
+    KONADO_CHARACTER_LIST_SCRIPT,
+    KONADO_CHARACTER_SCRIPT,
+    KONADO_SE_LIST_SCRIPT,
+    KONADO_SE_SCRIPT,
+    KONADO_VOICE_LIST_SCRIPT,
+    KONADO_VOICE_SCRIPT,
+    MANIFESTS_DIR,
     SE_DIR,
     VOICE_DIR,
 )
@@ -30,22 +40,28 @@ def _tres_header(script_class: str, load_steps: int) -> str:
 
 
 def _ext_resource_script(path: str, res_id: str) -> str:
-    """Generate ext_resource for a script."""
     return f'[ext_resource type="Script" path="{path}" id="{res_id}"]\n'
 
 
 def _ext_resource_texture(path: str, res_id: str) -> str:
-    """Generate ext_resource for a texture."""
     return f'[ext_resource type="Texture2D" path="{path}" id="{res_id}"]\n'
 
 
 def _ext_resource_audio(path: str, res_id: str) -> str:
-    """Generate ext_resource for an audio stream."""
     return f'[ext_resource type="AudioStream" path="{path}" id="{res_id}"]\n'
 
 
+def _ext_resource_scene(path: str, res_id: str) -> str:
+    return f'[ext_resource type="PackedScene" path="{path}" id="{res_id}"]\n'
+
+
 def generate_characters_tres() -> None:
-    """Generate characters.tres from character assets."""
+    """Generate characters.tres referencing character .tscn scene files.
+
+    Konado 2.8: KonadoCharacterList -> characters: Array[KonadoCharacter]
+      KonadoCharacter.character_id: String
+      KonadoCharacter.character_scene: PackedScene (the .tscn file)
+    """
     manifest_path = MANIFESTS_DIR / "characters.json"
     if not manifest_path.exists():
         print("[characters.tres] manifest not found, skipping")
@@ -56,79 +72,52 @@ def generate_characters_tres() -> None:
 
     items = data.get("items", data.get("characters", {}))
 
-    # Collect all characters and their expressions
+    # Collect characters that have a scene file
     characters = []
     for char_id, char_cfg in items.items():
-        expressions = char_cfg.get("expressions", {})
-        # Only include expressions that have generated files
-        available_states = []
-        for expr_name in expressions:
-            img_path = CHARACTERS_DIR / char_id / f"{expr_name}.png"
-            if img_path.exists():
-                available_states.append(expr_name)
-        if available_states:
-            characters.append((char_id, available_states))
+        scene_path = CHARACTERS_DIR / char_id / f"{char_id}.tscn"
+        if scene_path.exists():
+            characters.append(char_id)
 
     if not characters:
-        print("[characters.tres] no character assets found, skipping")
+        print("[characters.tres] no character scene files found, skipping")
         return
 
-    # Calculate load_steps: scripts + textures + sub_resources + root
-    total_textures = sum(len(states) for _, states in characters)
-    total_sub_resources = total_textures + len(characters)  # states + characters
-    load_steps = 3 + total_textures + total_sub_resources + 1  # 3 scripts + textures + subs + root
-
-    lines = [_tres_header("KND_CharacterList", load_steps)]
+    # load_steps: scripts + scenes + sub_resources + root
+    load_steps = 2 + len(characters) + len(characters) + 1
+    lines = [_tres_header("KonadoCharacterList", load_steps)]
 
     # External resources
-    lines.append(_ext_resource_script(
-        "res://addons/konado/scripts/character/knd_character_list.gd", "ext_1"
-    ))
-    lines.append(_ext_resource_script(
-        "res://addons/konado/scripts/character/knd_character.gd", "ext_2"
-    ))
-    lines.append(_ext_resource_script(
-        "res://addons/konado/scripts/character/knd_character_status.gd", "ext_3"
-    ))
+    lines.append(_ext_resource_script(KONADO_CHARACTER_SCRIPT, "ext_1"))
+    lines.append(_ext_resource_script(KONADO_CHARACTER_LIST_SCRIPT, "ext_2"))
 
-    ext_id = 4
-    texture_ids = {}  # (char_id, expr_name) -> ext_id
-    for char_id, states in characters:
-        for expr_name in states:
-            texture_ids[(char_id, expr_name)] = ext_id
-            lines.append(_ext_resource_texture(
-                f"res://assets/characters/{char_id}/{expr_name}.png", f"ext_{ext_id}"
-            ))
-            ext_id += 1
-
-    # Sub-resources for character states
-    res_id = 1
-    state_ids = {}  # (char_id, expr_name) -> res_id
-    for char_id, states in characters:
-        for expr_name in states:
-            state_ids[(char_id, expr_name)] = res_id
-            lines.append(f'\n[sub_resource type="Resource" id="res_{res_id}"]')
-            lines.append(f'script = ExtResource("ext_3")')
-            lines.append(f'status_name = "{expr_name}"')
-            lines.append(f'status_texture = ExtResource("ext_{texture_ids[(char_id, expr_name)]}")')
-            res_id += 1
+    ext_id = 3
+    scene_ids = {}
+    for char_id in characters:
+        scene_ids[char_id] = ext_id
+        lines.append(
+            _ext_resource_scene(
+                f"res://assets/characters/{char_id}/{char_id}.tscn", f"ext_{ext_id}"
+            )
+        )
+        ext_id += 1
 
     # Sub-resources for characters
-    char_ids = {}  # char_id -> res_id
-    for char_id, states in characters:
-        char_ids[char_id] = res_id
-        state_refs = ", ".join(f'SubResource("res_{state_ids[(char_id, s)]}")' for s in states)
+    res_id = 1
+    char_res_ids = {}
+    for char_id in characters:
+        char_res_ids[char_id] = res_id
         lines.append(f'\n[sub_resource type="Resource" id="res_{res_id}"]')
-        lines.append(f'script = ExtResource("ext_2")')
-        lines.append(f'chara_name = "{char_id}"')
-        lines.append(f'chara_status = Array[ExtResource("ext_3")]([{state_refs}])')
+        lines.append('script = ExtResource("ext_1")')
+        lines.append(f'character_id = "{char_id}"')
+        lines.append(f'character_scene = ExtResource("ext_{scene_ids[char_id]}")')
         res_id += 1
 
     # Root resource
-    char_refs = ", ".join(f'SubResource("res_{char_ids[c]}")' for c, _ in characters)
-    lines.append(f'\n[resource]')
-    lines.append(f'script = ExtResource("ext_1")')
-    lines.append(f'characters = Array[ExtResource("ext_2")]([{char_refs}])')
+    char_refs = ", ".join(f'SubResource("res_{char_res_ids[c]}")' for c in characters)
+    lines.append("\n[resource]")
+    lines.append('script = ExtResource("ext_2")')
+    lines.append(f'characters = Array[ExtResource("ext_1")]([{char_refs}])')
 
     out_path = CHARACTERS_DIR / "characters.tres"
     out_path.write_text("\n".join(lines), encoding="utf-8")
@@ -136,10 +125,11 @@ def generate_characters_tres() -> None:
 
 
 def generate_backgrounds_tres() -> None:
-    """Generate backgrounds.tres from background and CG assets.
+    """Generate backgrounds.tres referencing background .tscn scene files.
 
-    CGs are registered alongside regular backgrounds so they can be used
-    with the ``background`` command in .ks scripts.
+    Konado 2.8: KonadoBackgroundList -> background_list: Array[KonadoBackground]
+      KonadoBackground.background_name: String
+      KonadoBackground.background_scene: PackedScene (the .tscn file)
     """
     manifest_path = MANIFESTS_DIR / "backgrounds.json"
     if not manifest_path.exists():
@@ -151,63 +141,55 @@ def generate_backgrounds_tres() -> None:
 
     items = data.get("items", data.get("backgrounds", {}))
 
-    # Collect backgrounds: (id, res_path) pairs
-    backgrounds: list[tuple[str, str]] = []
+    backgrounds = []
     for bg_id in items:
-        img_path = BACKGROUNDS_DIR / f"{bg_id}.png"
-        if img_path.exists():
-            backgrounds.append((bg_id, f"res://assets/backgrounds/{bg_id}.png"))
+        scene_path = BACKGROUNDS_DIR / f"{bg_id}.tscn"
+        if scene_path.exists():
+            backgrounds.append(bg_id)
 
-    # Also include CGs as backgrounds (they can be used with the background command)
+    # Also include CGs as backgrounds
     cgs_manifest_path = MANIFESTS_DIR / "cgs.json"
     if cgs_manifest_path.exists():
         with open(cgs_manifest_path, encoding="utf-8") as f:
             cgs_data = json.load(f)
         for cg_id, cg_cfg in cgs_data.get("items", {}).items():
-            img_path = CGS_DIR / f"{cg_id}.png"
-            if img_path.exists():
-                backgrounds.append((cg_id, f"res://assets/cgs/{cg_id}.png"))
+            scene_path = CGS_DIR / f"{cg_id}.tscn"
+            if scene_path.exists():
+                backgrounds.append(cg_id)
 
     if not backgrounds:
-        print("[backgrounds.tres] no background assets found, skipping")
+        print("[backgrounds.tres] no background scene files found, skipping")
         return
 
-    # Calculate load_steps
-    load_steps = 2 + len(backgrounds) + len(backgrounds) + 1  # scripts + textures + subs + root
+    load_steps = 2 + len(backgrounds) + len(backgrounds) + 1
+    lines = [_tres_header("KonadoBackgroundList", load_steps)]
 
-    lines = [_tres_header("KND_BackgroundList", load_steps)]
-
-    # External resources
-    lines.append(_ext_resource_script(
-        "res://addons/konado/scripts/background/knd_background_list.gd", "ext_1"
-    ))
-    lines.append(_ext_resource_script(
-        "res://addons/konado/scripts/background/knd_background.gd", "ext_2"
-    ))
+    lines.append(_ext_resource_script(KONADO_BACKGROUND_SCRIPT, "ext_1"))
+    lines.append(_ext_resource_script(KONADO_BACKGROUND_LIST_SCRIPT, "ext_2"))
 
     ext_id = 3
-    texture_ids = {}
-    for bg_id, res_path in backgrounds:
-        texture_ids[bg_id] = ext_id
-        lines.append(_ext_resource_texture(res_path, f"ext_{ext_id}"))
+    scene_ids = {}
+    for bg_id in backgrounds:
+        scene_ids[bg_id] = ext_id
+        # Check if it's a CG (in cgs/) or regular background
+        bg_dir = "cgs" if (CGS_DIR / f"{bg_id}.tscn").exists() else "backgrounds"
+        lines.append(_ext_resource_scene(f"res://assets/{bg_dir}/{bg_id}.tscn", f"ext_{ext_id}"))
         ext_id += 1
 
-    # Sub-resources
     res_id = 1
-    bg_ids = {}
-    for bg_id, _ in backgrounds:
-        bg_ids[bg_id] = res_id
+    bg_res_ids = {}
+    for bg_id in backgrounds:
+        bg_res_ids[bg_id] = res_id
         lines.append(f'\n[sub_resource type="Resource" id="res_{res_id}"]')
-        lines.append(f'script = ExtResource("ext_2")')
+        lines.append('script = ExtResource("ext_1")')
         lines.append(f'background_name = "{bg_id}"')
-        lines.append(f'background_image = ExtResource("ext_{texture_ids[bg_id]}")')
+        lines.append(f'background_scene = ExtResource("ext_{scene_ids[bg_id]}")')
         res_id += 1
 
-    # Root resource
-    bg_refs = ", ".join(f'SubResource("res_{bg_ids[b]}")' for b, _ in backgrounds)
-    lines.append(f'\n[resource]')
-    lines.append(f'script = ExtResource("ext_1")')
-    lines.append(f'background_list = Array[ExtResource("ext_2")]([{bg_refs}])')
+    bg_refs = ", ".join(f'SubResource("res_{bg_res_ids[b]}")' for b in backgrounds)
+    lines.append("\n[resource]")
+    lines.append('script = ExtResource("ext_2")')
+    lines.append(f'background_list = Array[ExtResource("ext_1")]([{bg_refs}])')
 
     out_path = BACKGROUNDS_DIR / "backgrounds.tres"
     out_path.write_text("\n".join(lines), encoding="utf-8")
@@ -234,20 +216,15 @@ def generate_audio_tres(
     with open(manifest_path, encoding="utf-8") as f:
         data = json.load(f)
 
-    # Handle different manifest structures
     if manifest_name == "voice":
-        # Voice manifest has "lines" array with "id" field
         items_data = data.get("lines", [])
         item_ids = [item["id"] for item in items_data if "id" in item]
     else:
-        # Other manifests have "items" dict
         items_data = data.get("items", {})
         item_ids = list(items_data.keys())
 
-    # Find available audio files
     audio_items = []
     for item_id in item_ids:
-        # Check for various audio formats
         for ext in ["mp3", "ogg", "wav"]:
             audio_path = asset_dir / f"{item_id}.{ext}"
             if audio_path.exists():
@@ -258,18 +235,14 @@ def generate_audio_tres(
         print(f"[{out_name}] no audio assets found, skipping")
         return
 
-    # Calculate load_steps
     load_steps = 2 + len(audio_items) + len(audio_items) + 1
-
     lines = [_tres_header(script_class, load_steps)]
 
-    # External resources
     lines.append(_ext_resource_script(list_script, "ext_1"))
     lines.append(_ext_resource_script(item_script, "ext_2"))
 
     ext_id = 3
     audio_ids = {}
-    # Determine the res:// path based on asset_dir
     if asset_dir.name == "bgm":
         res_prefix = "res://assets/audio/bgm"
     elif asset_dir.name == "se":
@@ -281,26 +254,22 @@ def generate_audio_tres(
 
     for item_id, ext in audio_items:
         audio_ids[item_id] = ext_id
-        lines.append(_ext_resource_audio(
-            f"{res_prefix}/{item_id}.{ext}", f"ext_{ext_id}"
-        ))
+        lines.append(_ext_resource_audio(f"{res_prefix}/{item_id}.{ext}", f"ext_{ext_id}"))
         ext_id += 1
 
-    # Sub-resources
     res_id = 1
     item_res_ids = {}
     for item_id, ext in audio_items:
         item_res_ids[item_id] = res_id
         lines.append(f'\n[sub_resource type="Resource" id="res_{res_id}"]')
-        lines.append(f'script = ExtResource("ext_2")')
+        lines.append('script = ExtResource("ext_2")')
         lines.append(f'{name_field} = "{item_id}"')
         lines.append(f'{audio_field} = ExtResource("ext_{audio_ids[item_id]}")')
         res_id += 1
 
-    # Root resource
     item_refs = ", ".join(f'SubResource("res_{item_res_ids[i]}")' for i, _ in audio_items)
-    lines.append(f'\n[resource]')
-    lines.append(f'script = ExtResource("ext_1")')
+    lines.append("\n[resource]")
+    lines.append('script = ExtResource("ext_1")')
     lines.append(f'{list_field} = Array[ExtResource("ext_2")]([{item_refs}])')
 
     out_path = asset_dir / out_name
@@ -309,46 +278,46 @@ def generate_audio_tres(
 
 
 def generate_bgm_tres() -> None:
-    """Generate bgm.tres."""
+    """Generate bgm.tres for Konado 2.8."""
     generate_audio_tres(
         manifest_name="bgm",
         asset_dir=BGM_DIR,
-        script_class="KND_BgmList",
-        list_script="res://addons/konado/scripts/audio/bgm/knd_bgm_list.gd",
-        item_script="res://addons/konado/scripts/audio/bgm/knd_bgm.gd",
-        list_field="bgms",
-        name_field="bgm_name",
-        audio_field="bgm",
+        script_class="KonadoBackgroundMusicList",
+        list_script=KONADO_BGM_LIST_SCRIPT,
+        item_script=KONADO_BGM_SCRIPT,
+        list_field="background_music_tracks",
+        name_field="background_music_name",
+        audio_field="stream",
         out_name="bgm.tres",
     )
 
 
 def generate_se_tres() -> None:
-    """Generate se.tres."""
+    """Generate se.tres for Konado 2.8."""
     generate_audio_tres(
         manifest_name="se",
         asset_dir=SE_DIR,
-        script_class="KND_SoundEffectList",
-        list_script="res://addons/konado/scripts/audio/soundeffect/knd_soundeffect_list.gd",
-        item_script="res://addons/konado/scripts/audio/soundeffect/knd_soundeffect.gd",
-        list_field="soundeffects",
-        name_field="se_name",
-        audio_field="se",
+        script_class="KonadoSoundEffectList",
+        list_script=KONADO_SE_LIST_SCRIPT,
+        item_script=KONADO_SE_SCRIPT,
+        list_field="sound_effects",
+        name_field="sound_effect_name",
+        audio_field="stream",
         out_name="se.tres",
     )
 
 
 def generate_voice_tres() -> None:
-    """Generate voice.tres."""
+    """Generate voice.tres for Konado 2.8."""
     generate_audio_tres(
         manifest_name="voice",
         asset_dir=VOICE_DIR,
-        script_class="DialogVoiceList",
-        list_script="res://addons/konado/scripts/audio/voice/knd_voice_list.gd",
-        item_script="res://addons/konado/scripts/audio/voice/knd_voice.gd",
+        script_class="KonadoVoiceList",
+        list_script=KONADO_VOICE_LIST_SCRIPT,
+        item_script=KONADO_VOICE_SCRIPT,
         list_field="voices",
         name_field="voice_name",
-        audio_field="voice",
+        audio_field="stream",
         out_name="voice.tres",
     )
 

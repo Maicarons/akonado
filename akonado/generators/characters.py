@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 
-from ..config import MANIFESTS_DIR, CHARACTERS_DIR
+from ..config import CHARACTERS_DIR, MANIFESTS_DIR
 from ..providers.base import ImageProvider
 
 

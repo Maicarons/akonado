@@ -24,10 +24,12 @@ def list_skills() -> list[dict[str, str]]:
     for path in sorted(SKILLS_DIR.glob("*.json")):
         with open(path, encoding="utf-8") as f:
             data = json.load(f, strict=False)
-        skills.append({
-            "name": data.get("name", path.stem),
-            "description": data.get("description", ""),
-        })
+        skills.append(
+            {
+                "name": data.get("name", path.stem),
+                "description": data.get("description", ""),
+            }
+        )
     return skills
 
 

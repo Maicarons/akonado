@@ -45,13 +45,47 @@ One-sentence premise
     |
     v
 +-----------------------------------------------------+
-|  Godot + Konado -> Run visual novel                 |
+|  Step 9b: TTS -> Voice files                        |
+|    Extract lines from .ks -> synthesize ->          |
+|    inject voice labels                              |
+|    Output to assets/audio/voice/                    |
++-----------------------------------------------------+
+    |
+    v
++-----------------------------------------------------+
+|  Step 10: Generate Konado 2.8 scene files & .tres   |
+|    character_scenes -> .tscn scene files             |
+|    background_scenes -> .tscn scene files            |
+|    cg_scenes -> .tscn scene files                    |
+|    godot_resources -> .tres resource files           |
++-----------------------------------------------------+
+    |
+    v
++-----------------------------------------------------+
+|  Godot + Konado 2.8 -> Run visual novel              |
+|  (dialogue_runtime.tscn + compiled .ks scripts)      |
 +-----------------------------------------------------+
 ```
 
 ### Execution Order
 
 Voice generation (Step 9b) MUST run after .ks script generation (Step 9a), because the voice pipeline extracts dialogue lines from the .ks scripts.
+
+Scene file generation (Step 10) MUST run after all visual/audio assets are generated, because .tscn files reference existing PNG/MP3 files.
+
+### Konado 2.8 Architecture Changes
+
+Konado 2.8 introduced a major runtime architecture refactor that Akonado has fully adapted to:
+
+| Aspect | Konado 2.5 | Konado 2.8+ |
+|--------|------------|-------------|
+| Class naming | `KND_` prefix (e.g. `KND_Shot`) | `Konado` prefix (e.g. `KonadoShot`) |
+| Character system | Texture references (`KND_CharacterStatus`) | Scene references (`KonadoCharacterSceneBase`) |
+| Background system | Texture references (`KND_Background`) | Scene references (`KonadoBackgroundSceneBase`) |
+| Runtime | Interpreter parses .ks directly | Compiler produces bytecode (`KonadoProgram`) |
+| Editor | `ks_editor/` | `script_editor/` (language services) |
+| Templates | `template/` | `templates/default/` |
+| Main scene | `konado_dialogue.tscn` | `dialogue_runtime.tscn` |
 
 ## Core Modules
 

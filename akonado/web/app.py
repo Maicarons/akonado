@@ -12,12 +12,22 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 from ..config import (
-    AKONADO_ROOT, MANIFESTS_DIR, SKILLS_DIR, CHARACTERS_DIR,
-    BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR,
-    STORY_DIR, ensure_dirs, ENV_FILE,
+    AKONADO_ROOT,
+    BACKGROUNDS_DIR,
+    BGM_DIR,
+    CGS_DIR,
+    CHARACTERS_DIR,
+    ENV_FILE,
+    MANIFESTS_DIR,
+    SE_DIR,
+    SKILLS_DIR,
+    STORY_DIR,
+    UI_DIR,
+    VOICE_DIR,
+    ensure_dirs,
 )
 
 
@@ -54,16 +64,15 @@ def create_app() -> Flask:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 return redirect(url_for("manifest_detail", name=name))
             except json.JSONDecodeError as e:
-                return render_template("manifest_detail.html", name=name,
-                                       content=request.form["content"], error=str(e))
+                return render_template(
+                    "manifest_detail.html", name=name, content=request.form["content"], error=str(e)
+                )
 
         if not path.exists():
-            return render_template("manifest_detail.html", name=name,
-                                   content="{}", error=None)
+            return render_template("manifest_detail.html", name=name, content="{}", error=None)
         with open(path, encoding="utf-8") as f:
             content = f.read()
-        return render_template("manifest_detail.html", name=name,
-                               content=content, error=None)
+        return render_template("manifest_detail.html", name=name, content=content, error=None)
 
     # ── Skills ─────────────────────────────────────────────────
 
@@ -82,8 +91,9 @@ def create_app() -> Flask:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 return redirect(url_for("skill_detail", name=name))
             except json.JSONDecodeError as e:
-                return render_template("skill_detail.html", name=name,
-                                       content=request.form["content"], error=str(e))
+                return render_template(
+                    "skill_detail.html", name=name, content=request.form["content"], error=str(e)
+                )
 
         if not path.exists():
             return "Skill not found", 404
@@ -99,11 +109,9 @@ def create_app() -> Flask:
             content = request.form["content"]
             try:
                 ENV_FILE.write_text(content, encoding="utf-8")
-                return render_template("config.html", content=content,
-                                       saved=True, error=None)
+                return render_template("config.html", content=content, saved=True, error=None)
             except Exception as e:
-                return render_template("config.html", content=content,
-                                       saved=False, error=str(e))
+                return render_template("config.html", content=content, saved=False, error=str(e))
 
         if ENV_FILE.exists():
             content = ENV_FILE.read_text(encoding="utf-8")
@@ -123,12 +131,21 @@ def create_app() -> Flask:
 
         ensure_dirs()
 
-        from ..providers import ComfyUIImageProvider, MiMoTTS, QwenTTS
         from ..generators import (
-            generate_characters, generate_backgrounds, generate_cgs,
-            generate_bgm, generate_se, generate_voice_all, generate_ui,
+            generate_all_tres,
+            generate_background_scenes,
+            generate_backgrounds,
+            generate_bgm,
+            generate_cg_scenes,
+            generate_cgs,
+            generate_character_scenes,
+            generate_characters,
             generate_dialogue,
+            generate_se,
+            generate_ui,
+            generate_voice_all,
         )
+        from ..providers import ComfyUIImageProvider, MiMoTTS, QwenTTS
 
         image = ComfyUIImageProvider()
         tts = QwenTTS() if engine == "qwen" else MiMoTTS()
@@ -142,6 +159,10 @@ def create_app() -> Flask:
             "voice": lambda: generate_voice_all(tts, skip_existing=not force),
             "ui": lambda: generate_ui(image, skip_existing=not force),
             "dialogue": lambda: generate_dialogue(),
+            "character_scenes": lambda: generate_character_scenes(skip_existing=not force),
+            "background_scenes": lambda: generate_background_scenes(skip_existing=not force),
+            "cg_scenes": lambda: generate_cg_scenes(skip_existing=not force),
+            "tres": lambda: generate_all_tres(),
         }
 
         if asset_type == "all":
@@ -166,7 +187,7 @@ def create_app() -> Flask:
 
     @app.route("/api/providers")
     def api_providers():
-        from ..providers import ComfyUIImageProvider, MiMoTTS, QwenTTS, OpenAICompatibleLLM
+        from ..providers import ComfyUIImageProvider, MiMoTTS, OpenAICompatibleLLM, QwenTTS
 
         providers = {
             "comfyui": ComfyUIImageProvider().available(),
@@ -186,8 +207,8 @@ def create_app() -> Flask:
         variables = data.get("variables", {})
         temperature = data.get("temperature", 0.7)
 
-        from ..skills import load_skill, render_user_prompt
         from ..providers import OpenAICompatibleLLM
+        from ..skills import load_skill, render_user_prompt
 
         try:
             skill = load_skill(name)
@@ -230,11 +251,13 @@ def _list_manifests() -> list[dict]:
         for path in sorted(MANIFESTS_DIR.glob("*.json")):
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
-            manifests.append({
-                "name": path.stem,
-                "type": data.get("type", "unknown"),
-                "path": str(path),
-            })
+            manifests.append(
+                {
+                    "name": path.stem,
+                    "type": data.get("type", "unknown"),
+                    "path": str(path),
+                }
+            )
     return manifests
 
 
@@ -245,15 +268,18 @@ def _list_skills() -> list[dict]:
         for path in sorted(SKILLS_DIR.glob("*.json")):
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
-            skills.append({
-                "name": data.get("name", path.stem),
-                "description": data.get("description", ""),
-            })
+            skills.append(
+                {
+                    "name": data.get("name", path.stem),
+                    "description": data.get("description", ""),
+                }
+            )
     return skills
 
 
 def _get_stats() -> dict:
     """Get asset generation statistics."""
+
     def count_files(d: Path) -> int:
         return len(list(d.iterdir())) if d.exists() else 0
 

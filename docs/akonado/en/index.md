@@ -1,6 +1,6 @@
 # Akonado Documentation
 
-Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4.7 + Konado 2.5. From a one-sentence premise, it automatically generates scripts, character sprites, backgrounds, BGM, sound effects, voice acting, and UI assets that run directly in Godot.
+Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4.7 + **Konado 2.8+**. From a one-sentence premise, it automatically generates scripts, character sprites, backgrounds, BGM, sound effects, voice acting, and UI assets that run directly in Godot.
 
 ## Getting Started
 
@@ -23,3 +23,4 @@ Akonado is an AI-powered visual novel asset generation pipeline built on Godot 4
 ## External References
 
 - [Konado Framework Docs](../konado/) -- .ks script syntax, dialogue system API
+- [Konado 2.8 Upgrade Guide](https://godothub.com/oss/konado/en/2.8/tutorial/upgrade-2.8.html) -- Changes from 2.5 to 2.8

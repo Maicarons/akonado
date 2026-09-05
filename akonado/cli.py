@@ -30,11 +30,12 @@ def _strip_markdown_code_blocks(text: str) -> str:
         if first_newline != -1:
             text = text[first_newline + 1 :]
     if text.endswith("```"):
-        text = text[: -3]
+        text = text[:-3]
     text = text.strip()
     # If the result doesn't look like JSON, try to extract JSON block
     if not text.startswith("{"):
         import re
+
         match = re.search(r"\{.*\}", text, re.DOTALL)
         if match:
             text = match.group()
@@ -43,7 +44,7 @@ def _strip_markdown_code_blocks(text: str) -> str:
 
 def _get_providers(engine: str = "mimo"):
     """Instantiate providers based on configuration."""
-    from .providers import ComfyUIImageProvider, MiMoTTS, QwenTTS, OpenAICompatibleLLM
+    from .providers import ComfyUIImageProvider, MiMoTTS, OpenAICompatibleLLM, QwenTTS
 
     image = ComfyUIImageProvider()
     llm = OpenAICompatibleLLM()
@@ -58,7 +59,7 @@ def _get_providers(engine: str = "mimo"):
 
 def cmd_check(_args: argparse.Namespace) -> None:
     """Check provider availability."""
-    from .providers import ComfyUIClient, MiMoTTS, QwenTTS, OpenAICompatibleLLM
+    from .providers import ComfyUIClient, MiMoTTS, OpenAICompatibleLLM, QwenTTS
 
     comfyui = ComfyUIClient()
     providers = [
@@ -94,8 +95,15 @@ def cmd_check(_args: argparse.Namespace) -> None:
 def _check_and_fill_missing(type_filter: str, generators: dict) -> None:
     """Check manifests vs actual files, report missing, and regenerate."""
     from .config import (
-        MANIFESTS_DIR, CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR,
-        BGM_DIR, SE_DIR, VOICE_DIR, UI_DIR, STORY_DIR,
+        BACKGROUNDS_DIR,
+        BGM_DIR,
+        CGS_DIR,
+        CHARACTERS_DIR,
+        MANIFESTS_DIR,
+        SE_DIR,
+        STORY_DIR,
+        UI_DIR,
+        VOICE_DIR,
     )
 
     missing: dict[str, list[str]] = {}
@@ -231,9 +239,9 @@ def _check_and_fill_missing(type_filter: str, generators: dict) -> None:
     print("\nRegenerating missing assets...")
     for asset_type in missing:
         if asset_type in generators:
-            print(f"\n{'='*40}")
+            print(f"\n{'=' * 40}")
             print(f"  regenerating: {asset_type}")
-            print(f"{'='*40}")
+            print(f"{'=' * 40}")
             generators[asset_type]()
 
     print("\nDone!")
@@ -241,17 +249,21 @@ def _check_and_fill_missing(type_filter: str, generators: dict) -> None:
 
 def cmd_generate(args: argparse.Namespace) -> None:
     """Generate assets."""
-    from .generators import (
-        generate_characters,
-        generate_backgrounds,
-        generate_cgs,
-        generate_bgm,
-        generate_se,
-        generate_voice_all,
-        generate_ui,
-        generate_dialogue,
-    )
     from .config import ensure_dirs
+    from .generators import (
+        generate_all_tres,
+        generate_background_scenes,
+        generate_backgrounds,
+        generate_bgm,
+        generate_cg_scenes,
+        generate_cgs,
+        generate_character_scenes,
+        generate_characters,
+        generate_dialogue,
+        generate_se,
+        generate_ui,
+        generate_voice_all,
+    )
 
     ensure_dirs()
     skip = not args.force
@@ -267,6 +279,10 @@ def cmd_generate(args: argparse.Namespace) -> None:
         "voice": lambda: generate_voice_all(tts, skip_existing=skip),
         "ui": lambda: generate_ui(image, skip_existing=skip),
         "dialogue": lambda: generate_dialogue(),
+        "character_scenes": lambda: generate_character_scenes(skip_existing=skip),
+        "background_scenes": lambda: generate_background_scenes(skip_existing=skip),
+        "cg_scenes": lambda: generate_cg_scenes(skip_existing=skip),
+        "tres": lambda: generate_all_tres(),
     }
 
     # --check-missing: scan manifests, report missing, regenerate
@@ -276,9 +292,9 @@ def cmd_generate(args: argparse.Namespace) -> None:
 
     if args.type == "all":
         for name, fn in generators.items():
-            print(f"\n{'='*40}")
+            print(f"\n{'=' * 40}")
             print(f"  generating: {name}")
-            print(f"{'='*40}")
+            print(f"{'=' * 40}")
             fn()
     elif args.type in generators:
         generators[args.type]()
@@ -346,8 +362,8 @@ def cmd_list(args: argparse.Namespace) -> None:
 
 def cmd_skill(args: argparse.Namespace) -> None:
     """Run an LLM skill (prompt template) to generate content."""
-    from .skills import list_skills, load_skill, render_user_prompt
     from .providers import OpenAICompatibleLLM
+    from .skills import list_skills, load_skill, render_user_prompt
 
     if args.action == "list":
         skills = list_skills()
@@ -421,8 +437,15 @@ def cmd_skill(args: argparse.Namespace) -> None:
 def cmd_clean(args: argparse.Namespace) -> None:
     """Remove generated files for a type or all types."""
     from .config import (
-        CHARACTERS_DIR, BACKGROUNDS_DIR, CGS_DIR, BGM_DIR, SE_DIR,
-        VOICE_DIR, UI_DIR, MANIFESTS_DIR, STORY_DIR,
+        BACKGROUNDS_DIR,
+        BGM_DIR,
+        CGS_DIR,
+        CHARACTERS_DIR,
+        MANIFESTS_DIR,
+        SE_DIR,
+        STORY_DIR,
+        UI_DIR,
+        VOICE_DIR,
     )
 
     asset_map = {
@@ -512,7 +535,11 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     from pathlib import Path
 
     from .config import (
-        ensure_dirs, MANIFESTS_DIR, STORY_DIR, GODOT_DIR, ASSETS_DIR,
+        ASSETS_DIR,
+        GODOT_DIR,
+        MANIFESTS_DIR,
+        STORY_DIR,
+        ensure_dirs,
     )
     from .providers import OpenAICompatibleLLM
 
@@ -533,8 +560,13 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     print("  Step 1/10: Generating script from premise")
     print("=" * 50)
     script_result = _run_skill(
-        llm, "generate_script",
-        {"input": premise, "num_chapters": str(num_chapters), "scenes_per_chapter": str(scenes_per_chapter)},
+        llm,
+        "generate_script",
+        {
+            "input": premise,
+            "num_chapters": str(num_chapters),
+            "scenes_per_chapter": str(scenes_per_chapter),
+        },
         temperature,
     )
     try:
@@ -551,8 +583,13 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     print("=" * 50)
     char_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     char_result = _run_skill(
-        llm, "generate_character_prompts",
-        {"input": char_input, "style": "anime visual novel style", "style_keywords": "clean lineart, soft cel shading"},
+        llm,
+        "generate_character_prompts",
+        {
+            "input": char_input,
+            "style": "anime visual novel style",
+            "style_keywords": "clean lineart, soft cel shading",
+        },
         temperature,
     )
     try:
@@ -560,7 +597,10 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     except _json.JSONDecodeError:
         print("Warning: Failed to parse character JSON, saving raw output")
         char_data = char_result
-    _save_json(MANIFESTS_DIR / "characters.json", char_data if isinstance(char_data, dict) else {"raw": char_data})
+    _save_json(
+        MANIFESTS_DIR / "characters.json",
+        char_data if isinstance(char_data, dict) else {"raw": char_data},
+    )
 
     # ── Step 3: Generate background manifest ──────────────────
     print("\n" + "=" * 50)
@@ -568,7 +608,8 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     print("=" * 50)
     bg_input = _json.dumps(script_data.get("backgrounds", []), ensure_ascii=False, indent=2)
     bg_result = _run_skill(
-        llm, "generate_background_prompts",
+        llm,
+        "generate_background_prompts",
         {"input": bg_input, "style": "anime style background, visual novel background"},
         temperature,
     )
@@ -577,7 +618,10 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     except _json.JSONDecodeError:
         print("Warning: Failed to parse background JSON, saving raw output")
         bg_data = bg_result
-    _save_json(MANIFESTS_DIR / "backgrounds.json", bg_data if isinstance(bg_data, dict) else {"raw": bg_data})
+    _save_json(
+        MANIFESTS_DIR / "backgrounds.json",
+        bg_data if isinstance(bg_data, dict) else {"raw": bg_data},
+    )
 
     # ── Step 4: Generate CG manifest ─────────────────────────
     print("\n" + "=" * 50)
@@ -586,7 +630,8 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     cgs_input = _json.dumps(script_data.get("cgs", []), ensure_ascii=False, indent=2)
     char_input_for_cg = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     cgs_result = _run_skill(
-        llm, "generate_cg_prompts",
+        llm,
+        "generate_cg_prompts",
         {
             "input": cgs_input,
             "characters": char_input_for_cg,
@@ -600,7 +645,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     except _json.JSONDecodeError:
         print("Warning: Failed to parse CG JSON, saving raw output")
         cgs_data = cgs_result
-    _save_json(MANIFESTS_DIR / "cgs.json", cgs_data if isinstance(cgs_data, dict) else {"raw": cgs_data})
+    _save_json(
+        MANIFESTS_DIR / "cgs.json", cgs_data if isinstance(cgs_data, dict) else {"raw": cgs_data}
+    )
 
     # ── Step 5: Generate audio manifests ──────────────────────
     print("\n" + "=" * 50)
@@ -612,7 +659,8 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     }
     audio_input = _json.dumps(audio_input_data, ensure_ascii=False, indent=2)
     audio_result = _run_skill(
-        llm, "generate_audio_prompts",
+        llm,
+        "generate_audio_prompts",
         {"input": audio_input, "style": "visual novel game audio"},
         temperature,
     )
@@ -635,8 +683,13 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     print("=" * 50)
     voice_input = _json.dumps(script_data.get("characters", []), ensure_ascii=False, indent=2)
     voice_result = _run_skill(
-        llm, "generate_voice_config",
-        {"input": voice_input, "mimo_voices": "冰糖(女), 茉莉(女), 苏打(男), 白桦(男)", "qwen_speakers": "Ethan(晨煦/男), Cherry(芊悦/女), Serena(苏瑶/女), Eldric Sage(沧明子/老者男), Vincent(田叔/沙哑男), Kai(凯/男), Moon(月白/男), Maia(四月/女), Ryan(甜茶/男), Chelsie(千雪/女), Nofish(不吃鱼/男)"},
+        llm,
+        "generate_voice_config",
+        {
+            "input": voice_input,
+            "mimo_voices": "冰糖(女), 茉莉(女), 苏打(男), 白桦(男)",
+            "qwen_speakers": "Ethan(晨煦/男), Cherry(芊悦/女), Serena(苏瑶/女), Eldric Sage(沧明子/老者男), Vincent(田叔/沙哑男), Kai(凯/男), Moon(月白/男), Maia(四月/女), Ryan(甜茶/男), Chelsie(千雪/女), Nofish(不吃鱼/男)",
+        },
         temperature,
     )
     try:
@@ -644,19 +697,27 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     except _json.JSONDecodeError:
         print("Warning: Failed to parse voice config JSON, saving raw output")
         voice_data = {"raw": voice_result}
-    _save_json(MANIFESTS_DIR / "voice_config.json", voice_data if isinstance(voice_data, dict) else {"raw": voice_data})
+    _save_json(
+        MANIFESTS_DIR / "voice_config.json",
+        voice_data if isinstance(voice_data, dict) else {"raw": voice_data},
+    )
 
     # ── Step 7: Generate UI manifest ──────────────────────────
     print("\n" + "=" * 50)
     print("  Step 7/10: Generating UI prompts")
     print("=" * 50)
-    ui_input = _json.dumps({
-        "title": script_data.get("title", ""),
-        "premise": premise,
-        "characters": script_data.get("characters", []),
-    }, ensure_ascii=False, indent=2)
+    ui_input = _json.dumps(
+        {
+            "title": script_data.get("title", ""),
+            "premise": premise,
+            "characters": script_data.get("characters", []),
+        },
+        ensure_ascii=False,
+        indent=2,
+    )
     ui_result = _run_skill(
-        llm, "generate_ui_prompts",
+        llm,
+        "generate_ui_prompts",
         {"input": ui_input, "style": "anime visual novel style"},
         temperature,
     )
@@ -665,7 +726,9 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     except _json.JSONDecodeError:
         print("Warning: Failed to parse UI JSON, saving raw output")
         ui_data = {"raw": ui_result}
-    _save_json(MANIFESTS_DIR / "ui.json", ui_data if isinstance(ui_data, dict) else {"raw": ui_data})
+    _save_json(
+        MANIFESTS_DIR / "ui.json", ui_data if isinstance(ui_data, dict) else {"raw": ui_data}
+    )
 
     # ── Prompts-only mode: stop here ─────────────────────────
     if getattr(args, "prompts_only", False):
@@ -685,34 +748,51 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         return
 
     # ── Step 8: Generate visual/audio assets (NOT voice/dialogue) ──
-    print("\n" + "=" * 50)
-    print("  Step 8/10: Generating visual/audio assets")
-    print("=" * 50)
     from .generators import (
-        generate_characters, generate_backgrounds, generate_cgs,
-        generate_bgm, generate_se, generate_voice_all,
-        generate_ui, generate_dialogue, generate_all_tres,
+        generate_all_tres,
+        generate_background_scenes,
+        generate_backgrounds,
+        generate_bgm,
+        generate_cg_scenes,
+        generate_cgs,
+        generate_character_scenes,
+        generate_characters,
+        generate_dialogue,
+        generate_se,
+        generate_ui,
+        generate_voice_all,
     )
-    from .providers import ComfyUIImageProvider, MiMoTTS
 
-    skip = not args.force
-    engine = getattr(args, "engine", "mimo") or "mimo"
-    image = ComfyUIImageProvider()
-    tts = MiMoTTS() if engine == "mimo" else __import__("akonado.providers.tts_qwen", fromlist=["QwenTTS"]).QwenTTS()
+    scripts_only = getattr(args, "scripts_only", False)
 
-    for name, fn in [
-        ("characters", lambda: generate_characters(image, skip_existing=skip)),
-        ("backgrounds", lambda: generate_backgrounds(image, skip_existing=skip)),
-        ("cgs", lambda: generate_cgs(image, skip_existing=skip)),
-        ("bgm", lambda: generate_bgm(image, skip_existing=skip)),
-        ("se", lambda: generate_se(image, skip_existing=skip)),
-        ("ui", lambda: generate_ui(image, skip_existing=skip)),
-    ]:
-        print(f"\n--- {name} ---")
-        try:
-            fn()
-        except Exception as e:
-            print(f"  [error] {name}: {e}")
+    if not scripts_only:
+        print("\n" + "=" * 50)
+        print("  Step 8/10: Generating visual/audio assets")
+        print("=" * 50)
+        from .providers import ComfyUIImageProvider, MiMoTTS
+
+        skip = not args.force
+        engine = getattr(args, "engine", "mimo") or "mimo"
+        image = ComfyUIImageProvider()
+        tts = (
+            MiMoTTS()
+            if engine == "mimo"
+            else __import__("akonado.providers.tts_qwen", fromlist=["QwenTTS"]).QwenTTS()
+        )
+
+        for name, fn in [
+            ("characters", lambda: generate_characters(image, skip_existing=skip)),
+            ("backgrounds", lambda: generate_backgrounds(image, skip_existing=skip)),
+            ("cgs", lambda: generate_cgs(image, skip_existing=skip)),
+            ("bgm", lambda: generate_bgm(image, skip_existing=skip)),
+            ("se", lambda: generate_se(image, skip_existing=skip)),
+            ("ui", lambda: generate_ui(image, skip_existing=skip)),
+        ]:
+            print(f"\n--- {name} ---")
+            try:
+                fn()
+            except Exception as e:
+                print(f"  [error] {name}: {e}")
 
     # ── Step 9: Generate .ks scripts (BEFORE voice/dialogue) ──
     print("\n" + "=" * 50)
@@ -738,11 +818,13 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     char_info = []
     for cid in char_ids:
         cdata = char_manifest["items"][cid]
-        char_info.append({
-            "id": cid,
-            "name": cdata.get("name", cid),
-            "expressions": list(cdata.get("expressions", {}).keys()),
-        })
+        char_info.append(
+            {
+                "id": cid,
+                "name": cdata.get("name", cid),
+                "expressions": list(cdata.get("expressions", {}).keys()),
+            }
+        )
     char_info_str = _json.dumps(char_info, ensure_ascii=False)
 
     print(f"  Characters: {char_ids}")
@@ -763,12 +845,12 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
                 "bgm_list": _json.dumps(bgm_ids, ensure_ascii=False),
                 "context": chapter.get("summary", ""),
                 "extra_instructions": f"""重要：必须使用以下ID，不要自行发明！
-背景ID: {', '.join(bg_ids)}
-CG ID: {', '.join(cg_ids) if cg_ids else '（无）'}
-BGM ID: {', '.join(bgm_ids)}
-SE ID: {', '.join(se_ids)}
-角色ID: {', '.join(char_ids)}
-角色表情: {_json.dumps({c: list(char_manifest['items'][c]['expressions'].keys()) for c in char_ids}, ensure_ascii=False)}
+背景ID: {", ".join(bg_ids)}
+CG ID: {", ".join(cg_ids) if cg_ids else "（无）"}
+BGM ID: {", ".join(bgm_ids)}
+SE ID: {", ".join(se_ids)}
+角色ID: {", ".join(char_ids)}
+角色表情: {_json.dumps({c: list(char_manifest["items"][c]["expressions"].keys()) for c in char_ids}, ensure_ascii=False)}
 """,
             }
             ks_result = _run_skill(llm, "generate_scene_script", scene_vars, temperature)
@@ -778,11 +860,12 @@ SE ID: {', '.join(se_ids)}
             print(f"  [saved] {ks_path}")
 
     # ── Step 8b: Generate voice and dialogue (AFTER .ks scripts) ──
-    print("\n--- voice ---")
-    try:
-        generate_voice_all(tts, skip_existing=skip)
-    except Exception as e:
-        print(f"  [error] voice: {e}")
+    if not scripts_only:
+        print("\n--- voice ---")
+        try:
+            generate_voice_all(tts, skip_existing=skip)
+        except Exception as e:
+            print(f"  [error] voice: {e}")
 
     print("\n--- dialogue ---")
     try:
@@ -790,10 +873,33 @@ SE ID: {', '.join(se_ids)}
     except Exception as e:
         print(f"  [error] dialogue: {e}")
 
-    # ── Step 10: Generate .tres resource files ────────────────
+    # ── Step 10: Generate Konado 2.8+ scene files & .tres resources ──
     print("\n" + "=" * 50)
-    print("  Step 10/10: Generating Godot .tres resource files")
+    print("  Step 10/10: Generating scene files & .tres resources")
     print("=" * 50)
+
+    # Generate .tscn scene files for Konado 2.8
+    if not scripts_only:
+        print("\n--- character scenes ---")
+        try:
+            generate_character_scenes(skip_existing=skip)
+        except Exception as e:
+            print(f"  [error] character_scenes: {e}")
+
+        print("\n--- background scenes ---")
+        try:
+            generate_background_scenes(skip_existing=skip)
+        except Exception as e:
+            print(f"  [error] background_scenes: {e}")
+
+        print("\n--- CG scenes ---")
+        try:
+            generate_cg_scenes(skip_existing=skip)
+        except Exception as e:
+            print(f"  [error] cg_scenes: {e}")
+
+    # Generate .tres resource files
+    print("\n--- .tres resources ---")
     try:
         generate_all_tres()
     except Exception as e:
@@ -836,8 +942,8 @@ def cmd_workflows(_args: argparse.Namespace) -> None:
 
 def cmd_web(args: argparse.Namespace) -> None:
     """Launch web GUI."""
+    from .config import WEB_DEBUG, WEB_HOST, WEB_PORT
     from .web.app import create_app
-    from .config import WEB_HOST, WEB_PORT, WEB_DEBUG
 
     host = args.host or WEB_HOST
     port = args.port or WEB_PORT
@@ -860,18 +966,24 @@ def main(argv: list[str] | None = None) -> None:
     gen_parser = sub.add_parser("generate", aliases=["g"], help="Generate assets")
     gen_parser.add_argument(
         "type",
-        help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all",
+        help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/character_scenes/background_scenes/cg_scenes/tres/all",
     )
     gen_parser.add_argument(
-        "--force", "-f", action="store_true",
+        "--force",
+        "-f",
+        action="store_true",
         help="Force regeneration (don't skip existing files)",
     )
     gen_parser.add_argument(
-        "--engine", "-e", choices=["mimo", "qwen"],
+        "--engine",
+        "-e",
+        choices=["mimo", "qwen"],
         help="TTS engine for voice generation (default: mimo)",
     )
     gen_parser.add_argument(
-        "--check-missing", "-c", action="store_true",
+        "--check-missing",
+        "-c",
+        action="store_true",
         help="Check for missing assets and regenerate them",
     )
 
@@ -886,7 +998,9 @@ def main(argv: list[str] | None = None) -> None:
         help="Type to clean: characters/backgrounds/cgs/bgm/se/voice/ui/all/manifests/scripts",
     )
     clean_parser.add_argument(
-        "--deep", "-d", action="store_true",
+        "--deep",
+        "-d",
+        action="store_true",
         help="With 'all': also remove manifests and scripts",
     )
 
@@ -906,18 +1020,34 @@ def main(argv: list[str] | None = None) -> None:
     skill_parser.add_argument("--temperature", "-t", type=float, help="LLM temperature")
 
     # pipeline
-    pipe_parser = sub.add_parser("pipeline", aliases=["p"], help="Full pipeline: premise -> all assets")
+    pipe_parser = sub.add_parser(
+        "pipeline", aliases=["p"], help="Full pipeline: premise -> all assets"
+    )
     pipe_parser.add_argument("premise", help="One-sentence story premise")
     pipe_parser.add_argument("--force", "-f", action="store_true", help="Force regeneration")
     pipe_parser.add_argument(
-        "--prompts-only", action="store_true",
+        "--prompts-only",
+        action="store_true",
         help="Only generate script and manifest prompts, skip asset generation",
     )
-    pipe_parser.add_argument("--temperature", "-t", type=float, help="LLM temperature (default: 0.7)")
-    pipe_parser.add_argument("--chapters", type=int, default=4, help="Number of chapters (default: 4)")
-    pipe_parser.add_argument("--scenes-per-chapter", type=int, default=3, help="Scenes per chapter (default: 3)")
+    pipe_parser.add_argument(
+        "--scripts-only",
+        action="store_true",
+        help="Generate manifests + .ks scripts, skip visual/audio asset generation",
+    )
+    pipe_parser.add_argument(
+        "--temperature", "-t", type=float, help="LLM temperature (default: 0.7)"
+    )
+    pipe_parser.add_argument(
+        "--chapters", type=int, default=4, help="Number of chapters (default: 4)"
+    )
+    pipe_parser.add_argument(
+        "--scenes-per-chapter", type=int, default=3, help="Scenes per chapter (default: 3)"
+    )
     pipe_parser.add_argument("--godot-dir", type=str, help="Godot engine directory")
-    pipe_parser.add_argument("--engine", "-e", choices=["mimo", "qwen"], help="TTS engine (default: mimo)")
+    pipe_parser.add_argument(
+        "--engine", "-e", choices=["mimo", "qwen"], help="TTS engine (default: mimo)"
+    )
 
     # web
     web_parser = sub.add_parser("web", help="Launch web GUI")

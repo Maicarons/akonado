@@ -49,14 +49,16 @@ def generate_dialogue() -> list[dict]:
 
             is_voiced = character in voiced_chars
 
-            lines.append({
-                "file": rel_path,
-                "chapter": chapter,
-                "line_no": line_no,
-                "character": character,
-                "text": text,
-                "voiced": is_voiced,
-            })
+            lines.append(
+                {
+                    "file": rel_path,
+                    "chapter": chapter,
+                    "line_no": line_no,
+                    "character": character,
+                    "text": text,
+                    "voiced": is_voiced,
+                }
+            )
 
     manifest = {
         "type": "dialogue",

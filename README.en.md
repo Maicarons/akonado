@@ -5,7 +5,7 @@
 Full-pipeline AI visual novel asset generator built on Godot + Konado.
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Konado-2.5-blueviolet.svg?style=flat-square&logoSize=14" alt="Konado" height="20">
+  <img src="https://img.shields.io/badge/Konado-2.8-blueviolet.svg?style=flat-square&logoSize=14" alt="Konado" height="20">
   <img src="https://img.shields.io/badge/Godot-4.7+-blue.svg?style=flat-square&logo=godotengine&logoSize=14" alt="Godot" height="20">
   <img src="https://img.shields.io/badge/Python-3.10+-green.svg?style=flat-square&logo=python&logoSize=14" alt="Python" height="20">
   <img src="https://img.shields.io/badge/License-AGPL_3.0-purple.svg?style=flat-square&logoSize=14" alt="License" height="20">
@@ -131,15 +131,23 @@ python -m akonado clean all --deep   # Also remove manifests and .ks scripts
 
 ```
 akonado/                  # Project root (Godot project)
-  addons/konado/          # Konado plugin (upstream VN framework)
+  addons/konado/          # Konado 2.8+ plugin (upstream VN framework)
   assets/                 # Game assets (AI-generated)
+    characters/           #   Character sprites + .tscn scene files
+    backgrounds/          #   Backgrounds + .tscn scene files
+    cgs/                  #   CG illustrations + .tscn scene files
+    audio/                #   BGM / SE / Voice files
   story/                  # .ks scripts (AI-generated)
+  resources/              # Konado 2.8 resource templates
+  ui/                     # UI assets
   docs/
     konado/               # Konado framework docs
     akonado/              # Akonado AI pipeline docs
   akonado/                # AI asset generation pipeline (Python package)
     providers/            # Backend abstraction (LLM, Image, TTS)
     generators/           # Asset generators
+      character_scenes.py #   Konado 2.8 character scenes (.tscn)
+      background_scenes.py#   Konado 2.8 background scenes (.tscn)
     skills/               # LLM prompt templates (JSON)
     manifests/            # Asset manifest definitions (JSON)
     web/                  # Flask Web GUI
@@ -152,7 +160,7 @@ akonado/                  # Project root (Godot project)
 |---------|-------------|
 | `python -m akonado pipeline "<premise>"` | Full pipeline: premise → script → prompts → assets → .ks |
 | `python -m akonado pipeline "<premise>" --prompts-only` | Generate script and prompts only, skip asset generation |
-| `python -m akonado generate <type>` | Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all) |
+| `python -m akonado generate <type>` | Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/character_scenes/background_scenes/cg_scenes/tres/all) |
 | `python -m akonado generate all --check-missing` | Detect missing assets and auto-fill |
 | `python -m akonado check` | Check provider availability |
 | `python -m akonado list [type]` | View manifest contents |
@@ -198,17 +206,18 @@ akonado/                  # Project root (Godot project)
 
 ## Upstream Project
 
-This project is built on [Konado](https://github.com/godothub/konado) dialogue framework (v2.5).
+This project is built on [Konado](https://github.com/godothub/konado) dialogue framework (v2.8+).
 
-### Konado 2.5 Highlights
+### Konado 2.8 Highlights
 
-- **Quick Save/Load** — Built-in quick save/load system with dialogue template support
-- **Main Menu Screen** — Game startup main menu
-- **Background Transitions** — "Blink" and other visual transition effects; backgrounds are now scenes
-- **Character Motion Layer** — `motion` command for stage actions and custom animations
-- **Character Scene-based** — Character sprites are now scene nodes for flexible extension
-- **VSCode Syntax Highlight** — Konado script syntax highlighting extension (`konado-script-syntax/`)
-- **Achievement Fix** — Fixed achievement closing bug
+- **Bytecode Runtime** — New `KonadoVirtualMachine` execution model with instruction-based bytecode
+- **Scene-based Resources** — Characters and backgrounds use `.tscn` scene files extending `KonadoCharacterSceneBase` / `KonadoBackgroundSceneBase`
+- **Camera System** — Camera movement, reset, shake for stage effects
+- **NVL Screen Text** — Full NVL mode lifecycle support
+- **Runtime Failure Recovery** — Recoverable failure sessions + atomic VM recovery
+- **i18n Multi-language** — Multi-language script loading with translation files (en/ja/ko/zh_Hans/zh_Hant)
+- **Language Service** — Editor diagnostics, refactoring, quick fixes, symbol index, navigation
+- **VSCode Extension** — `plugins/vscode/` syntax highlighting + diagnostics + formatting
 
 ## Dependencies
 

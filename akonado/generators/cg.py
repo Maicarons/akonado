@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 
-from ..config import MANIFESTS_DIR, CGS_DIR
+from ..config import CGS_DIR, MANIFESTS_DIR
 from ..providers.base import ImageProvider
 
 

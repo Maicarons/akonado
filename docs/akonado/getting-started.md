@@ -14,6 +14,8 @@ Akonado 由以下组件构成，你需要全部搭建才能跑通完整管线：
 | TTS 引擎 | 角色配音合成 | 是（MiMo 或 Qwen 二选一） |
 | Godot 4.7+ | 运行生成的视觉小说 | 运行时需要 |
 
+> **Konado 2.8+**：本项目的 Konado 框架已升级到 2.8+，新增了字节码运行时、场景化资源、相机系统、NVL 屏幕文本、i18n 多语言支持等特性。详见 [Konado 2.8 升级指南](https://godothub.com/oss/konado/en/2.8/tutorial/upgrade-2.8.html)。
+
 ### 硬件要求
 
 | 配置 | 最低要求 | 推荐配置 |
@@ -364,7 +366,7 @@ ComfyUI workflows (5):
 python -m akonado pipeline "一个关于奶茶店的故事，主角面临传统与现代的选择"
 ```
 
-这会自动执行完整的 7 步管线：
+这会自动执行完整的 10 步管线：
 
 1. **生成剧本** → `akonado/manifests/script.json`
 2. **生成角色提示** → `akonado/manifests/characters.json`
@@ -372,7 +374,10 @@ python -m akonado pipeline "一个关于奶茶店的故事，主角面临传统�
 4. **生成音频提示** → `akonado/manifests/bgm.json` + `se.json`
 5. **生成配音配置** → `akonado/manifests/voice_config.json`
 6. **生成视觉/音频资产** → `assets/` 目录
-7. **生成 .ks 脚本 + 配音** → `story/` + `assets/audio/voice/`
+7. **生成 .ks 脚本** → `story/` 目录
+8. **生成配音** → `assets/audio/voice/`
+9. **生成 Konado 2.8 场景文件** → `.tscn` 场景文件
+10. **生成资源清单** → `.tres` 资源文件
 
 ### 7.2 自定义参数
 
@@ -419,6 +424,12 @@ python -m akonado generate scenes        # 生成所有场景脚本
 
 # 4. 生成配音
 python -m akonado generate voice
+
+# 5. 生成 Konado 2.8 场景文件与资源清单
+python -m akonado generate character_scenes   # 角色场景 .tscn
+python -m akonado generate background_scenes  # 背景场景 .tscn
+python -m akonado generate cg_scenes          # CG 场景 .tscn
+python -m akonado generate tres               # 资源清单 .tres
 
 # 或一次性生成全部
 python -m akonado generate all

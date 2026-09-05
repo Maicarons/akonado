@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 
-from ..config import MANIFESTS_DIR, BACKGROUNDS_DIR
+from ..config import BACKGROUNDS_DIR, MANIFESTS_DIR
 from ..providers.base import ImageProvider
 
 

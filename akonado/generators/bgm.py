@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 
-from ..config import MANIFESTS_DIR, BGM_DIR
+from ..config import BGM_DIR, MANIFESTS_DIR
 from ..providers.base import ImageProvider
 
 

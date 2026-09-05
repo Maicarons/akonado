@@ -89,15 +89,23 @@ python -m akonado web
 
 ```
 akonado/                  # 本项目根目录（Godot 项目）
-  addons/konado/          # Konado 插件（上游视觉小说框架）
+  addons/konado/          # Konado 2.8+ 插件（上游视觉小说框架）
   assets/                 # 游戏资产（由 AI 生成）
+    characters/           #   角色精灵图 + .tscn 场景文件
+    backgrounds/          #   背景图 + .tscn 场景文件
+    cgs/                  #   CG 插画 + .tscn 场景文件
+    audio/                #   BGM / SE / 配音文件
   story/                  # .ks 脚本（由 AI 生成）
+  resources/              # Konado 2.8 资源模板
+  ui/                     # UI 资产
   docs/
     konado/               # Konado 框架文档
     akonado/              # Akonado AI 管线文档
   akonado/                # AI 资产生成管线（Python 包）
     providers/            # 后端抽象层（LLM、Image、TTS）
     generators/           # 资产生成器
+      character_scenes.py #   Konado 2.8 角色场景 (.tscn)
+      background_scenes.py#   Konado 2.8 背景场景 (.tscn)
     skills/               # LLM prompt 模板（JSON）
     manifests/            # 资产清单定义（JSON）
     web/                  # Flask Web GUI
@@ -110,7 +118,7 @@ akonado/                  # 本项目根目录（Godot 项目）
 |------|------|
 | `python -m akonado pipeline "<premise>"` | 一键生成全部资产（推荐） |
 | `python -m akonado check` | 检查 provider 可用性 |
-| `python -m akonado generate <type>` | 生成资产（characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/all） |
+| `python -m akonado generate <type>` | 生成资产（characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/character_scenes/background_scenes/cg_scenes/tres/all） |
 | `python -m akonado list [type]` | 查看 manifest 内容 |
 | `python -m akonado clean <type>` | 删除生成的文件（支持 all/manifests/scripts/类型名，`--deep` 清理全部） |
 | `python -m akonado skill list` | 列出可用 skills |
@@ -123,6 +131,19 @@ akonado/                  # 本项目根目录（Godot 项目）
 ## Konado 上游项目
 
 本项目基于 [Konado](https://github.com/godothub/konado) 对话框架（v2.8+）。
+
+### Konado 2.8 新特性
+
+Konado 2.8 带来了架构级别的重大更新：
+
+- **字节码运行时** — 全新的 `KonadoVirtualMachine` 虚拟机执行模型，指令式字节码系统
+- **场景化资源** — 角色和背景改用 `.tscn` 场景文件，继承 `KonadoCharacterSceneBase` / `KonadoBackgroundSceneBase`
+- **相机系统** — 支持摄像机移动、重置、震动等舞台效果
+- **NVL 屏幕文本** — 支持 NVL 模式完整生命周期
+- **运行时故障恢复** — 可恢复的失败会话 + 原子 VM 恢复
+- **i18n 多语言** — 多语言脚本加载 + 翻译文件（en/ja/ko/zh_Hans/zh_Hant）
+- **语言服务** — 编辑器内诊断、重构、快速修复、符号索引、导航
+- **VSCode 扩展** — `plugins/vscode/` 语法高亮 + 诊断 + 格式化
 
 ### Konado Project Team
 
