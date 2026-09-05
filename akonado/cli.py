@@ -688,7 +688,12 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
         {
             "input": voice_input,
             "mimo_voices": "冰糖(女), 茉莉(女), 苏打(男), 白桦(男)",
-            "qwen_speakers": "Ethan(晨煦/男), Cherry(芊悦/女), Serena(苏瑶/女), Eldric Sage(沧明子/老者男), Vincent(田叔/沙哑男), Kai(凯/男), Moon(月白/男), Maia(四月/女), Ryan(甜茶/男), Chelsie(千雪/女), Nofish(不吃鱼/男)",
+            "qwen_speakers": (
+                "Ethan(晨煦/男), Cherry(芊悦/女), Serena(苏瑶/女), "
+                "Eldric Sage(沧明子/老者男), Vincent(田叔/沙哑男), Kai(凯/男), "
+                "Moon(月白/男), Maia(四月/女), Ryan(甜茶/男), "
+                "Chelsie(千雪/女), Nofish(不吃鱼/男)"
+            ),
         },
         temperature,
     )
@@ -850,7 +855,10 @@ CG ID: {", ".join(cg_ids) if cg_ids else "（无）"}
 BGM ID: {", ".join(bgm_ids)}
 SE ID: {", ".join(se_ids)}
 角色ID: {", ".join(char_ids)}
-角色表情: {_json.dumps({c: list(char_manifest["items"][c]["expressions"].keys()) for c in char_ids}, ensure_ascii=False)}
+角色表情: {_json.dumps(
+    {c: list(char_manifest["items"][c]["expressions"].keys()) for c in char_ids},
+    ensure_ascii=False,
+)}
 """,
             }
             ks_result = _run_skill(llm, "generate_scene_script", scene_vars, temperature)
@@ -966,7 +974,8 @@ def main(argv: list[str] | None = None) -> None:
     gen_parser = sub.add_parser("generate", aliases=["g"], help="Generate assets")
     gen_parser.add_argument(
         "type",
-        help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/character_scenes/background_scenes/cg_scenes/tres/all",
+        help="Asset type: characters/backgrounds/cgs/bgm/se/voice/ui/"
+             "dialogue/character_scenes/background_scenes/cg_scenes/tres/all",
     )
     gen_parser.add_argument(
         "--force",

@@ -36,7 +36,10 @@ from ..config import (
 
 def _tres_header(script_class: str, load_steps: int) -> str:
     """Generate .tres header."""
-    return f'[gd_resource type="Resource" script_class="{script_class}" load_steps={load_steps} format=3]\n'
+    return (
+        f'[gd_resource type="Resource" script_class="{script_class}"'
+        f" load_steps={load_steps} format=3]\n"
+    )
 
 
 def _ext_resource_script(path: str, res_id: str) -> str:

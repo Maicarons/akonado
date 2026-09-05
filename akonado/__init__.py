@@ -8,7 +8,8 @@ Usage:
     python -m akonado <command>
 
 Commands:
-    generate <type>   Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/dialogue/character_scenes/background_scenes/cg_scenes/tres/all)
+    generate <type>   Generate assets (characters/backgrounds/cgs/bgm/se/voice/ui/
+                      dialogue/character_scenes/background_scenes/cg_scenes/tres/all)
     list [type]       View manifest contents
     clean <type>      Remove generated files for a type
     check             Check provider availability
