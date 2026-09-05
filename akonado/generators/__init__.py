@@ -11,7 +11,7 @@ from .cg import generate_cgs
 from .character_scenes import generate_character_scenes
 from .characters import generate_characters
 from .dialogue import generate_dialogue
-from .godot_resources import (
+from .godot import (
     generate_all_tres,
     generate_backgrounds_tres,
     generate_bgm_tres,
