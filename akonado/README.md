@@ -152,6 +152,7 @@ akonado/
 ```python
 from akonado.providers.base import LLMProvider
 
+
 class MyCustomLLM(LLMProvider):
     def available(self) -> bool:
         return True
