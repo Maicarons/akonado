@@ -44,7 +44,7 @@ Repository = "https://github.com/Maicarons/akonado"
 Issues = "https://github.com/Maicarons/akonado/issues"
 
 [tool.setuptools.packages.find]
-include = ["akonado*"]
+include = ["*"]
 
 [tool.ruff]
 line-length = 100
